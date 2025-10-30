@@ -1,7 +1,7 @@
 // components/GalaxyIntro.tsx
 "use client";
 import React, { useEffect, useState } from "react";
-import GalaxyCanvas from "./GalaxyCanvas";
+import GalaxyCanvas from "./GalaxyBackground";
 
 const GalaxyIntro: React.FC = () => {
   const [slideUp, setSlideUp] = useState(false);
@@ -28,9 +28,7 @@ const GalaxyIntro: React.FC = () => {
             slideUp ? "opacity-100" : "opacity-0"
           }`}
         >
-          <h1 className="text-5xl mb-6 font-bold tracking-wide">
-            My Projects
-          </h1>
+          <h1 className="text-5xl mb-6 font-bold tracking-wide">My Projects</h1>
           <p className="text-lg max-w-xl text-gray-300 text-center">
             Explore the software I’ve built — from simulations to backend
             systems, all crafted with precision and creativity.
