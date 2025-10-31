@@ -1,5 +1,3 @@
-"use client";
-
 import SpinningYinYang from "../components/YinYang";
 import Image from "next/image";
 import ProjectCarousel from "@/components/ProjectCarousel";
