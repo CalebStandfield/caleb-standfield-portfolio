@@ -151,20 +151,65 @@ export default function Home() {
           {/* Carousel */}
           <div className="w-full lg:w-1/2">
             <ProjectCarousel
-              images={["/project1a.png", "/project1b.png", "/project1c.png"]}
+              images={[
+                "/blackjack/blackjack_main.png",
+                "/blackjack/blackjack_win.png",
+                "/blackjack/blackjack_lose.png",
+              ]}
             />
           </div>
 
           {/* Text content */}
           <div className="flex flex-col w-full lg:w-1/2 space-y-4 text-center lg:text-left">
-            <h3 className="text-3xl font-bold text-white">Placeholder</h3>
-            <p className="text-gray-200 leading-relaxed text-lg">Placeholder</p>
+            <h3 className="text-3xl font-bold text-white">
+              Blackjack Game Engine
+            </h3>
+
+            <div className="not-prose [text-decoration:none]">
+              <ul className="list-disc list-inside text-gray-200 leading-relaxed text-lg space-y-1 *:decoration-transparent *:hover:decoration-transparent">
+                <li>
+                  Developed from scratch a complete blackjack game engine.
+                </li>
+                <li>
+                  Added fully AI opponents to give life and challenge to the
+                  game.
+                </li>
+                <li>
+                  Worked with a team of six using Agile development and daily
+                  scrum meetings.
+                </li>
+                <li>
+                  Demonstrated OOP design, event handling, and state management.
+                </li>
+              </ul>
+            </div>
+
+            {/* Skill cards */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-4">
+              {[
+                "C++ / Qt Creator",
+                "Object-Oriented Design",
+                "AI Opponent Logic",
+                "State Management",
+                "Agile Development",
+                "Project Delegation",
+              ].map((skill) => (
+                <div
+                  key={skill}
+                  className="px-3 py-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)] text-white text-sm font-medium hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all duration-300"
+                >
+                  {skill}
+                </div>
+              ))}
+            </div>
+
+            {/* GitHub button */}
             <div className="flex gap-4 justify-center lg:justify-start pt-6">
               <a
-                href="https://github.com/yourusername/placeholder"
+                href="https://github.com/CalebStandfield/full-blackjack-game-engine-with-UI"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-2 bg-white text-black font-semibold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] transition-all duration-300"
+                className="px-6 py-2 bg-white/90 backdrop-blur-sm text-black font-semibold rounded-full shadow-[0_0_40px_rgba(255,255,255,0.8)] hover:bg-white hover:shadow-[0_0_60px_rgba(255,255,255,1)] hover:scale-110 transition-all duration-300"
               >
                 GitHub
               </a>
@@ -174,7 +219,7 @@ export default function Home() {
 
         {/* End of Project 1 */}
 
-        {/* Start of Project #1 */}
+        {/* Start of Project #2 */}
         <div className="w-full min-h-[60vh] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 md:px-16 py-10 gap-8">
           {/* Carousel */}
           <div className="w-full lg:w-1/2">
@@ -200,7 +245,63 @@ export default function Home() {
           </div>
         </div>
 
-        {/* End of Project 1 */}
+        {/* End of Project 2 */}
+
+        {/* Start of Project #3 */}
+        <div className="w-full min-h-[60vh] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 md:px-16 py-10 gap-8">
+          {/* Carousel */}
+          <div className="w-full lg:w-1/2">
+            <ProjectCarousel
+              images={["/project1a.png", "/project1b.png", "/project1c.png"]}
+            />
+          </div>
+
+          {/* Text content */}
+          <div className="flex flex-col w-full lg:w-1/2 space-y-4 text-center lg:text-left">
+            <h3 className="text-3xl font-bold text-white">Placeholder</h3>
+            <p className="text-gray-200 leading-relaxed text-lg">Placeholder</p>
+            <div className="flex gap-4 justify-center lg:justify-start pt-6">
+              <a
+                href="https://github.com/yourusername/placeholder"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 bg-white text-black font-semibold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] transition-all duration-300"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* End of Project 3 */}
+
+        {/* Start of Project #4 */}
+        <div className="w-full min-h-[60vh] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 md:px-16 py-10 gap-8">
+          {/* Carousel */}
+          <div className="w-full lg:w-1/2">
+            <ProjectCarousel
+              images={["/project1a.png", "/project1b.png", "/project1c.png"]}
+            />
+          </div>
+
+          {/* Text content */}
+          <div className="flex flex-col w-full lg:w-1/2 space-y-4 text-center lg:text-left">
+            <h3 className="text-3xl font-bold text-white">Placeholder</h3>
+            <p className="text-gray-200 leading-relaxed text-lg">Placeholder</p>
+            <div className="flex gap-4 justify-center lg:justify-start pt-6">
+              <a
+                href="https://github.com/yourusername/placeholder"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 bg-white text-black font-semibold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] transition-all duration-300"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* End of Project 4 */}
       </section>
 
       {/* === ABOUT + CONTACT COMBINED SECTION === */}
