@@ -145,12 +145,116 @@ export default function Home() {
         id="projects"
         className="min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 md:px-24 bg-linear-to-b from-[#111111]/90 via-[#0d0d0d]/90 to-[#080808]/90"
       >
-        <h2 className="text-3xl sm:text-4xl font-bold mb-8">Projects</h2>
-        <p className="max-w-2xl text-center text-shadow-white text-base sm:text-lg leading-relaxed">
-          I’ve built and explored projects involving AI, web development, and
-          data analysis — all combining creativity with computation. More
-          details and visuals coming soon.
-        </p>
+        {/* Title */}
+        <h2 className="text-4xl font-bold mt-24 mb-12 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+          Featured Projects
+        </h2>
+
+        {/* Project #1 */}
+        <div className="w-full min-h-[60vh] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 md:px-16 py-10 gap-8">
+          {/* Image or video */}
+          <div className="relative w-full lg:w-1/2 aspect-[16/9] rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+            <img
+              src="/project1.png"
+              alt="Project 1 screenshot"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+            />
+          </div>
+
+          {/* Text content */}
+          <div className="flex flex-col w-full lg:w-1/2 space-y-4 text-center lg:text-left">
+            <h3 className="text-3xl font-bold text-white">
+              Fraud Detection System
+            </h3>
+            <p className="text-gray-200 leading-relaxed text-lg">
+              A machine learning project exploring anomaly detection using
+              Isolation Forest and PCA for detecting fraudulent transactions.
+            </p>
+
+            <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-4">
+              <span className="px-3 py-1 bg-white/10 text-gray-200 rounded-full text-sm">
+                Python
+              </span>
+              <span className="px-3 py-1 bg-white/10 text-gray-200 rounded-full text-sm">
+                Scikit-Learn
+              </span>
+              <span className="px-3 py-1 bg-white/10 text-gray-200 rounded-full text-sm">
+                Data Visualization
+              </span>
+            </div>
+
+            <div className="flex gap-4 justify-center lg:justify-start pt-6">
+              <a
+                href="https://github.com/yourusername/fraud-detection"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 bg-white text-black font-semibold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] transition-all duration-300"
+              >
+                GitHub
+              </a>
+              <a
+                href="#"
+                className="px-6 py-2 border border-white/30 text-white font-semibold rounded-full hover:bg-white hover:text-black transition-all duration-300"
+              >
+                Live Demo
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Project #1 */}
+        <div className="w-full min-h-[60vh] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 md:px-16 py-10 gap-8">
+          {/* Image or video */}
+          <div className="relative w-full lg:w-1/2 aspect-[16/9] rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+            <img
+              src="/project1.png"
+              alt="Project 1 screenshot"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+            />
+          </div>
+
+          {/* Text content */}
+          <div className="flex flex-col w-full lg:w-1/2 space-y-4 text-center lg:text-left">
+            <h3 className="text-3xl font-bold text-white">
+              Fraud Detection System
+            </h3>
+            <p className="text-gray-200 leading-relaxed text-lg">
+              A machine learning project exploring anomaly detection using
+              Isolation Forest and PCA for detecting fraudulent transactions.
+            </p>
+
+            <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-4">
+              <span className="px-3 py-1 bg-white/10 text-gray-200 rounded-full text-sm">
+                Python
+              </span>
+              <span className="px-3 py-1 bg-white/10 text-gray-200 rounded-full text-sm">
+                Scikit-Learn
+              </span>
+              <span className="px-3 py-1 bg-white/10 text-gray-200 rounded-full text-sm">
+                Data Visualization
+              </span>
+            </div>
+
+            <div className="flex gap-4 justify-center lg:justify-start pt-6">
+              <a
+                href="https://github.com/yourusername/fraud-detection"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 bg-white text-black font-semibold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] transition-all duration-300"
+              >
+                GitHub
+              </a>
+              <a
+                href="#"
+                className="px-6 py-2 border border-white/30 text-white font-semibold rounded-full hover:bg-white hover:text-black transition-all duration-300"
+              >
+                Live Demo
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Duplicate this block for more projects */}
       </section>
 
       {/* === ABOUT + CONTACT COMBINED SECTION === */}
