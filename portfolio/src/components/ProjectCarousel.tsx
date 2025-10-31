@@ -68,14 +68,15 @@ export default function ProjectCarousel({
         {images.map((src, i) => (
           <div
             key={i}
-            className="w-full shrink-0 snap-center relative aspect-video"
+            className="w-full shrink-0 snap-center relative flex items-center justify-center bg-black/40 rounded-3xl overflow-hidden"
+            style={{ maxHeight: "480px" }}
           >
             <Image
               src={src}
               alt={`Project image ${i + 1}`}
               width={1920}
               height={1080}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
               draggable={false}
               priority={i === 0}
             />

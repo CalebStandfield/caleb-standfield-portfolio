@@ -1,6 +1,7 @@
 import SpinningYinYang from "../components/YinYang";
 import Image from "next/image";
 import ProjectCarousel from "@/components/ProjectCarousel";
+import ResumeSection from "@/components/ResumeSection";
 
 export default function Home() {
   return (
@@ -230,7 +231,10 @@ export default function Home() {
 
           {/* Text content */}
           <div className="flex flex-col w-full lg:w-1/2 space-y-4 text-center lg:text-left">
-            <h3 className="text-3xl font-bold text-white">Placeholder</h3>
+            <h3 className="text-3xl font-bold text-white">
+              Adding more projects in the morning but its 2am and im going to
+              bed :)
+            </h3>
             <p className="text-gray-200 leading-relaxed text-lg">Placeholder</p>
             <div className="flex gap-4 justify-center lg:justify-start pt-6">
               <a
@@ -304,6 +308,13 @@ export default function Home() {
         {/* End of Project 4 */}
       </section>
 
+      <section
+        id="resume"
+        className="min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 md:px-24 bg-linear-to-b from-[#111111]/90 via-[#0d0d0d]/90 to-[#080808]/90"
+      >
+        <ResumeSection />
+      </section>
+
       {/* === ABOUT + CONTACT COMBINED SECTION === */}
       <section
         id="about"
@@ -353,10 +364,19 @@ export default function Home() {
         </p>
 
         <a
-          href="mailto:caleb@example.com"
-          className="mt-8 px-8 py-3 bg-linear-to-r from-white via-gray-200 to-white text-black font-semibold rounded-full shadow-[0_0_25px_rgba(255,255,255,0.45)] hover:shadow-[0_0_45px_rgba(255,255,255,0.8)] hover:scale-105 transition-all duration-300"
+          href="mailto:calebjstandfield@gmail.com"
+          className="group mt-6 inline-block relative overflow-hidden px-6 py-2 rounded-full font-semibold text-black
+             bg-white
+             border border-white/90
+             shadow-[0_0_25px_rgba(255,255,255,1)]
+             transition-all duration-300
+             hover:scale-105 hover:shadow-[0_0_45px_rgba(255,200,80,1)]"
         >
-          Email Me
+          {/* glowing overlay */}
+          <span className="absolute inset-0 bg-linear-to-r from-yellow-400 via-amber-500 to-orange-400 opacity-0 group-hover:opacity-70 transition-opacity duration-300 blur-md" />
+
+          {/* text */}
+          <span className="relative z-10">Email Me</span>
         </a>
       </section>
     </main>
