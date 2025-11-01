@@ -41,15 +41,7 @@ export default function Home() {
                   href="#about"
                   className="hover:text-white transition-colors duration-300 cursor-pointer"
                 >
-                  About
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#about"
-                  className="hover:text-white transition-colors duration-300 cursor-pointer"
-                >
-                  Contact
+                  About/Contact
                 </a>
               </li>
             </ul>
@@ -154,8 +146,11 @@ export default function Home() {
             <ProjectCarousel
               images={[
                 "/blackjack/blackjack_main.png",
-                "/blackjack/blackjack_win.png",
-                "/blackjack/blackjack_lose.png",
+                "/blackjack/blackjack_bet.png",
+                "/blackjack/blackjack_playing.png",
+                "/blackjack/blackjack_lost.png",
+                "/blackjack/blackjack_won.png",
+                "/blackjack/blackjack_blackjack.png",
               ]}
             />
           </div>
@@ -317,7 +312,7 @@ export default function Home() {
 
       {/* === ABOUT + CONTACT COMBINED SECTION === */}
       <section
-        id="about"
+        id="about/contact"
         className="min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 md:px-24 bg-linear-to-b from-[#111111]/90 via-[#0d0d0d]/90 to-[#080808]/90"
       >
         {/* ABOUT */}
