@@ -137,7 +137,13 @@ export default function Home() {
         id="projects"
         className="min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 md:px-24 bg-linear-to-b from-[#111111]/90 via-[#0d0d0d]/90 to-[#080808]/90"
       >
-        <h2 className="text-4xl font-bold mt-24 mb-12 text-white">Projects</h2>
+        <div className="relative inline-block mt-24 mb-12">
+          {/* Golden blurred halo */}
+          <span className="absolute inset-0 bg-linear-to-r from-yellow-400 via-amber-500 to-orange-400 blur-lg opacity-60 animate-[pulseGlow_4s_ease-in-out_infinite]" />
+
+          {/* White text on top */}
+          <h2 className="relative text-4xl font-bold text-white">Projects</h2>
+        </div>
 
         {/* Start of Project #1 */}
         <div className="w-full min-h-[60vh] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 md:px-16 py-10 gap-8">
@@ -219,7 +225,39 @@ export default function Home() {
         <div className="w-full min-h-[60vh] flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 md:px-16 py-10 gap-8">
           {/* Carousel */}
           <div className="w-full lg:w-1/2">
-            <ProjectCarousel images={[""]} />
+            <ProjectCarousel
+              images={[
+                "/FWF/FWF_logo.png",
+                "/FWF/FWF_design_progress.png",
+                "/FWF/FWF_inital_data_base_design.png",
+              ]}
+            />
+            <div className="space-y-4">
+              <ul className="list-disc list-inside text-gray-200 leading-relaxed text-lg space-y-1 *:decoration-transparent *:hover:decoration-transparent">
+                <li>
+                  Some inital photos of our designs choices! Check back to see
+                  new pictures and progress!
+                </li>
+                <li>
+                  Project is split between public and private repositories for
+                  now. Check out our public documentation repository with the
+                  github button :)
+                </li>
+                <li>Also check out my fellow team members Github pages too!</li>
+                <li>
+                  Here is our instagram handle: we post memes and updates about
+                  our work in hopes to build a community while we build the app!
+                </li>
+              </ul>
+              <a
+                href="https://www.instagram.com/fitnesswithfriendsapp?igsh=ZHA1aG5rNTI3Ymx6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 px-6 py-2 bg-linear-to-r from-pink-500 via-purple-500 to-yellow-400 text-white font-semibold rounded-full shadow-[0_0_30px_rgba(255,100,200,0.6)] hover:shadow-[0_0_50px_rgba(255,120,220,0.8)] hover:scale-110 transition-all duration-300"
+              >
+                Instagram
+              </a>
+            </div>
           </div>
 
           {/* Text content */}
@@ -291,12 +329,38 @@ export default function Home() {
             {/* GitHub button */}
             <div className="flex gap-4 justify-center lg:justify-start pt-6">
               <a
-                href="https://github.com/orgs/FitnessFiends/repositories"
+                href="https://github.com/FitnessFiends/FWF-Docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-2 bg-white/90 backdrop-blur-sm text-black font-semibold rounded-full shadow-[0_0_40px_rgba(255,255,255,0.8)] hover:bg-white hover:shadow-[0_0_60px_rgba(255,255,255,1)] hover:scale-110 transition-all duration-300"
               >
                 GitHub Page
+              </a>
+              <a
+                href="https://github.com/JohnLaird04"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 bg-white/90 backdrop-blur-sm text-black font-semibold rounded-full shadow-[0_0_40px_rgba(255,255,255,0.8)] hover:bg-white hover:shadow-[0_0_60px_rgba(255,255,255,1)] hover:scale-110 transition-all duration-300"
+              >
+                John Laird
+              </a>
+
+              <a
+                href="https://github.com/Ishan-KSharma"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 bg-white/90 backdrop-blur-sm text-black font-semibold rounded-full shadow-[0_0_40px_rgba(255,255,255,0.8)] hover:bg-white hover:shadow-[0_0_60px_rgba(255,255,255,1)] hover:scale-110 transition-all duration-300"
+              >
+                Ishan Sharma
+              </a>
+
+              <a
+                href="https://github.com/anshulkasera"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 bg-white/90 backdrop-blur-sm text-black font-semibold rounded-full shadow-[0_0_40px_rgba(255,255,255,0.8)] hover:bg-white hover:shadow-[0_0_60px_rgba(255,255,255,1)] hover:scale-110 transition-all duration-300"
+              >
+                Anshul Kasera
               </a>
             </div>
           </div>
@@ -453,6 +517,10 @@ export default function Home() {
         </div>
 
         {/* End of Project 4 */}
+
+        <h3 className="text-4xl font-bold mt-24 mb-12 text-white">
+          Check out my Github for more projects I have worked on!
+        </h3>
       </section>
 
       <section

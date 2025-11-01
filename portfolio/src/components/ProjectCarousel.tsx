@@ -76,7 +76,7 @@ export default function ProjectCarousel({
               alt={`Project image ${i + 1}`}
               width={1920}
               height={1080}
-              className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-auto object-cover hover:scale-102 transition-transform duration-700"
               draggable={false}
               priority={i === 0}
             />
