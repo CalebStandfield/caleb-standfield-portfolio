@@ -533,7 +533,7 @@ export default function Home() {
       {/* === ABOUT + CONTACT COMBINED SECTION === */}
       <section
         id="about/contact"
-        className="min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 md:px-24 bg-linear-to-b from-[#111111]/90 via-[#0d0d0d]/90 to-[#080808]/90"
+        className="min-h-screen flex flex-col justify-center items-center pb-24 pt-12 px-6 sm:px-12 md:px-24 bg-linear-to-b from-[#111111]/90 via-[#0d0d0d]/90 to-[#080808]/90"
       >
         {/* ABOUT */}
         <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
