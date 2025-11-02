@@ -13,9 +13,11 @@ export default function Home() {
       <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-white/5 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
           {/* Left side — name/title */}
-          <h1 className="text-sm sm:text-base md:text-xl font-bold tracking-wide text-white text-center sm:text-left w-full sm:w-auto">
-            Caleb Standfield ・ CS ・ Computer Science
-          </h1>
+          <a href="#home">
+            <h1 className="text-sm sm:text-base md:text-xl font-bold tracking-wide text-white text-center sm:text-left w-full sm:w-auto">
+              Caleb Standfield ・ CS ・ Computer Science
+            </h1>
+          </a>
 
           {/* Right side — nav links + pfp */}
           <div className="flex items-center gap-6">
@@ -38,7 +40,7 @@ export default function Home() {
               </li>
               <li>
                 <a
-                  href="#about"
+                  href="#about/contact"
                   className="hover:text-white transition-colors duration-300 cursor-pointer"
                 >
                   About/Contact
@@ -74,64 +76,65 @@ export default function Home() {
       </nav>
 
       {/* === HERO / INTRO === */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen py-20 lg:py-0 px-6 sm:px-12 md:px-24">
-        {/* LEFT SIDE — Text */}
-        <div className="flex flex-col justify-center text-center lg:text-left items-center lg:items-start space-y-6">
-          <div className="mt-16 sm:mt-24">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
-              Caleb
-              <br />
-              Standfield
-            </h1>
+      <section id="home">
+        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen py-20 lg:py-0 px-6 sm:px-12 md:px-24">
+          {/* LEFT SIDE — Text */}
+          <div className="flex flex-col justify-center text-center lg:text-left items-center lg:items-start space-y-6">
+            <div className="mt-16 sm:mt-24">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]">
+                Caleb
+                <br />
+                Standfield
+              </h1>
 
-            <div className="flex flex-col items-center lg:items-start mt-8 space-y-4">
-              <Image
-                src="/pfp.jpg"
-                alt="Caleb Standfield"
-                width={350}
-                height={250}
-                className="rounded-full border-2 border-white/30 shadow-[0_0_25px_rgba(255,255,255,0.3)] object-cover brightness-110 contrast-110"
-              />
+              <div className="flex flex-col items-center lg:items-start mt-8 space-y-4">
+                <Image
+                  src="/pfp.jpg"
+                  alt="Caleb Standfield"
+                  width={350}
+                  height={250}
+                  className="rounded-full border-2 border-white/30 shadow-[0_0_25px_rgba(255,255,255,0.3)] object-cover brightness-110 contrast-110"
+                />
+              </div>
+
+              <div className="mt-4 h-[3px] w-24 mx-auto lg:mx-0 bg-linear-to-r from-white to-gray-400 rounded-full" />
+
+              <p className="mt-6 text-lg sm:text-xl md:text-2xl font-semibold text-white relative isolate drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+                University of Utah
+              </p>
+
+              <ul className="list-disc list-inside mt-4 text-sm sm:text-base md:text-lg text-white relative isolate drop-shadow-[0_0_10px_rgba(255,255,255,0.4)] space-y-1 text-center lg:text-left">
+                <li>B.S. in Computer Science</li>
+                <li>Undergraduate Certificate in Data Science</li>
+                <li>Minor in Japanese</li>
+                <li>Graduation: Dec 2026</li>
+              </ul>
+
+              {/* Scroll down indicator */}
+              <div className="mt-12 flex flex-col items-center animate-bounce text-gray-400">
+                <p className="text-xs tracking-widest uppercase">Scroll Down</p>
+                <div className="mt-2 w-px h-6 bg-gray-400"></div>
+              </div>
             </div>
+          </div>
 
-            <div className="mt-4 h-[3px] w-24 mx-auto lg:mx-0 bg-linear-to-r from-white to-gray-400 rounded-full" />
+          {/* RIGHT SIDE — Glowing Orb with Yin-Yang */}
+          <div className="relative flex items-center justify-center mt-20 lg:mt-0">
+            <div className="relative w-[260px] sm:w-[320px] md:w-[380px] lg:w-[440px] h-[260px] sm:h-80 md:h-[380px] lg:h-[440px] rounded-full bg-linear-to-b from-white to-[#f4f4f4] shadow-[0_0_100px_40px_rgba(255,255,255,0.5)] flex items-center justify-center overflow-hidden">
+              {/* Halo */}
+              <div className="absolute -inset-16 sm:-inset-20 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_70%)]" />
 
-            <p className="mt-6 text-lg sm:text-xl md:text-2xl font-semibold text-white relative isolate drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">
-              University of Utah
-            </p>
+              {/* Glow Overlay */}
+              <div className="absolute inset-0 rounded-full bg-white/40 mix-blend-screen animate-orb-pulse pointer-events-none z-10" />
 
-            <ul className="list-disc list-inside mt-4 text-sm sm:text-base md:text-lg text-white relative isolate drop-shadow-[0_0_10px_rgba(255,255,255,0.4)] space-y-1 text-center lg:text-left">
-              <li>B.S. in Computer Science</li>
-              <li>Undergraduate Certificate in Data Science</li>
-              <li>Minor in Japanese</li>
-              <li>Graduation: Dec 2026</li>
-            </ul>
-
-            {/* Scroll down indicator */}
-            <div className="mt-12 flex flex-col items-center animate-bounce text-gray-400">
-              <p className="text-xs tracking-widest uppercase">Scroll Down</p>
-              <div className="mt-2 w-px h-6 bg-gray-400"></div>
+              {/* Yin-Yang Symbol */}
+              <div className="relative flex items-center justify-center z-20">
+                <SpinningYinYang />
+              </div>
             </div>
           </div>
         </div>
-
-        {/* RIGHT SIDE — Glowing Orb with Yin-Yang */}
-        <div className="relative flex items-center justify-center mt-20 lg:mt-0">
-          <div className="relative w-[260px] sm:w-[320px] md:w-[380px] lg:w-[440px] h-[260px] sm:h-80 md:h-[380px] lg:h-[440px] rounded-full bg-linear-to-b from-white to-[#f4f4f4] shadow-[0_0_100px_40px_rgba(255,255,255,0.5)] flex items-center justify-center overflow-hidden">
-            {/* Halo */}
-            <div className="absolute -inset-16 sm:-inset-20 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_70%)]" />
-
-            {/* Glow Overlay */}
-            <div className="absolute inset-0 rounded-full bg-white/40 mix-blend-screen animate-orb-pulse pointer-events-none z-10" />
-
-            {/* Yin-Yang Symbol */}
-            <div className="relative flex items-center justify-center z-20">
-              <SpinningYinYang />
-            </div>
-          </div>
-        </div>
-      </div>
-
+      </section>
       {/* === PROJECTS SECTION === */}
       <section
         id="projects"
