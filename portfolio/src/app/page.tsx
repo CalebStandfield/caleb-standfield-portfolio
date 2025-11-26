@@ -233,6 +233,8 @@ export default function Home() {
                 "/FWF/FWF_logo.png",
                 "/FWF/FWF_design_progress.png",
                 "/FWF/FWF_inital_data_base_design.png",
+                "/FWF/FWF_nov20_add_buttons.png",
+                "/FWF/FWF_nov20_homepage.png",
               ]}
             />
             <div className="space-y-4">
