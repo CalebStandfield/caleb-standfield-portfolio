@@ -48,7 +48,6 @@ export default function Home() {
               </li>
             </ul>
 
-            {/* Profile picture on far right */}
             <div className="relative group">
               <a
                 href="https://github.com/CalebStandfield"
@@ -69,6 +68,31 @@ export default function Home() {
               {/* Tooltip */}
               <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-black bg-white px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg">
                 GitHub
+              </span>
+            </div>
+
+            <div className="relative group">
+              <a
+                href="https://www.linkedin.com/in/caleb-standfield/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="LinkedIn"
+                className="hover:scale-150 transition-transform duration-300"
+              >
+                {/* LinkedIn SVG */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="w-8 h-8 text-gray-300 hover:text-white transition-colors duration-300"
+                >
+                  <path d="M19 0h-14c-2.757 0-5 2.243-5 5v14c0 2.757 2.243 5 5 5h14c2.757 0 5-2.243 5-5v-14c0-2.757-2.243-5-5-5zm-11.5 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764c.968 0 1.75.79 1.75 1.764s-.782 1.764-1.75 1.764zm14 12.268h-3v-5.604c0-3.356-4-3.1-4 0v5.604h-3v-11h3v1.671c1.396-2.586 7-2.777 7 2.476v6.853z" />
+                </svg>
+              </a>
+
+              {/* Tooltip */}
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-black bg-white px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg">
+                LinkedIn
               </span>
             </div>
           </div>
