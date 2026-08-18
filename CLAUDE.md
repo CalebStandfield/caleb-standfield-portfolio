@@ -23,6 +23,8 @@ in [`portfolio/`](./portfolio). Run all `npm` commands from inside `portfolio/`.
   successor package to framer-motion.
 - Path alias `@/*` maps to `src/*` (set in `vite.config.ts` and the tsconfigs).
 
+Do not bring in new dependencies without explicit permission.
+
 ### Layout
 
 - `index.html` is the entry; `src/main.tsx` mounts `src/App.tsx` into `#root`.
