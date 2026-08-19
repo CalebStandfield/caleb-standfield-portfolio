@@ -130,14 +130,18 @@ function roundedPath(points: Point[], radius: number): string {
 }
 
 /**
- * One rail branch from a shared source (profile bottom): straight down to the
- * split Y, out to a side rail X (near the wall), down the rail, then in to the
- * target's side. Left and right cards share their rail run, so drawn together
- * they read as one trunk that splits into two wall rails feeding the cards.
+ * One rail branch from a shared source (profile bottom): the branches overlap
+ * down to the scroll CTA, fork around its sides, then close into a two-line
+ * channel before splitting to a side rail X (near the wall), down the rail,
+ * and finally in to the target's side.
  * Returns just the path `d`.
  */
 export function railBranch(
   source: Point,
+  trunkX: number,
+  ctaTop: number,
+  ctaBottom: number,
+  ctaEdgeX: number,
   splitY: number,
   railX: number,
   target: Point,
@@ -145,7 +149,11 @@ export function railBranch(
 ): string {
   const pts = dedupe([
     source,
-    { x: source.x, y: splitY },
+    { x: source.x, y: ctaTop },
+    { x: ctaEdgeX, y: ctaTop },
+    { x: ctaEdgeX, y: ctaBottom },
+    { x: trunkX, y: ctaBottom },
+    { x: trunkX, y: splitY },
     { x: railX, y: splitY },
     { x: railX, y: target.y },
     { x: target.x, y: target.y },

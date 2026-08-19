@@ -126,9 +126,8 @@ export function SystemDiagram() {
     })
     .filter((s): s is Segment => s !== null);
 
-  // A trunk drops from the profile, splits at `splitY` out to a left and right
-  // rail near the walls, and the rails flow down feeding each card on its OUTER
-  // side (left cards from the left rail, right cards from the right rail).
+  // The profile trunk stays shared until the scroll CTA, then forks around it
+  // and closes into two lines before branching to the matching wall rails.
   const trunkSegments: Segment[] = (() => {
     const prof = rects["profile"];
     const projRects = projectIds.map((id) => rects[id]);
@@ -136,6 +135,11 @@ export function SystemDiagram() {
     const source = anchor(prof, "bottom");
     // Split below the hero's bottom row so the rails clear those cards.
     const splitY = size.h * 0.383;
+    const ctaY = size.h * 0.23;
+    const ctaTop = ctaY - 10;
+    const ctaBottom = ctaY + 72;
+    const channelOffset = Math.min(22, size.w * 0.03);
+    const ctaOffset = Math.min(54, size.w * 0.07);
     const leftRailX = size.w * 0.005;
     const rightRailX = size.w * 0.995;
     return projectIds.map((id) => {
@@ -144,12 +148,23 @@ export function SystemDiagram() {
       const side = isLeft ? "left" : "right";
       const target = anchor(r, side);
       const railX = isLeft ? leftRailX : rightRailX;
+      const trunkX = source.x + (isLeft ? -channelOffset : channelOffset);
+      const ctaEdgeX = source.x + (isLeft ? -ctaOffset : ctaOffset);
       return {
         from: "profile",
         to: id,
         a: source,
         b: target,
-        d: railBranch(source, splitY, railX, target),
+        d: railBranch(
+          source,
+          trunkX,
+          ctaTop,
+          ctaBottom,
+          ctaEdgeX,
+          splitY,
+          railX,
+          target,
+        ),
       };
     });
   })();
@@ -306,13 +321,13 @@ export function SystemDiagram() {
           ))}
         </svg>
 
-        {/* scroll-down call to action; the trunk passes down through it */}
+        {/* scroll-down call to action, tightly framed by the profile trunks */}
         <a
           href="#projects"
           aria-label="Scroll to projects"
-          className="group absolute left-1/2 top-[30%] z-10 flex -translate-x-1/2 flex-col items-center gap-1"
+          className="group absolute left-1/2 top-[23.5%] z-10 flex -translate-x-1/2 flex-col items-center gap-1"
         >
-          <span className="font-mono text-[0.65rem] tracking-[0.3em] text-muted-line transition-colors group-hover:text-orange">
+          <span className="font-mono text-xs tracking-[0.22em] text-orange">
             SCROLL
           </span>
           <motion.span
