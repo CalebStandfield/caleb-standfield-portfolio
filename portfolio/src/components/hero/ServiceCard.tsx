@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { animate as animateValue, motion, useMotionValue } from "motion/react";
 import { CaretDown } from "@phosphor-icons/react";
 
 import { cn } from "@/lib/utils";
@@ -11,6 +11,9 @@ interface ServiceCardProps {
   index: number;
   animate: boolean;
   registerRef: (el: HTMLDivElement | null) => void;
+  /** Called when the card transitions to open, so the diagram can pulse light
+   *  out to this card's connected neighbors. */
+  onOpen?: () => void;
   /** flow = static full-width (mobile); default = absolute positioned. */
   flow?: boolean;
 }
@@ -32,56 +35,91 @@ export function ServiceCard({
   index,
   animate,
   registerRef,
+  onOpen,
   flow = false,
 }: ServiceCardProps) {
   const isCore = card.kind === "core";
   const Icon = card.icon;
-  // `open` drives the typing; `expanded` drives the box height. On open the box
-  // opens first, then text types in. On close the text deletes, then the box
-  // collapses (so the delete stays visible instead of getting clipped shut).
+  // `open` tracks intent (drives the caret rotation / aria); `expanded` drives
+  // the box height. On open the box grows first, then text types in; on close
+  // the text deletes, then the box collapses.
   const [open, setOpen] = useState(true);
   const [expanded, setExpanded] = useState(true);
-  // Carets only exist after the first toggle, so the page loads instant (no
-  // caret writing over already-shown code).
-  const [touched, setTouched] = useState(false);
 
-  const rawLines = card.code.split("\n");
-  const lines = highlightLines(card.code, card.lang);
-  // Per-line duration proportional to length so typing speed stays even, plus
-  // cumulative start offsets: type top-down, delete bottom-up.
-  const durs = rawLines.map((l) => Math.max(0.05, l.length / CPS));
-  const startIn: number[] = [];
-  const startOut: number[] = [];
-  let accIn = 0;
-  for (let i = 0; i < durs.length; i++) {
-    startIn[i] = accIn;
-    accIn += durs[i];
-  }
-  let accOut = 0;
-  for (let i = durs.length - 1; i >= 0; i--) {
-    startOut[i] = accOut;
-    accOut += durs[i];
-  }
-  const total = accIn;
-  const totalMs = total * 1000;
-  // Full timeline length for the single-caret animation. Opening waits OPEN_DELAY
-  // for the box to grow; closing starts immediately.
-  const lenOpen = OPEN_DELAY + total;
-  const lenClose = total;
+  const lines = useMemo(
+    () => highlightLines(card.code, card.lang),
+    [card.code, card.lang],
+  );
+  // Reveal geometry, in "typing seconds". Each line costs length/CPS seconds;
+  // startIn[i] is the cumulative offset where line i begins. `total` is the full
+  // cost. This is the single axis the whole reveal is derived from.
+  const { durs, startIn, total } = useMemo(() => {
+    const d = card.code.split("\n").map((l) => Math.max(0.05, l.length / CPS));
+    const s: number[] = [];
+    let acc = 0;
+    for (let i = 0; i < d.length; i++) {
+      s[i] = acc;
+      acc += d[i];
+    }
+    return { durs: d, startIn: s, total: acc };
+  }, [card.code]);
 
-  // Toggle handler owns both states so we never setState inside an effect. On
-  // open the box grows first; on close the text deletes, then after totalMs the
-  // box collapses (so the delete stays visible instead of getting clipped shut).
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // `progress` is how much of the code is typed, in the same seconds unit
+  // (0 = empty, `total` = fully typed). Every toggle animates it from its
+  // CURRENT value, so a fast close-then-open resumes from where it was instead
+  // of snapping back to the start.
+  const progress = useMotionValue(total);
+  const lineEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const caretEls = useRef<(HTMLSpanElement | null)[]>([]);
+
+  // Derive every line's clip and the single caret straight from `progress`.
+  useEffect(() => {
+    const paint = (c: number) => {
+      for (let i = 0; i < durs.length; i++) {
+        const f = (c - startIn[i]) / durs[i];
+        const clamped = Math.min(1, Math.max(0, f));
+        const line = lineEls.current[i];
+        if (line) line.style.clipPath = `inset(0 ${(1 - clamped) * 101}% 0 0)`;
+        const caret = caretEls.current[i];
+        if (caret) {
+          // The caret shows only on the line currently being typed/deleted, at
+          // that line's reveal edge, so it reads as one moving cursor.
+          caret.style.left = `${clamped * 100}%`;
+          // Epsilon guards the line boundaries: at rest the frontier line lands
+          // on f=1 (or 0) with float wobble, which would otherwise leave a caret
+          // parked on every card's last line.
+          caret.style.opacity = f > 1e-3 && f < 1 - 1e-3 ? "1" : "0";
+        }
+      }
+    };
+    paint(progress.get());
+    return progress.on("change", paint);
+  }, [progress, durs, startIn]);
+
+  const anim = useRef<ReturnType<typeof animateValue> | null>(null);
   const toggle = () => {
-    clearTimeout(timer.current);
-    setTouched(true);
+    anim.current?.stop();
     const next = !open;
     setOpen(next);
+    const from = progress.get();
+    const target = next ? total : 0;
+    // Constant typing speed: duration scales with the distance left to cover.
+    const duration = Math.abs(target - from);
+    // Only wait for the box to grow when starting from fully closed; a resume
+    // (box already open) types immediately.
+    const delay = next && from === 0 ? OPEN_DELAY : 0;
     if (next) setExpanded(true);
-    else timer.current = setTimeout(() => setExpanded(false), totalMs);
+    anim.current = animateValue(progress, target, {
+      duration,
+      delay,
+      ease: "linear",
+      onComplete: () => {
+        if (next) onOpen?.();
+        else setExpanded(false);
+      },
+    });
   };
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => () => anim.current?.stop(), []);
 
   return (
     <motion.div
@@ -198,88 +236,32 @@ export function ServiceCard({
 
             <pre className="overflow-x-auto px-4 py-3.5 font-mono text-[0.72rem] leading-relaxed">
               <code>
-                {lines.map((spans, li) => {
-                  const delay = open ? OPEN_DELAY + startIn[li] : startOut[li];
-                  // This line's active window as a fraction of the whole reveal
-                  // timeline. The caret animates across the entire timeline but is
-                  // only lit (opacity 1) during [s, e], so a single cursor appears
-                  // to travel line to line.
-                  const timeline = open ? lenOpen : lenClose;
-                  // Clamp the window into (0,1) and build a trapezoid with tiny
-                  // epsilon ramps. Motion silently drops a keyframe track that has
-                  // duplicate adjacent `times`, so the edges must be distinct.
-                  const s = Math.max(delay / timeline, 0.0006);
-                  const e = Math.min(
-                    Math.max((delay + durs[li]) / timeline, s + 0.01),
-                    0.999,
-                  );
-                  const eps = 0.005;
-                  let up = s + eps;
-                  let dn = e - eps;
-                  if (up >= dn) {
-                    const m = (s + e) / 2;
-                    up = m - 0.001;
-                    dn = m + 0.001;
-                  }
-                  return (
-                    <span key={li} className="relative block w-fit">
-                      {/* the line text, wiped in/out from the caret edge */}
-                      <motion.span
-                        className="block"
-                        initial={false}
-                        animate={{
-                          clipPath: open
-                            ? "inset(0 0 0 0)"
-                            : "inset(0 101% 0 0)",
-                        }}
-                        transition={{
-                          duration: durs[li],
-                          ease: "linear",
-                          delay,
-                        }}
-                      >
-                        {spans.length ? spans : " "}
-                      </motion.span>
-
-                      {/* one caret rides the reveal edge; lit only during this
-                          line's window so it reads as a single blinking cursor.
-                          Keyed on `open` so it remounts and re-runs each toggle
-                          (Motion would otherwise skip the identical opacity keys).
-                          Runs even under reduced-motion (user-initiated). */}
-                      {touched && (
-                        <motion.span
-                          key={open ? "o" : "c"}
-                          aria-hidden
-                          className="pointer-events-none absolute top-[0.18em]"
-                          initial={{
-                            opacity: 0,
-                            left: open ? "0%" : "100%",
-                          }}
-                          animate={{
-                            left: open
-                              ? ["0%", "0%", "100%", "100%"]
-                              : ["100%", "100%", "0%", "0%"],
-                            opacity: [0, 0, 1, 1, 0, 0],
-                          }}
-                          transition={{
-                            left: {
-                              duration: timeline,
-                              ease: "linear",
-                              times: [0, s, e, 1],
-                            },
-                            opacity: {
-                              duration: timeline,
-                              ease: "linear",
-                              times: [0, s, up, dn, e, 1],
-                            },
-                          }}
-                        >
-                          <span className="caret-blink block h-[1.05em] w-[2px] bg-orange" />
-                        </motion.span>
-                      )}
+                {lines.map((spans, li) => (
+                  <span key={li} className="relative block w-fit">
+                    {/* line text, clipped from the right by `progress` */}
+                    <span
+                      ref={(el) => {
+                        lineEls.current[li] = el;
+                      }}
+                      className="block"
+                    >
+                      {spans.length ? spans : " "}
                     </span>
-                  );
-                })}
+
+                    {/* the single blinking caret; the paint loop parks it on the
+                        line being typed and hides it everywhere else */}
+                    <span
+                      ref={(el) => {
+                        caretEls.current[li] = el;
+                      }}
+                      aria-hidden
+                      className="pointer-events-none absolute top-[0.18em] left-0"
+                      style={{ opacity: 0 }}
+                    >
+                      <span className="caret-blink block h-[1.05em] w-[2px] bg-orange" />
+                    </span>
+                  </span>
+                ))}
               </code>
             </pre>
           </div>
