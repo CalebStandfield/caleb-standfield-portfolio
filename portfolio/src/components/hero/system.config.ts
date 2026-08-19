@@ -196,8 +196,8 @@ async fn main() -> Result<()> {
     subtitle: "More on the way",
     icon: Sparkle,
     tags: ["WIP"],
-    x: 24,
-    y: 43.3,
+    x: 22,
+    y: 39.8,
     images: [],
   },
   {
@@ -207,8 +207,8 @@ async fn main() -> Result<()> {
     subtitle: "Sprite editor",
     icon: PaintBrush,
     tags: ["RUST", "WASM"],
-    x: 76,
-    y: 56.7,
+    x: 78,
+    y: 53.2,
     images: [
       "/sprite/sprite_draw.png",
       "/sprite/sprite_cs.png",
@@ -223,8 +223,8 @@ async fn main() -> Result<()> {
     subtitle: "Terminal card game",
     icon: Cards,
     tags: ["C++"],
-    x: 24,
-    y: 70,
+    x: 22,
+    y: 66.5,
     images: [
       "/blackjack/blackjack_main.png",
       "/blackjack/blackjack_bet.png",
@@ -241,8 +241,8 @@ async fn main() -> Result<()> {
     subtitle: "In progress",
     icon: Keyboard,
     tags: ["WIP"],
-    x: 76,
-    y: 83.3,
+    x: 78,
+    y: 79.8,
     images: [],
   },
 ];

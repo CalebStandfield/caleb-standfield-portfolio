@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { CaretDoubleDown } from "@phosphor-icons/react";
 
@@ -73,6 +79,32 @@ export function SystemDiagram() {
     return () => ro.disconnect();
   }, [measure]);
 
+  useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const updateHash = () => {
+      if (!desktopQuery.matches) return;
+      const projects = document.getElementById("projects");
+      if (!projects) return;
+
+      const nextHash =
+        window.innerHeight / 2 >= projects.getBoundingClientRect().top
+          ? "#projects"
+          : "#home";
+
+      if (window.location.hash !== nextHash) {
+        window.history.replaceState(null, "", nextHash);
+      }
+    };
+
+    updateHash();
+    window.addEventListener("scroll", updateHash, { passive: true });
+    desktopQuery.addEventListener("change", updateHash);
+    return () => {
+      window.removeEventListener("scroll", updateHash);
+      desktopQuery.removeEventListener("change", updateHash);
+    };
+  }, []);
+
   const registerRef = useCallback(
     (id: string) => (el: HTMLDivElement | null) => {
       if (el) cardEls.current.set(id, el);
@@ -104,8 +136,8 @@ export function SystemDiagram() {
     const source = anchor(prof, "bottom");
     // Split below the hero's bottom row so the rails clear those cards.
     const splitY = size.h * 0.383;
-    const leftRailX = size.w * 0.025;
-    const rightRailX = size.w * 0.975;
+    const leftRailX = size.w * 0.005;
+    const rightRailX = size.w * 0.995;
     return projectIds.map((id) => {
       const r = rects[id];
       const isLeft = r.x + r.w / 2 < size.w / 2;
@@ -221,7 +253,7 @@ export function SystemDiagram() {
       {/* Desktop: full architecture diagram */}
       <div
         ref={containerRef}
-        className="relative mx-auto hidden h-[2900px] w-full max-w-[1360px] lg:h-[3000px] md:block"
+        className="relative mx-auto hidden h-[2900px] w-full max-w-[1560px] lg:h-[3000px] md:block"
       >
         <svg
           className="pointer-events-none absolute inset-0 h-full w-full"
@@ -292,7 +324,10 @@ export function SystemDiagram() {
           </motion.span>
         </a>
         {/* scroll anchor for the CTA, sitting just above the project row */}
-        <div id="projects" className="absolute left-0 top-[41%] h-px w-full" />
+        <div
+          id="projects"
+          className="absolute left-0 top-[37.0%] h-px w-full"
+        />
 
         {cards.map((card, i) => renderCard(card, i, false))}
       </div>
