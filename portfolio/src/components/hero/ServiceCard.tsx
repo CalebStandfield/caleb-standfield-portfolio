@@ -88,7 +88,12 @@ export function ServiceCard({
           // Epsilon guards the line boundaries: at rest the frontier line lands
           // on f=1 (or 0) with float wobble, which would otherwise leave a caret
           // parked on every card's last line.
-          caret.style.opacity = f > 1e-3 && f < 1 - 1e-3 ? "1" : "0";
+          const active = f > 1e-3 && f < 1 - 1e-3;
+          caret.style.opacity = active ? "1" : "0";
+          // Pause the blink on hidden carets so we don't run one infinite
+          // animation per line; only the active caret ticks.
+          const blink = caret.firstElementChild as HTMLElement | null;
+          if (blink) blink.style.animationPlayState = active ? "running" : "paused";
         }
       }
     };
