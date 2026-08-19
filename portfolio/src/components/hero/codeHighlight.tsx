@@ -162,3 +162,16 @@ export function highlightCode(code: string, lang: Lang) {
     </span>
   ));
 }
+
+// Same highlighter, but split per line so each line can be animated on its own.
+// No multi-line strings/comments in the hero snippets, so tokenizing line-by-line
+// is safe. Returns one array of spans per source line.
+export function highlightLines(code: string, lang: Lang) {
+  return code.split("\n").map((line) =>
+    tokenize(line, lang).map((t, idx) => (
+      <span key={idx} style={{ color: COLOR[t.kind] }}>
+        {t.value}
+      </span>
+    )),
+  );
+}
