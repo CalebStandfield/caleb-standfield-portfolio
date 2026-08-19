@@ -143,25 +143,15 @@ export function ServiceCard({
               </div>
             </div>
 
-            {/* status dot / core badge + code toggle */}
+            {/* core badge + code toggle */}
             <div className="flex shrink-0 items-center gap-2">
-              {card.badge ? (
+              {card.badge && (
                 <span
                   className="rounded border px-1.5 py-0.5 font-mono text-[0.6rem] tracking-widest text-orange"
                   style={{ borderColor: BORDER_CORE }}
                 >
                   {card.badge}
                 </span>
-              ) : (
-                <span
-                  aria-hidden
-                  className="size-2 rounded-full"
-                  style={
-                    card.kind === "external"
-                      ? { border: "1.5px solid #565B66" }
-                      : { background: "#FF8F40", boxShadow: "0 0 6px #FF8F40" }
-                  }
-                />
               )}
               <button
                 type="button"
