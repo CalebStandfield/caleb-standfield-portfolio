@@ -35,8 +35,11 @@ interface Segment {
   b: { x: number; y: number };
 }
 
-// How long a light takes to cross a connector, in ms.
-const PULSE_MS = 1600;
+// Light travel speed along connectors. Increase for faster pulses.
+const PULSE_SPEED_PX_PER_SECOND = 250;
+// Once a pulse reaches a card, hold it there before fading it out.
+const PULSE_TARGET_HOLD_MS = 240;
+const PULSE_TARGET_FADE_MS = 280;
 // The profile fires one pulse in a random direction this often.
 const AUTO_MS = 4000;
 
@@ -224,18 +227,34 @@ export function SystemDiagram() {
       for (const pu of pulses) {
         const el = pulseEls.current.get(pu.id);
         const path = pathEls.current[pu.seg];
-        const t = (now - pu.born) / PULSE_MS;
-        if (!el || !path || t >= 1) {
+        if (!el || !path) {
           done.push(pu.id);
           continue;
         }
         const len = path.getTotalLength();
-        const pt = path.getPointAtLength((pu.reverse ? 1 - t : t) * len);
+        const travelMs = (len / PULSE_SPEED_PX_PER_SECOND) * 1000;
+        const elapsedMs = now - pu.born;
+        const travelProgress = Math.min(elapsedMs / travelMs, 1);
+        const atTargetMs = elapsedMs - travelMs;
+        const fadeProgress =
+          atTargetMs <= PULSE_TARGET_HOLD_MS
+            ? 0
+            : (atTargetMs - PULSE_TARGET_HOLD_MS) / PULSE_TARGET_FADE_MS;
+        if (fadeProgress >= 1) {
+          done.push(pu.id);
+          continue;
+        }
+        const pt = path.getPointAtLength(
+          (pu.reverse ? 1 - travelProgress : travelProgress) * len,
+        );
         el.setAttribute("cx", String(pt.x));
         el.setAttribute("cy", String(pt.y));
-        // Quick fade-in, hold full brightness across the run, then fade out only
-        // once it reaches the destination (last stretch of the path).
-        const o = t < 0.12 ? t / 0.12 : t > 0.82 ? (1 - t) / 0.18 : 1;
+        // Fade in at the source, remain fully visible during the run, then fade
+        // only after reaching and pausing at the destination.
+        const o =
+          travelProgress < 0.12
+            ? travelProgress / 0.12
+            : Math.max(0, 1 - fadeProgress);
         el.setAttribute("opacity", String(o));
       }
       if (done.length) {
