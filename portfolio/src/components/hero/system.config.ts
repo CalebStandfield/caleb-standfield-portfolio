@@ -10,14 +10,17 @@ import {
   ArrowsLeftRight,
   GearSix,
   Database,
-  Lightning,
   Stack,
+  Sparkle,
+  PaintBrush,
+  Cards,
+  Keyboard,
   type Icon,
 } from "@phosphor-icons/react";
 
 import type { Lang } from "./codeHighlight";
 
-export type CardKind = "core" | "rust" | "external";
+export type CardKind = "core" | "rust" | "external" | "project";
 export type Side = "top" | "bottom" | "left" | "right";
 
 export interface CardData {
@@ -28,8 +31,11 @@ export interface CardData {
   badge?: string;
   icon?: Icon;
   tags?: string[];
-  lang: Lang;
-  code: string;
+  // Code snippet body (service cards). Project cards omit this and show images.
+  lang?: Lang;
+  code?: string;
+  // Carousel images (project cards). Absolute /public paths. Empty = "coming soon".
+  images?: string[];
   x: number; // center, 0-100
   y: number; // top, 0-100
 }
@@ -51,7 +57,7 @@ export const cards: CardData[] = [
     tags: ["TYPESCRIPT", "REACT"],
     lang: "ts",
     x: 15,
-    y: 4,
+    y: 1.4,
     code: `// client.ts
 async function loadProfile() {
   const res = await fetch(
@@ -70,7 +76,7 @@ async function loadProfile() {
     tags: ["EDGE"],
     lang: "nginx",
     x: 50,
-    y: 2,
+    y: 0.7,
     code: `upstream api_pool {
     server 10.0.4.11:8080;
     server 10.0.4.12:8080;
@@ -86,7 +92,7 @@ async function loadProfile() {
     tags: ["TYPESCRIPT", "JWT"],
     lang: "ts",
     x: 85,
-    y: 5,
+    y: 1.73,
     code: `export async function verifyToken(
   jwt: string
 ): Promise<Claims> {
@@ -104,7 +110,7 @@ async function loadProfile() {
     tags: ["RUST", "AXUM"],
     lang: "rust",
     x: 15,
-    y: 37,
+    y: 12.83,
     code: `async fn get_profile(
   State(db): State<Pool>,
 ) -> Result<Json<Profile>> {
@@ -119,7 +125,7 @@ async function loadProfile() {
     badge: "CORE",
     lang: "rust",
     x: 50,
-    y: 36,
+    y: 12.47,
     code: `struct Profile {
     name: "Caleb Standfield",
     school: "University of Utah",
@@ -136,7 +142,7 @@ async function loadProfile() {
     tags: ["RUST", "TOKIO"],
     lang: "rust",
     x: 85,
-    y: 37,
+    y: 12.83,
     code: `#[tokio::main]
 async fn main() -> Result<()> {
   let mut rx = queue.subscribe(
@@ -155,7 +161,7 @@ async fn main() -> Result<()> {
     tags: ["POSTGRESQL", "SQL"],
     lang: "sql",
     x: 15,
-    y: 70,
+    y: 24.27,
     code: `CREATE TABLE profile (
   id UUID PRIMARY KEY,
   name TEXT NOT NULL,
@@ -163,22 +169,6 @@ async fn main() -> Result<()> {
   degree TEXT NOT NULL,
   graduated_on DATE
 );`,
-  },
-  {
-    id: "redis",
-    kind: "rust",
-    title: "Redis Cache",
-    subtitle: "Profile read-through",
-    icon: Lightning,
-    tags: ["RUST", "REDIS"],
-    lang: "rust",
-    x: 50,
-    y: 71,
-    code: `let mut conn = client
-  .get_async_connection().await?;
-conn.set_ex(
-  "profile:cache", payload, 300)
-  .await?;`,
   },
   {
     id: "events",
@@ -189,7 +179,7 @@ conn.set_ex(
     tags: ["RUST", "KAFKA"],
     lang: "rust",
     x: 85,
-    y: 70,
+    y: 24.27,
     code: `producer.send(
   FutureRecord::to(
     "profile.updated")
@@ -197,7 +187,68 @@ conn.set_ex(
 )
 .await?;`,
   },
+
+  // --- projects (lower band; carousel cards fed by the trunk from profile) ---
+  {
+    id: "coming-soon",
+    kind: "project",
+    title: "coming_soon",
+    subtitle: "More on the way",
+    icon: Sparkle,
+    tags: ["WIP"],
+    x: 24,
+    y: 43.3,
+    images: [],
+  },
+  {
+    id: "pixelify",
+    kind: "project",
+    title: "pixelify",
+    subtitle: "Sprite editor",
+    icon: PaintBrush,
+    tags: ["RUST", "WASM"],
+    x: 76,
+    y: 56.7,
+    images: [
+      "/sprite/sprite_draw.png",
+      "/sprite/sprite_cs.png",
+      "/sprite/sprite_stoplight.png",
+      "/sprite/sprite_save.png",
+    ],
+  },
+  {
+    id: "blackjack",
+    kind: "project",
+    title: "blackjack",
+    subtitle: "Terminal card game",
+    icon: Cards,
+    tags: ["C++"],
+    x: 24,
+    y: 70,
+    images: [
+      "/blackjack/blackjack_main.png",
+      "/blackjack/blackjack_bet.png",
+      "/blackjack/blackjack_playing.png",
+      "/blackjack/blackjack_blackjack.png",
+      "/blackjack/blackjack_won.png",
+      "/blackjack/blackjack_lost.png",
+    ],
+  },
+  {
+    id: "learn-vim",
+    kind: "project",
+    title: "learn_vim",
+    subtitle: "In progress",
+    icon: Keyboard,
+    tags: ["WIP"],
+    x: 76,
+    y: 83.3,
+    images: [],
+  },
 ];
+
+// Project cards, in trunk order (2 left, 2 right of the center trunk).
+export const projectIds = ["coming-soon", "pixelify", "blackjack", "learn-vim"];
 
 export const edges: Edge[] = [
   { from: "client", fromSide: "right", to: "load_balancer", toSide: "left" },
@@ -209,7 +260,4 @@ export const edges: Edge[] = [
   { from: "profile", fromSide: "right", to: "worker", toSide: "left" },
   { from: "api_gateway", fromSide: "bottom", to: "postgres", toSide: "top" },
   { from: "worker", fromSide: "bottom", to: "events", toSide: "top" },
-  { from: "profile", fromSide: "bottom", to: "redis", toSide: "top" },
-  { from: "postgres", fromSide: "right", to: "redis", toSide: "left" },
-  { from: "redis", fromSide: "right", to: "events", toSide: "left" },
 ];

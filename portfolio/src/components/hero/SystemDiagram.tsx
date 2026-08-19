@@ -1,27 +1,42 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { CaretDoubleDown } from "@phosphor-icons/react";
 
 import { ServiceCard } from "./ServiceCard";
-import { anchor, trace, type Rect } from "./connectors";
-import { cards, edges } from "./system.config";
+import { ProjectCard } from "./ProjectCard";
+import { anchor, trace, railBranch, type Rect } from "./connectors";
+import { cards, edges, projectIds, type CardData } from "./system.config";
 
 interface Size {
   w: number;
   h: number;
 }
 
-// A single light traveling along one connector.
+// A single light traveling along one connector segment.
 interface Pulse {
   id: number;
-  edge: number; // index into `edges` / `traces`
+  seg: number; // index into the flattened `segments` list
   reverse: boolean; // true = travel from `to` back toward `from`
   born: number; // performance.now() at spawn
 }
 
+// One drawable connector: its path plus the two node ids it joins (for pulses).
+interface Segment {
+  from: string;
+  to: string;
+  d: string;
+  a: { x: number; y: number };
+  b: { x: number; y: number };
+}
+
 // How long a light takes to cross a connector, in ms.
 const PULSE_MS = 1600;
-// Center profile fires one pulse in a random N/S/E/W direction this often.
+// The profile fires one pulse in a random direction this often.
 const AUTO_MS = 4000;
+
+function isProject(card: CardData): boolean {
+  return card.kind === "project";
+}
 
 export function SystemDiagram() {
   const reduce = useReducedMotion();
@@ -66,43 +81,89 @@ export function SystemDiagram() {
     [],
   );
 
+  // --- connector segments: top graph edges + the trunk down to the projects --
+  const topSegments: Segment[] = edges
+    .map((e) => {
+      const from = rects[e.from];
+      const to = rects[e.to];
+      if (!from || !to) return null;
+      const a = anchor(from, e.fromSide);
+      const b = anchor(to, e.toSide);
+      const { d } = trace(a, e.fromSide, b, e.toSide);
+      return { from: e.from, to: e.to, a, b, d };
+    })
+    .filter((s): s is Segment => s !== null);
+
+  // A trunk drops from the profile, splits at `splitY` out to a left and right
+  // rail near the walls, and the rails flow down feeding each card on its OUTER
+  // side (left cards from the left rail, right cards from the right rail).
+  const trunkSegments: Segment[] = (() => {
+    const prof = rects["profile"];
+    const projRects = projectIds.map((id) => rects[id]);
+    if (!prof || projRects.some((r) => !r) || !size.w) return [];
+    const source = anchor(prof, "bottom");
+    // Split below the hero's bottom row so the rails clear those cards.
+    const splitY = size.h * 0.383;
+    const leftRailX = size.w * 0.025;
+    const rightRailX = size.w * 0.975;
+    return projectIds.map((id) => {
+      const r = rects[id];
+      const isLeft = r.x + r.w / 2 < size.w / 2;
+      const side = isLeft ? "left" : "right";
+      const target = anchor(r, side);
+      const railX = isLeft ? leftRailX : rightRailX;
+      return {
+        from: "profile",
+        to: id,
+        a: source,
+        b: target,
+        d: railBranch(source, splitY, railX, target),
+      };
+    });
+  })();
+
+  const segments = [...topSegments, ...trunkSegments];
+  // Kept in a ref so the pulse callbacks (interval / onOpen) always read the
+  // current geometry without re-subscribing. Synced after each commit.
+  const segmentsRef = useRef(segments);
+  useEffect(() => {
+    segmentsRef.current = segments;
+  });
+
   // --- light pulses along the connectors -----------------------------------
-  // Live path elements (indexed by edge) and pulse circles, both read directly
-  // by the RAF loop. Sampling the live path each frame means a pulse follows
-  // whatever the line looks like right now, even after a card collapses.
   const pathEls = useRef<(SVGPathElement | null)[]>([]);
   const pulseEls = useRef<Map<number, SVGCircleElement>>(new Map());
   const [pulses, setPulses] = useState<Pulse[]>([]);
   const nextPulseId = useRef(0);
 
-  const spawn = useCallback((edge: number, reverse: boolean) => {
+  const spawn = useCallback((seg: number, reverse: boolean) => {
     setPulses((p) => [
       ...p,
-      { id: nextPulseId.current++, edge, reverse, born: performance.now() },
+      { id: nextPulseId.current++, seg, reverse, born: performance.now() },
     ]);
   }, []);
 
-  // Emit outward from a card to every neighbor it connects to. A pulse travels
+  // Emit outward from a card along every segment it touches. A pulse runs
   // from->to; if the card is the `to` end we reverse so light leaves the card.
   const emitFrom = useCallback(
     (cardId: string) => {
-      edges.forEach((e, i) => {
-        if (e.from === cardId) spawn(i, false);
-        else if (e.to === cardId) spawn(i, true);
+      segmentsRef.current.forEach((s, i) => {
+        if (s.from === cardId) spawn(i, false);
+        else if (s.to === cardId) spawn(i, true);
       });
     },
     [spawn],
   );
 
-  // Center profile fires a single random-direction pulse on an interval.
+  // The profile fires a single random-direction pulse on an interval.
   useEffect(() => {
-    const fromCenter = edges
-      .map((e, i) => ({ e, i }))
-      .filter(({ e }) => e.from === "profile" || e.to === "profile");
-    if (!fromCenter.length) return;
     const id = setInterval(() => {
-      const pick = fromCenter[Math.floor(Math.random() * fromCenter.length)];
-      spawn(pick.i, pick.e.to === "profile");
+      const opts = segmentsRef.current
+        .map((s, i) => ({ s, i }))
+        .filter(({ s }) => s.from === "profile" || s.to === "profile");
+      if (!opts.length) return;
+      const pick = opts[Math.floor(Math.random() * opts.length)];
+      spawn(pick.i, pick.s.to === "profile");
     }, AUTO_MS);
     return () => clearInterval(id);
   }, [spawn]);
@@ -115,7 +176,7 @@ export function SystemDiagram() {
       const done: number[] = [];
       for (const pu of pulses) {
         const el = pulseEls.current.get(pu.id);
-        const path = pathEls.current[pu.edge];
+        const path = pathEls.current[pu.seg];
         const t = (now - pu.born) / PULSE_MS;
         if (!el || !path || t >= 1) {
           done.push(pu.id);
@@ -139,23 +200,28 @@ export function SystemDiagram() {
     return () => cancelAnimationFrame(raf);
   }, [pulses]);
 
-  const traces = edges
-    .map((e, i) => {
-      const from = rects[e.from];
-      const to = rects[e.to];
-      if (!from || !to) return null;
-      const a = anchor(from, e.fromSide);
-      const b = anchor(to, e.toSide);
-      return { i, ...trace(a, e.fromSide, b, e.toSide) };
-    })
-    .filter((t): t is NonNullable<typeof t> => t !== null);
+  const renderCard = (card: CardData, i: number, flow: boolean) => {
+    const common = {
+      card,
+      index: i,
+      animate,
+      registerRef: flow ? () => {} : registerRef(card.id),
+      onOpen: flow ? undefined : () => emitFrom(card.id),
+      flow,
+    };
+    return isProject(card) ? (
+      <ProjectCard key={card.id} {...common} />
+    ) : (
+      <ServiceCard key={card.id} {...common} />
+    );
+  };
 
   return (
     <>
       {/* Desktop: full architecture diagram */}
       <div
         ref={containerRef}
-        className="relative mx-auto hidden h-[1000px] w-full max-w-[1360px] lg:h-[1040px] md:block"
+        className="relative mx-auto hidden h-[2900px] w-full max-w-[1360px] lg:h-[3000px] md:block"
       >
         <svg
           className="pointer-events-none absolute inset-0 h-full w-full"
@@ -163,13 +229,13 @@ export function SystemDiagram() {
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          {traces.map((t) => (
+          {segments.map((s, i) => (
             <motion.path
-              key={t.i}
+              key={`${s.from}-${s.to}`}
               ref={(el: SVGPathElement | null) => {
-                pathEls.current[t.i] = el;
+                pathEls.current[i] = el;
               }}
-              d={t.d}
+              d={s.d}
               fill="none"
               stroke="#FF8F40"
               strokeOpacity={0.32}
@@ -180,16 +246,16 @@ export function SystemDiagram() {
               animate={{ pathLength: 1, opacity: 1 }}
               transition={{
                 duration: 0.8,
-                delay: animate ? 0.5 + t.i * 0.05 : 0,
+                delay: animate ? 0.5 + i * 0.05 : 0,
                 ease: "easeInOut",
               }}
             />
           ))}
-          {/* ports */}
-          {traces.map((t) => (
-            <g key={`p-${t.i}`}>
-              <Port point={t.a} animate={animate} delay={0.5 + t.i * 0.05} />
-              <Port point={t.b} animate={animate} delay={0.9 + t.i * 0.05} />
+          {/* ports at both ends of each segment */}
+          {segments.map((s, i) => (
+            <g key={`p-${s.from}-${s.to}`}>
+              <Port point={s.a} animate={animate} delay={0.5 + i * 0.05} />
+              <Port point={s.b} animate={animate} delay={0.9 + i * 0.05} />
             </g>
           ))}
           {/* traveling light pulses; positioned each frame by the RAF loop */}
@@ -208,30 +274,32 @@ export function SystemDiagram() {
           ))}
         </svg>
 
-        {cards.map((card, i) => (
-          <ServiceCard
-            key={card.id}
-            card={card}
-            index={i}
-            animate={animate}
-            registerRef={registerRef(card.id)}
-            onOpen={() => emitFrom(card.id)}
-          />
-        ))}
+        {/* scroll-down call to action; the trunk passes down through it */}
+        <a
+          href="#projects"
+          aria-label="Scroll to projects"
+          className="group absolute left-1/2 top-[30%] z-10 flex -translate-x-1/2 flex-col items-center gap-1"
+        >
+          <span className="font-mono text-[0.65rem] tracking-[0.3em] text-muted-line transition-colors group-hover:text-orange">
+            SCROLL
+          </span>
+          <motion.span
+            className="text-orange"
+            animate={animate ? { y: [0, 6, 0] } : undefined}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <CaretDoubleDown size={18} weight="bold" />
+          </motion.span>
+        </a>
+        {/* scroll anchor for the CTA, sitting just above the project row */}
+        <div id="projects" className="absolute left-0 top-[41%] h-px w-full" />
+
+        {cards.map((card, i) => renderCard(card, i, false))}
       </div>
 
       {/* Mobile: single scrollable column, no connectors */}
       <div className="mx-auto flex max-w-md flex-col items-stretch gap-4 md:hidden">
-        {cards.map((card, i) => (
-          <ServiceCard
-            key={card.id}
-            card={card}
-            index={i}
-            animate={animate}
-            registerRef={() => {}}
-            flow
-          />
-        ))}
+        {cards.map((card, i) => renderCard(card, i, true))}
       </div>
     </>
   );

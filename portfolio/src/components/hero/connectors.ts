@@ -129,6 +129,30 @@ function roundedPath(points: Point[], radius: number): string {
   return parts.join(" ");
 }
 
+/**
+ * One rail branch from a shared source (profile bottom): straight down to the
+ * split Y, out to a side rail X (near the wall), down the rail, then in to the
+ * target's side. Left and right cards share their rail run, so drawn together
+ * they read as one trunk that splits into two wall rails feeding the cards.
+ * Returns just the path `d`.
+ */
+export function railBranch(
+  source: Point,
+  splitY: number,
+  railX: number,
+  target: Point,
+  radius = 12,
+): string {
+  const pts = dedupe([
+    source,
+    { x: source.x, y: splitY },
+    { x: railX, y: splitY },
+    { x: railX, y: target.y },
+    { x: target.x, y: target.y },
+  ]);
+  return roundedPath(pts, radius);
+}
+
 /** Full trace path string plus the two port endpoints. */
 export function trace(
   a: Point,
