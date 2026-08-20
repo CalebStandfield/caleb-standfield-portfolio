@@ -1,7 +1,7 @@
 // Pure geometry for the connector traces. Operates in pixel space relative to
 // the diagram container. No React, no DOM.
 
-import type { Side } from "./system.config";
+export type Side = "top" | "bottom" | "left" | "right";
 
 export interface Point {
   x: number;
@@ -13,6 +13,24 @@ export interface Rect {
   y: number;
   w: number;
   h: number;
+}
+
+export interface TraceOptions {
+  stub?: number;
+  radius?: number;
+  points?: Point[];
+  obstacles?: Rect[];
+  reserved?: Rect[];
+  labelSize?: { w: number; h: number };
+  bounds?: Rect;
+}
+
+export interface TraceResult {
+  d: string;
+  a: Point;
+  b: Point;
+  points: Point[];
+  labelAnchor?: Point;
 }
 
 const OUTWARD: Record<Side, Point> = {
@@ -100,6 +118,133 @@ function dedupe(points: Point[]): Point[] {
   return cleaned;
 }
 
+function overlaps(a: Rect, b: Rect): boolean {
+  return (
+    a.x < b.x + b.w &&
+    a.x + a.w > b.x &&
+    a.y < b.y + b.h &&
+    a.y + a.h > b.y
+  );
+}
+
+function expand(rect: Rect, amount: number): Rect {
+  return {
+    x: rect.x - amount,
+    y: rect.y - amount,
+    w: rect.w + amount * 2,
+    h: rect.h + amount * 2,
+  };
+}
+
+interface StraightRun {
+  start: number;
+  end: number;
+  fixed: number;
+  horizontal: boolean;
+}
+
+function subtractBlockedRange(
+  runs: Array<{ start: number; end: number }>,
+  blockedStart: number,
+  blockedEnd: number,
+): Array<{ start: number; end: number }> {
+  return runs.flatMap((run) => {
+    if (blockedEnd <= run.start || blockedStart >= run.end) return [run];
+
+    const next: Array<{ start: number; end: number }> = [];
+    if (blockedStart > run.start) {
+      next.push({ start: run.start, end: blockedStart });
+    }
+    if (blockedEnd < run.end) {
+      next.push({ start: blockedEnd, end: run.end });
+    }
+    return next;
+  });
+}
+
+function clearRuns(
+  start: Point,
+  end: Point,
+  obstacles: Rect[],
+): StraightRun[] {
+  const horizontal = Math.abs(start.y - end.y) < 0.01;
+  const rangeStart = horizontal
+    ? Math.min(start.x, end.x)
+    : Math.min(start.y, end.y);
+  const rangeEnd = horizontal
+    ? Math.max(start.x, end.x)
+    : Math.max(start.y, end.y);
+  const fixed = horizontal ? start.y : start.x;
+  let runs = [{ start: rangeStart, end: rangeEnd }];
+
+  for (const obstacle of obstacles) {
+    if (horizontal) {
+      if (fixed < obstacle.y || fixed > obstacle.y + obstacle.h) continue;
+      runs = subtractBlockedRange(runs, obstacle.x, obstacle.x + obstacle.w);
+    } else {
+      if (fixed < obstacle.x || fixed > obstacle.x + obstacle.w) continue;
+      runs = subtractBlockedRange(runs, obstacle.y, obstacle.y + obstacle.h);
+    }
+  }
+
+  return runs.map((run) => ({ ...run, fixed, horizontal }));
+}
+
+/** Midpoint of the longest straight run that can hold a horizontal label. */
+function longestClearSegmentMidpoint(
+  points: Point[],
+  obstacles: Rect[],
+  reserved: Rect[],
+  labelSize: { w: number; h: number },
+  bounds?: Rect,
+): Point | undefined {
+  const paddedObstacles = obstacles.map((rect) => expand(rect, 6));
+  const runs: StraightRun[] = [];
+
+  for (let index = 0; index < points.length - 1; index += 1) {
+    runs.push(...clearRuns(points[index], points[index + 1], paddedObstacles));
+  }
+
+  runs.sort((a, b) => b.end - b.start - (a.end - a.start));
+
+  for (const run of runs) {
+    const requiredLength = run.horizontal ? labelSize.w + 12 : labelSize.h + 12;
+    if (run.end - run.start < requiredLength) continue;
+
+    const midpoint = (run.start + run.end) / 2;
+    const point = run.horizontal
+      ? { x: midpoint, y: run.fixed }
+      : { x: run.fixed, y: midpoint };
+    const labelRect: Rect = {
+      x: point.x - labelSize.w / 2,
+      y: point.y - labelSize.h / 2,
+      w: labelSize.w,
+      h: labelSize.h,
+    };
+
+    if (
+      (bounds && !contains(bounds, labelRect)) ||
+      paddedObstacles.some((obstacle) => overlaps(labelRect, obstacle)) ||
+      reserved.some((rect) => overlaps(labelRect, expand(rect, 4)))
+    ) {
+      continue;
+    }
+
+    return point;
+  }
+
+  return undefined;
+}
+
+function contains(outer: Rect, inner: Rect): boolean {
+  return (
+    inner.x >= outer.x &&
+    inner.y >= outer.y &&
+    inner.x + inner.w <= outer.x + outer.w &&
+    inner.y + inner.h <= outer.y + outer.h
+  );
+}
+
 /** Build an SVG path with rounded right-angle corners through the points. */
 function roundedPath(points: Point[], radius: number): string {
   if (points.length < 2) return "";
@@ -129,48 +274,47 @@ function roundedPath(points: Point[], radius: number): string {
   return parts.join(" ");
 }
 
-/**
- * One rail branch from a shared source (profile bottom): the branches overlap
- * down to the scroll CTA, fork around its sides, then close into a two-line
- * channel before splitting to a side rail X (near the wall), down the rail,
- * and finally in to the target's side.
- * Returns just the path `d`.
- */
-export function railBranch(
-  source: Point,
-  trunkX: number,
-  ctaTop: number,
-  ctaBottom: number,
-  ctaEdgeX: number,
-  splitY: number,
-  railX: number,
-  target: Point,
-  radius = 12,
-): string {
-  const pts = dedupe([
-    source,
-    { x: source.x, y: ctaTop },
-    { x: ctaEdgeX, y: ctaTop },
-    { x: ctaEdgeX, y: ctaBottom },
-    { x: trunkX, y: ctaBottom },
-    { x: trunkX, y: splitY },
-    { x: railX, y: splitY },
-    { x: railX, y: target.y },
-    { x: target.x, y: target.y },
-  ]);
-  return roundedPath(pts, radius);
-}
-
 /** Full trace path string plus the two port endpoints. */
 export function trace(
   a: Point,
   sideA: Side,
   b: Point,
   sideB: Side,
-  opts: { stub?: number; radius?: number } = {},
-): { d: string; a: Point; b: Point } {
-  const stub = opts.stub ?? 22;
+  opts: TraceOptions = {},
+): TraceResult {
+  const requestedStub = opts.stub ?? 22;
   const radius = opts.radius ?? 10;
-  const pts = dedupe(waypoints(a, sideA, b, sideB, stub));
-  return { d: roundedPath(pts, radius), a, b };
+  const horizontalFacing =
+    (sideA === "right" && sideB === "left" && b.x > a.x) ||
+    (sideA === "left" && sideB === "right" && a.x > b.x);
+  const verticalFacing =
+    (sideA === "bottom" && sideB === "top" && b.y > a.y) ||
+    (sideA === "top" && sideB === "bottom" && a.y > b.y);
+  const facingGap = horizontalFacing
+    ? Math.abs(b.x - a.x)
+    : verticalFacing
+      ? Math.abs(b.y - a.y)
+      : Number.POSITIVE_INFINITY;
+
+  // Keep the outward stubs inside the available gap when two card faces sit
+  // close together. Fixed stubs would cross, double back, and draw a loop.
+  const stub = Math.min(requestedStub, facingGap / 3);
+  const pts = dedupe(opts.points ?? waypoints(a, sideA, b, sideB, stub));
+  const labelAnchor = opts.labelSize
+    ? longestClearSegmentMidpoint(
+        pts,
+        opts.obstacles ?? [],
+        opts.reserved ?? [],
+        opts.labelSize,
+        opts.bounds,
+      )
+    : undefined;
+
+  return {
+    d: roundedPath(pts, radius),
+    a,
+    b,
+    points: pts,
+    labelAnchor,
+  };
 }

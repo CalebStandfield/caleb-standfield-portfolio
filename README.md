@@ -15,6 +15,7 @@ caleb-standfield-portfolio/   <- git root (this folder)
     │   ├── main.tsx          <- app entry, mounts <App /> into #root
     │   ├── App.tsx           <- root component
     │   ├── index.css         <- Tailwind + theme tokens
+    │   ├── components/portfolio/ <- page sections + system rail
     │   ├── components/ui/     <- shadcn components
     │   └── lib/utils.ts       <- cn() helper
     ├── public/               <- static assets (images, resume PDF)
@@ -70,7 +71,11 @@ preset is Vite (build output is `dist/`).
 
 ## Current status
 
-The portfolio is mid-redesign. The live page is intentionally stripped down to
-just the top bar (name plus GitHub/LinkedIn links) over a blank black canvas.
-Projects, resume, and about/contact sections, along with their images in
-`portfolio/public/`, are being reintroduced as the new design comes together.
+The portfolio uses a content-first, single-page layout with profile, projects,
+resume, and contact sections. On desktop and landscape tablet widths, a sticky
+system diagram follows the active section as a decorative visual. Narrower
+screens use the same content without the diagram.
+
+Project slots and system-rail content are configured in
+`portfolio/src/components/portfolio/portfolio.config.ts`. Static project images,
+the downloadable resume, and the social preview live in `portfolio/public/`.

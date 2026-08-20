@@ -8,6 +8,7 @@
 
 html {
   scroll-behavior: smooth;
+  background: #0A0A0C;
 }
 
 @theme inline {
@@ -140,10 +141,22 @@ html {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-ink text-ink-text;
+    margin: 0;
+    min-width: 320px;
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  .project-link {
+    @apply inline-flex items-center gap-2 rounded-md border border-muted-line/25 px-3 py-2 font-mono text-xs text-ink-text transition-colors hover:border-orange/50 hover:text-orange;
+  }
+
+  .resume-chip {
+    @apply rounded-md border border-muted-line/25 bg-ink/35 px-2.5 py-1.5 font-mono text-[0.66rem] text-muted-line;
   }
 }
 
