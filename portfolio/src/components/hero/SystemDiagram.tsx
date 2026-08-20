@@ -136,9 +136,9 @@ export function SystemDiagram() {
     const projRects = projectIds.map((id) => rects[id]);
     if (!prof || projRects.some((r) => !r) || !size.w) return [];
     const source = anchor(prof, "bottom");
-    // Split below the hero's bottom row so the rails clear those cards.
-    const splitY = size.h * 0.383;
-    const ctaY = size.h * 0.23;
+    // Split below the side columns so the rails clear those cards.
+    const splitY = size.h * 0.42;
+    const ctaY = size.h * 0.29;
     const ctaTop = ctaY - 10;
     const ctaBottom = ctaY + 72;
     const channelOffset = Math.min(22, size.w * 0.03);
@@ -344,7 +344,7 @@ export function SystemDiagram() {
         <a
           href="#projects"
           aria-label="Scroll to projects"
-          className="group absolute left-1/2 top-[23.5%] z-10 flex -translate-x-1/2 flex-col items-center gap-1"
+          className="group absolute left-1/2 top-[29%] z-10 flex -translate-x-1/2 flex-col items-center gap-1"
         >
           <span className="font-mono text-xs tracking-[0.22em] text-orange">
             SCROLL
@@ -360,7 +360,7 @@ export function SystemDiagram() {
         {/* scroll anchor for the CTA, sitting just above the project row */}
         <div
           id="projects"
-          className="absolute left-0 top-[37.0%] h-px w-full"
+          className="absolute left-0 top-[42%] h-px w-full"
         />
 
         {cards.map((card, i) => renderCard(card, i, false))}

@@ -8,9 +8,10 @@ import {
   TreeStructure,
   ShieldCheck,
   ArrowsLeftRight,
-  GearSix,
   Database,
-  Stack,
+  DeviceMobile,
+  CloudArrowDown,
+  HardDrives,
   Sparkle,
   PaintBrush,
   Cards,
@@ -36,6 +37,8 @@ export interface CardData {
   code?: string;
   // Carousel images (project cards). Absolute /public paths. Empty = "coming soon".
   images?: string[];
+  // Renders the framed photo placeholder (the core profile card only).
+  photo?: boolean;
   x: number; // center, 0-100
   y: number; // top, 0-100
 }
@@ -48,57 +51,21 @@ export interface Edge {
 }
 
 export const cards: CardData[] = [
-  {
-    id: "client",
-    kind: "external",
-    title: "Client",
-    subtitle: "Browser / SPA",
-    icon: Globe,
-    tags: ["TYPESCRIPT", "REACT"],
-    lang: "ts",
-    x: 15,
-    y: 1.4,
-    code: `// client.ts
-async function loadProfile() {
-  const res = await fetch(
-    "/api/v1/profile",
-    { headers: { auth } }
-  );
-  return res.json();
-}`,
-  },
+  // --- backend cluster (left column, requests flow down then into profile) ---
   {
     id: "load_balancer",
     kind: "external",
     title: "Load Balancer",
     subtitle: "Edge routing",
     icon: TreeStructure,
-    tags: ["EDGE"],
+    tags: ["NGINX", "EDGE"],
     lang: "nginx",
-    x: 50,
-    y: 0.7,
+    x: 11,
+    y: 1,
     code: `upstream api_pool {
     server 10.0.4.11:8080;
     server 10.0.4.12:8080;
     least_conn;
-}`,
-  },
-  {
-    id: "auth",
-    kind: "external",
-    title: "Auth Provider",
-    subtitle: "Identity / OAuth",
-    icon: ShieldCheck,
-    tags: ["TYPESCRIPT", "JWT"],
-    lang: "ts",
-    x: 85,
-    y: 1.73,
-    code: `export async function verifyToken(
-  jwt: string
-): Promise<Claims> {
-  const claims = await jwks.verify(jwt);
-  if (claims.exp < now()) throw err;
-  return claims;
 }`,
   },
   {
@@ -109,8 +76,8 @@ async function loadProfile() {
     icon: ArrowsLeftRight,
     tags: ["RUST", "AXUM"],
     lang: "rust",
-    x: 15,
-    y: 12.83,
+    x: 11,
+    y: 11.2,
     code: `async fn get_profile(
   State(db): State<Pool>,
 ) -> Result<Json<Profile>> {
@@ -119,37 +86,21 @@ async function loadProfile() {
 }`,
   },
   {
-    id: "profile",
-    kind: "core",
-    title: "profile.rs",
-    badge: "CORE",
-    lang: "rust",
-    x: 50,
-    y: 12.47,
-    code: `struct Profile {
-    name: "Caleb Standfield",
-    school: "University of Utah",
-    degree: "B.S. Computer Science",
-    graduated: "Dec 2026",
-}`,
-  },
-  {
-    id: "worker",
-    kind: "rust",
-    title: "Worker Service",
-    subtitle: "Async job runner",
-    icon: GearSix,
-    tags: ["RUST", "TOKIO"],
-    lang: "rust",
-    x: 85,
-    y: 12.83,
-    code: `#[tokio::main]
-async fn main() -> Result<()> {
-  let mut rx = queue.subscribe(
-    "jobs").await?;
-  while let Some(job) = rx.recv().await {
-    process(job).await?;
-  }
+    id: "auth",
+    kind: "external",
+    title: "Auth Service",
+    subtitle: "Identity / OAuth",
+    icon: ShieldCheck,
+    tags: ["TYPESCRIPT", "JWT"],
+    lang: "ts",
+    x: 11,
+    y: 21.4,
+    code: `export async function verifyToken(
+  jwt: string
+): Promise<Claims> {
+  const claims = await jwks.verify(jwt);
+  if (claims.exp < now()) throw err;
+  return claims;
 }`,
   },
   {
@@ -160,8 +111,8 @@ async fn main() -> Result<()> {
     icon: Database,
     tags: ["POSTGRESQL", "SQL"],
     lang: "sql",
-    x: 15,
-    y: 24.27,
+    x: 11,
+    y: 31.6,
     code: `CREATE TABLE profile (
   id UUID PRIMARY KEY,
   name TEXT NOT NULL,
@@ -170,22 +121,91 @@ async fn main() -> Result<()> {
   graduated_on DATE
 );`,
   },
+
+  // --- core (center, the dominant card; holds the photo) ---
   {
-    id: "events",
-    kind: "rust",
-    title: "Event Queue",
-    subtitle: "Change notifications",
-    icon: Stack,
-    tags: ["RUST", "KAFKA"],
+    id: "profile",
+    kind: "core",
+    title: "profile.rs",
+    badge: "CORE",
+    photo: true,
     lang: "rust",
-    x: 85,
-    y: 24.27,
-    code: `producer.send(
-  FutureRecord::to(
-    "profile.updated")
-  .payload(&event)
-)
-.await?;`,
+    x: 50,
+    y: 4,
+    code: `struct Profile {
+    name: "Caleb Standfield",
+    school: "University of Utah",
+    degree: "B.S. Computer Science",
+    graduated: "Dec 2026",
+}`,
+  },
+
+  // --- frontend cluster (right column, clients served from profile) ---
+  {
+    id: "web_app",
+    kind: "external",
+    title: "Web App (SPA)",
+    subtitle: "Vite / React",
+    icon: Globe,
+    tags: ["TYPESCRIPT", "REACT"],
+    lang: "ts",
+    x: 89,
+    y: 1,
+    code: `async function loadProfile() {
+  const res = await fetch(
+    "/api/v1/profile",
+    { headers: { auth } }
+  );
+  return res.json();
+}`,
+  },
+  {
+    id: "mobile",
+    kind: "external",
+    title: "Mobile App",
+    subtitle: "iOS / Android",
+    icon: DeviceMobile,
+    tags: ["REST"],
+    lang: "ts",
+    x: 89,
+    y: 11.2,
+    code: `const profile = await api
+  .get("/v1/profile")
+  .then((r) => r.data);
+
+render(<ProfileScreen {...profile} />);`,
+  },
+  {
+    id: "cdn",
+    kind: "external",
+    title: "CDN",
+    subtitle: "CloudFront / Fastly",
+    icon: CloudArrowDown,
+    tags: ["EDGE"],
+    lang: "nginx",
+    x: 89,
+    y: 21.4,
+    code: `location /assets/ {
+    proxy_pass http://origin;
+    proxy_cache edge_cache;
+    add_header Cache-Control public;
+}`,
+  },
+  {
+    id: "static_assets",
+    kind: "external",
+    title: "Static Assets",
+    subtitle: "Object storage",
+    icon: HardDrives,
+    tags: ["S3"],
+    lang: "nginx",
+    x: 89,
+    y: 31.6,
+    code: `# s3://assets.example.com/*
+location / {
+    root /var/www/static;
+    expires max;
+}`,
   },
 
   // --- projects (lower band; carousel cards fed by the trunk from profile) ---
@@ -197,7 +217,7 @@ async fn main() -> Result<()> {
     icon: Sparkle,
     tags: ["WIP"],
     x: 22,
-    y: 39.8,
+    y: 44,
     images: [],
   },
   {
@@ -208,7 +228,7 @@ async fn main() -> Result<()> {
     icon: PaintBrush,
     tags: ["RUST", "WASM"],
     x: 78,
-    y: 53.2,
+    y: 56.5,
     images: [
       "/sprite/sprite_draw.png",
       "/sprite/sprite_cs.png",
@@ -224,7 +244,7 @@ async fn main() -> Result<()> {
     icon: Cards,
     tags: ["C++"],
     x: 22,
-    y: 66.5,
+    y: 69,
     images: [
       "/blackjack/blackjack_main.png",
       "/blackjack/blackjack_bet.png",
@@ -242,7 +262,7 @@ async fn main() -> Result<()> {
     icon: Keyboard,
     tags: ["WIP"],
     x: 78,
-    y: 79.8,
+    y: 81.5,
     images: [],
   },
 ];
@@ -251,13 +271,14 @@ async fn main() -> Result<()> {
 export const projectIds = ["coming-soon", "pixelify", "blackjack", "learn-vim"];
 
 export const edges: Edge[] = [
-  { from: "client", fromSide: "right", to: "load_balancer", toSide: "left" },
-  { from: "load_balancer", fromSide: "right", to: "auth", toSide: "left" },
-  { from: "client", fromSide: "bottom", to: "api_gateway", toSide: "top" },
-  { from: "load_balancer", fromSide: "bottom", to: "profile", toSide: "top" },
-  { from: "auth", fromSide: "bottom", to: "worker", toSide: "top" },
+  // backend cluster: load balancer feeds the gateway, everything into profile
+  { from: "load_balancer", fromSide: "bottom", to: "api_gateway", toSide: "top" },
   { from: "api_gateway", fromSide: "right", to: "profile", toSide: "left" },
-  { from: "profile", fromSide: "right", to: "worker", toSide: "left" },
-  { from: "api_gateway", fromSide: "bottom", to: "postgres", toSide: "top" },
-  { from: "worker", fromSide: "bottom", to: "events", toSide: "top" },
+  { from: "auth", fromSide: "right", to: "profile", toSide: "left" },
+  { from: "postgres", fromSide: "right", to: "profile", toSide: "left" },
+  // frontend cluster: profile serves the clients, which pull assets via the CDN
+  { from: "profile", fromSide: "right", to: "web_app", toSide: "left" },
+  { from: "profile", fromSide: "right", to: "mobile", toSide: "left" },
+  { from: "web_app", fromSide: "bottom", to: "cdn", toSide: "top" },
+  { from: "cdn", fromSide: "bottom", to: "static_assets", toSide: "top" },
 ];

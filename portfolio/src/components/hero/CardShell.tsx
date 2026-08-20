@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
-import { CaretDown } from "@phosphor-icons/react";
+import { CaretDown, UserSquare } from "@phosphor-icons/react";
 
 import { cn } from "@/lib/utils";
 import type { CardData } from "./system.config";
@@ -51,10 +51,13 @@ export function CardShell({
   const mono = isCore || isProject;
   const Icon = card.icon;
 
-  // Project cards are large feature blocks; service cards are compact.
-  const widthClass = isProject
-    ? "w-[28rem] lg:w-[36rem]"
-    : "w-[19rem] lg:w-[21rem]";
+  // Core is the dominant card (holds the photo); projects are large feature
+  // blocks; service cards are compact.
+  const widthClass = isCore
+    ? "w-[30rem] lg:w-[38rem]"
+    : isProject
+      ? "w-[28rem] lg:w-[36rem]"
+      : "w-[19rem] lg:w-[21rem]";
 
   return (
     <motion.div
@@ -155,6 +158,26 @@ export function CardShell({
                   {tag}
                 </span>
               ))}
+            </div>
+          )}
+
+          {/* photo slot: framed placeholder sized so a real photo drops in
+              large later. Always visible, independent of the code body. */}
+          {card.photo && (
+            <div className="px-4 pt-4">
+              <div
+                className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 rounded-lg border"
+                style={{
+                  borderColor: BORDER_CORE,
+                  background:
+                    "radial-gradient(120% 100% at 50% 0%, rgba(255,143,64,0.06), transparent 70%)",
+                }}
+              >
+                <UserSquare size={40} weight="thin" className="text-orange" />
+                <span className="font-mono text-[0.65rem] tracking-widest text-muted-line">
+                  photo
+                </span>
+              </div>
             </div>
           )}
         </div>
