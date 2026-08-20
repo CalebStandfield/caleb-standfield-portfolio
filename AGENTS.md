@@ -29,16 +29,20 @@ Do not bring in new dependencies without explicit permission.
 
 - `index.html` is the entry; `src/main.tsx` mounts `src/App.tsx` into `#root`.
 - `src/components/portfolio/` holds the homepage sections, typed content
-  configuration, active-section tracking, and the scroll-driven system rail.
+  configuration, active-section tracking, expandable code-node behavior, and
+  the continuous system rail.
 - `src/components/hero/` now contains only shared syntax-highlighting and
   connector-geometry utilities used by the portfolio presentation.
 - `src/components/ui/` holds shadcn components. `src/lib/utils.ts` has `cn()`.
 - Static assets (resume PDF, images) live in `public/` and are served from `/`.
 
 The homepage uses a single-column content flow below 1024px. At 1024px and
-wider, the content occupies the left side and a sticky, decorative system rail
-tracks the active Hero, Projects, Resume, or Contact section on the right.
-Project content is configured in `src/components/portfolio/portfolio.config.ts`.
+wider, the content occupies the left side and one document-level system graph
+runs down the right side. Graph bands align to measured section anchors rather
+than moving an internal canvas. Its code cards are expanded by default and use
+one reusable type/delete interaction; realistic traffic scenarios drive SVG
+pulses between connected nodes. Project and graph content are configured in
+`src/components/portfolio/portfolio.config.ts`.
 
 ### Scripts (run from `portfolio/`)
 

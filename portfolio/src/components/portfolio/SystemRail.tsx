@@ -6,15 +6,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { CaretDown } from "@phosphor-icons/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
+import { highlightLines } from "@/components/hero/codeHighlight";
 import { anchor, trace, type Point, type Rect } from "@/components/hero/connectors";
 import { cn } from "@/lib/utils";
 import {
   edgeColors,
-  stageAnchor,
   stageBand,
-  SYSTEM_CANVAS_HEIGHT,
   systemEdges,
   systemNodes,
   trafficScenarios,
@@ -26,17 +26,17 @@ import type {
   SystemNodeData,
   TrafficScenario,
 } from "./portfolio.types";
+import { useTypedCode } from "./useTypedCode";
 
 interface RailSize {
   width: number;
-  viewportHeight: number;
+  height: number;
 }
 
 interface Segment {
   edge: SystemEdgeData;
   d: string;
   color: string;
-  start: Point;
   labelAnchor?: Point;
   labelWidth?: number;
 }
@@ -48,15 +48,27 @@ interface Pulse {
   direction: 1 | -1;
 }
 
-const PULSE_SPEED = 245;
-const PULSE_HOLD_MS = 140;
-const PULSE_FADE_MS = 240;
+const DEFAULT_STAGE_POSITIONS: Record<PortfolioStage, number> = {
+  hero: 128,
+  projects: 1080,
+  resume: 2320,
+  contact: 3220,
+};
+
+const PULSE_SPEED = 270;
+const PULSE_HOLD_MS = 120;
+const PULSE_FADE_MS = 260;
 const LABEL_HEIGHT = 18;
 
-const bandLabels: Array<{ band: SystemBand; order: string; label: string; y: number }> = [
-  { band: "request", order: "01", label: "request path", y: 28 },
-  { band: "data", order: "02", label: "data + async", y: 606 },
-  { band: "ops", order: "03", label: "delivery + operations", y: 1438 },
+const bandLabels: Array<{
+  band: SystemBand;
+  stage: PortfolioStage;
+  order: string;
+  label: string;
+}> = [
+  { band: "request", stage: "hero", order: "01", label: "request + response" },
+  { band: "data", stage: "projects", order: "02", label: "data + async" },
+  { band: "ops", stage: "resume", order: "03", label: "delivery + operations" },
 ];
 
 function labelWidth(label: string): number {
@@ -86,13 +98,13 @@ function chooseScenario(
 function nodeBorder(kind: SystemNodeData["kind"]): string {
   switch (kind) {
     case "core":
-      return "rgba(255, 143, 64, 0.55)";
+      return "rgba(255, 143, 64, 0.72)";
     case "data":
-      return "rgba(89, 194, 255, 0.4)";
+      return "rgba(89, 194, 255, 0.52)";
     case "ops":
-      return "rgba(183, 156, 255, 0.4)";
+      return "rgba(183, 156, 255, 0.5)";
     default:
-      return "rgba(120, 96, 74, 0.38)";
+      return "rgba(150, 124, 96, 0.48)";
   }
 }
 
@@ -101,41 +113,58 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
   const animate = !reduceMotion;
   const activeBand = stageBand[stage];
 
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLElement>(null);
   const nodeEls = useRef<Map<string, HTMLDivElement>>(new Map());
   const [rects, setRects] = useState<Record<string, Rect>>({});
-  const [size, setSize] = useState<RailSize>({ width: 0, viewportHeight: 0 });
+  const [size, setSize] = useState<RailSize>({ width: 0, height: 0 });
+  const [stagePositions, setStagePositions] = useState(DEFAULT_STAGE_POSITIONS);
 
   const measure = useCallback(() => {
-    const viewport = viewportRef.current;
-    const canvas = canvasRef.current;
-    if (!viewport || !canvas) return;
+    const rail = railRef.current;
+    if (!rail) return;
 
-    const viewportBox = viewport.getBoundingClientRect();
-    const canvasBox = canvas.getBoundingClientRect();
+    const railBox = rail.getBoundingClientRect();
+    const nextPositions = { ...DEFAULT_STAGE_POSITIONS };
+    for (const currentStage of Object.keys(nextPositions) as PortfolioStage[]) {
+      const stageAnchor = document.querySelector<HTMLElement>(
+        `[data-system-anchor="${currentStage}"]`,
+      );
+      if (stageAnchor) {
+        nextPositions[currentStage] =
+          stageAnchor.getBoundingClientRect().top - railBox.top;
+      }
+    }
+
     const nextRects: Record<string, Rect> = {};
     nodeEls.current.forEach((element, id) => {
       const box = element.getBoundingClientRect();
       nextRects[id] = {
-        x: box.left - canvasBox.left,
-        y: box.top - canvasBox.top,
+        x: box.left - railBox.left,
+        y: box.top - railBox.top,
         w: box.width,
         h: box.height,
       };
     });
 
+    setStagePositions(nextPositions);
     setRects(nextRects);
-    setSize({ width: canvasBox.width, viewportHeight: viewportBox.height });
+    setSize({ width: railBox.width, height: railBox.height });
   }, []);
 
   useLayoutEffect(() => {
     measure();
     const observer = new ResizeObserver(measure);
-    if (viewportRef.current) observer.observe(viewportRef.current);
-    if (canvasRef.current) observer.observe(canvasRef.current);
+    const content = document.querySelector<HTMLElement>("[data-portfolio-content]");
+    if (railRef.current) observer.observe(railRef.current);
+    if (content) observer.observe(content);
     nodeEls.current.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
+    window.addEventListener("resize", measure);
+    void document.fonts.ready.then(measure);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [measure]);
 
   const registerNode = useCallback(
@@ -159,12 +188,12 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
       const end = anchor(to, edge.toSide);
       const width = edge.label ? labelWidth(edge.label) : undefined;
       const result = trace(start, edge.fromSide, end, edge.toSide, {
-        stub: 15,
+        stub: 18,
         radius: 8,
         obstacles,
         reserved,
         labelSize: width ? { w: width, h: LABEL_HEIGHT } : undefined,
-        bounds: { x: 0, y: 0, w: size.width, h: SYSTEM_CANVAS_HEIGHT },
+        bounds: { x: 0, y: 0, w: size.width, h: size.height },
       });
 
       if (result.labelAnchor && width) {
@@ -181,13 +210,12 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
           edge,
           d: result.d,
           color: edgeColors[edge.kind],
-          start,
           labelAnchor: result.labelAnchor,
           labelWidth: width,
         },
       ];
     });
-  }, [rects, size.width]);
+  }, [rects, size.height, size.width]);
 
   const segmentsRef = useRef(segments);
   useEffect(() => {
@@ -214,6 +242,17 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
     [],
   );
 
+  const emitNodeTraffic = useCallback(
+    (nodeId: string, opening: boolean) => {
+      if (!animate || !opening) return;
+      segmentsRef.current.forEach((segment, segmentIndex) => {
+        if (segment.edge.from === nodeId) spawn(segmentIndex, 1);
+        if (segment.edge.to === nodeId) spawn(segmentIndex, -1);
+      });
+    },
+    [animate, spawn],
+  );
+
   useEffect(() => {
     if (!animate || !size.width || !segments.length) return;
 
@@ -232,7 +271,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
           const step = scenario.steps[stepIndex];
           if (!step) {
             previousScenarioId = scenario.id;
-            schedule(4200 + Math.random() * 2800);
+            schedule(1800 + Math.random() * 2400);
             return;
           }
 
@@ -260,7 +299,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
 
           timer = window.setTimeout(
             () => runStep(stepIndex + 1),
-            travelMs + (step.pauseMs ?? 100),
+            travelMs + (step.pauseMs ?? 90),
           );
         };
 
@@ -268,12 +307,12 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
       }, delayMs);
     };
 
-    schedule(650);
+    schedule(420);
     return () => {
       cancelled = true;
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [activeBand, animate, segments.length, size.width, spawn, stage]);
+  }, [activeBand, animate, segments.length, size.width, spawn]);
 
   useEffect(() => {
     if (!pulses.length) return;
@@ -310,7 +349,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
         circle.setAttribute("cy", String(point.y));
         circle.setAttribute(
           "opacity",
-          String(progress < 0.12 ? progress / 0.12 : Math.max(0, 1 - fade)),
+          String(progress < 0.1 ? progress / 0.1 : Math.max(0, 1 - fade)),
         );
       }
 
@@ -326,216 +365,264 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
     return () => cancelAnimationFrame(frame);
   }, [pulses]);
 
-  const rawOffset = size.viewportHeight * 0.44 - stageAnchor[stage];
-  const minOffset = size.viewportHeight - SYSTEM_CANVAS_HEIGHT;
-  const offsetY = Math.max(minOffset, Math.min(0, rawOffset));
-
   return (
     <aside
-      aria-hidden="true"
-      className="sticky top-[5.4rem] h-[calc(100vh-6.8rem)] min-h-[34rem] self-start"
+      ref={railRef}
+      aria-label="Interactive system architecture"
+      className="relative min-w-0 self-stretch border-x border-muted-line/10 bg-surface/10"
     >
-      <div
-        ref={viewportRef}
-        className="relative h-full overflow-hidden rounded-3xl border border-muted-line/15 bg-surface/20"
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,143,64,0.05),transparent_24%),radial-gradient(circle_at_50%_48%,rgba(89,194,255,0.035),transparent_26%),radial-gradient(circle_at_50%_78%,rgba(183,156,255,0.04),transparent_25%)]" />
+
+      <svg
+        className="pointer-events-none absolute inset-0 z-[1] size-full overflow-visible"
+        viewBox={`0 0 ${size.width || 1} ${size.height || 1}`}
+        preserveAspectRatio="none"
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(255,143,64,0.045),transparent_62%)]" />
-        <motion.div
-          ref={canvasRef}
-          className="absolute inset-x-0 top-0"
-          style={{ height: SYSTEM_CANVAS_HEIGHT }}
-          animate={{ y: offsetY }}
-          transition={
-            animate
-              ? { duration: 0.75, ease: [0.22, 1, 0.36, 1] }
-              : { duration: 0 }
-          }
-        >
-          <svg
-            className="absolute inset-0 z-[1] h-full w-full overflow-visible"
-            viewBox={`0 0 ${size.width || 1} ${SYSTEM_CANVAS_HEIGHT}`}
-            preserveAspectRatio="none"
-          >
-            <defs>
-              {Object.entries(edgeColors).map(([kind, color]) => (
-                <marker
-                  key={kind}
-                  id={`rail-arrow-${kind}`}
-                  markerWidth="8"
-                  markerHeight="8"
-                  refX="7"
-                  refY="4"
-                  orient="auto"
-                  markerUnits="userSpaceOnUse"
-                >
-                  <path d="M 0 1 L 7 4 L 0 7 Z" fill={color} fillOpacity="0.8" />
-                </marker>
-              ))}
-            </defs>
+        <defs>
+          {Object.entries(edgeColors).map(([kind, color]) => (
+            <marker
+              key={kind}
+              id={`rail-arrow-${kind}`}
+              markerWidth="8"
+              markerHeight="8"
+              refX="7"
+              refY="4"
+              orient="auto"
+              markerUnits="userSpaceOnUse"
+            >
+              <path d="M 0 1 L 7 4 L 0 7 Z" fill={color} fillOpacity="0.9" />
+            </marker>
+          ))}
+        </defs>
 
-            {segments.map((segment, index) => {
-              const active = segment.edge.band === activeBand;
-              return (
-                <motion.path
-                  key={segment.edge.id}
-                  ref={(element: SVGPathElement | null) => {
-                    pathEls.current[index] = element;
-                  }}
-                  d={segment.d}
-                  fill="none"
-                  stroke={segment.color}
-                  strokeWidth={active ? 1.55 : 1.1}
-                  strokeDasharray={
-                    segment.edge.kind === "async"
-                      ? "6 5"
-                      : segment.edge.kind === "ops"
-                        ? "2 6"
-                        : undefined
-                  }
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  markerEnd={`url(#rail-arrow-${segment.edge.kind})`}
-                  animate={{ opacity: active ? 0.72 : 0.13 }}
-                  transition={{ duration: animate ? 0.45 : 0 }}
-                />
-              );
-            })}
-
-            {segments.map((segment) => {
-              const active = segment.edge.band === activeBand;
-              if (!active || !segment.edge.label || !segment.labelAnchor || !segment.labelWidth) {
-                return null;
+        {segments.map((segment, index) => {
+          const active = segment.edge.band === activeBand;
+          return (
+            <motion.path
+              key={segment.edge.id}
+              ref={(element: SVGPathElement | null) => {
+                pathEls.current[index] = element;
+              }}
+              d={segment.d}
+              fill="none"
+              stroke={segment.color}
+              strokeWidth={active ? 1.8 : 1.35}
+              strokeDasharray={
+                segment.edge.kind === "async"
+                  ? "6 5"
+                  : segment.edge.kind === "ops"
+                    ? "2 6"
+                    : undefined
               }
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              markerEnd={`url(#rail-arrow-${segment.edge.kind})`}
+              animate={{ opacity: active ? 0.86 : 0.4 }}
+              transition={{ duration: animate ? 0.45 : 0 }}
+            />
+          );
+        })}
 
-              return (
-                <g
-                  key={`label-${segment.edge.id}`}
-                  transform={`translate(${segment.labelAnchor.x} ${segment.labelAnchor.y})`}
-                >
-                  <rect
-                    x={-segment.labelWidth / 2}
-                    y={-LABEL_HEIGHT / 2}
-                    width={segment.labelWidth}
-                    height={LABEL_HEIGHT}
-                    rx={LABEL_HEIGHT / 2}
-                    fill="#0A0A0C"
-                    fillOpacity="0.95"
-                    stroke={segment.color}
-                    strokeOpacity="0.38"
-                  />
-                  <text
-                    x="0"
-                    y="3"
-                    fill={segment.color}
-                    className="font-mono text-[8px] tracking-[0.05em]"
-                    textAnchor="middle"
-                  >
-                    {segment.edge.label}
-                  </text>
-                </g>
-              );
-            })}
+        {segments.map((segment) => {
+          const active = segment.edge.band === activeBand;
+          if (
+            !segment.edge.label ||
+            !segment.labelAnchor ||
+            !segment.labelWidth
+          ) {
+            return null;
+          }
 
-            {animate &&
-              pulses.map((pulse) => {
-                const segment = segments[pulse.segmentIndex];
-                const color = segment?.color ?? edgeColors.request;
-                return (
-                  <circle
-                    key={pulse.id}
-                    ref={(element) => {
-                      if (element) pulseEls.current.set(pulse.id, element);
-                      else pulseEls.current.delete(pulse.id);
-                    }}
-                    r={3.6}
-                    fill={color}
-                    stroke={color}
-                    strokeOpacity={0.22}
-                    strokeWidth={5}
-                    opacity={0}
-                    style={{ filter: `drop-shadow(0 0 7px ${color})` }}
-                  />
-                );
-              })}
-          </svg>
-
-          {bandLabels.map((band) => {
-            const active = band.band === activeBand;
-            return (
-              <motion.div
-                key={band.band}
-                className="absolute left-5 z-[3] flex items-center gap-2 font-mono text-[0.58rem] uppercase tracking-[0.18em]"
-                style={{ top: band.y }}
-                animate={{ opacity: active ? 0.9 : 0.18 }}
-                transition={{ duration: animate ? 0.4 : 0 }}
+          return (
+            <motion.g
+              key={`label-${segment.edge.id}`}
+              transform={`translate(${segment.labelAnchor.x} ${segment.labelAnchor.y})`}
+              animate={{ opacity: active ? 0.95 : 0.48 }}
+              transition={{ duration: animate ? 0.4 : 0 }}
+            >
+              <rect
+                x={-segment.labelWidth / 2}
+                y={-LABEL_HEIGHT / 2}
+                width={segment.labelWidth}
+                height={LABEL_HEIGHT}
+                rx={LABEL_HEIGHT / 2}
+                fill="#0A0A0C"
+                fillOpacity="0.96"
+                stroke={segment.color}
+                strokeOpacity="0.48"
+              />
+              <text
+                x="0"
+                y="3"
+                fill={segment.color}
+                className="font-mono text-[8px] tracking-[0.05em]"
+                textAnchor="middle"
               >
-                <span className="text-orange">{band.order}</span>
-                <span className="text-muted-line">{band.label}</span>
-              </motion.div>
+                {segment.edge.label}
+              </text>
+            </motion.g>
+          );
+        })}
+
+        {animate &&
+          pulses.map((pulse) => {
+            const segment = segments[pulse.segmentIndex];
+            const color = segment?.color ?? edgeColors.request;
+            return (
+              <circle
+                key={pulse.id}
+                ref={(element) => {
+                  if (element) pulseEls.current.set(pulse.id, element);
+                  else pulseEls.current.delete(pulse.id);
+                }}
+                r={4.2}
+                fill={color}
+                stroke={color}
+                strokeOpacity={0.28}
+                strokeWidth={8}
+                opacity={0}
+                style={{ filter: `drop-shadow(0 0 9px ${color})` }}
+              />
             );
           })}
+      </svg>
 
-          {systemNodes.map((node, index) => (
-            <SystemNode
-              key={node.id}
-              node={node}
-              index={index}
-              active={node.band === activeBand}
-              animate={animate}
-              registerRef={registerNode(node.id)}
-            />
-          ))}
-        </motion.div>
-      </div>
+      {bandLabels.map((band) => {
+        const active = band.band === activeBand;
+        return (
+          <motion.div
+            key={band.band}
+            className="absolute inset-x-5 z-[3] flex items-center gap-2 font-mono text-[0.58rem] uppercase tracking-[0.18em]"
+            style={{ top: stagePositions[band.stage] }}
+            animate={{ opacity: active ? 0.95 : 0.58 }}
+            transition={{ duration: animate ? 0.4 : 0 }}
+          >
+            <span className="text-orange">{band.order}</span>
+            <span className="whitespace-nowrap text-muted-line">{band.label}</span>
+            <span className="h-px flex-1 bg-gradient-to-r from-muted-line/35 to-transparent" />
+          </motion.div>
+        );
+      })}
+
+      {systemNodes.map((node) => (
+        <SystemNode
+          key={node.id}
+          node={node}
+          top={stagePositions[node.stage] + node.y}
+          active={node.band === activeBand}
+          reduceMotion={Boolean(reduceMotion)}
+          registerRef={registerNode(node.id)}
+          onToggle={(opening) => emitNodeTraffic(node.id, opening)}
+        />
+      ))}
     </aside>
   );
 }
 
 function SystemNode({
   node,
-  index,
+  top,
   active,
-  animate,
+  reduceMotion,
   registerRef,
+  onToggle,
 }: {
   node: SystemNodeData;
-  index: number;
+  top: number;
   active: boolean;
-  animate: boolean;
+  reduceMotion: boolean;
   registerRef: (element: HTMLDivElement | null) => void;
+  onToggle: (opening: boolean) => void;
 }) {
   const Icon = node.icon;
+  const codeId = `system-code-${node.id}`;
+  const { expanded, bodyMounted, visibleCode, typing, toggle } = useTypedCode(
+    node.code,
+    node.initiallyExpanded ?? true,
+    reduceMotion,
+  );
+  const lines = highlightLines(visibleCode, node.language);
+
+  const handleToggle = () => {
+    const opening = toggle();
+    onToggle(opening);
+  };
 
   return (
     <motion.div
       ref={registerRef}
-      className="absolute z-[2] w-[8.75rem] -translate-x-1/2 xl:w-[9.5rem]"
-      style={{ left: `${node.x}%`, top: node.y }}
-      initial={animate ? { opacity: 0, y: 6 } : false}
-      animate={{ opacity: active ? 0.82 : 0.24, y: 0, scale: active ? 1 : 0.985 }}
-      transition={{
-        duration: animate ? 0.42 : 0,
-        delay: active && animate ? Math.min(index * 0.025, 0.16) : 0,
-      }}
+      className="absolute z-[2] w-[9.5rem] -translate-x-1/2 xl:w-[12rem] 2xl:w-[13rem]"
+      style={{ left: `${node.x}%`, top }}
+      initial={false}
+      animate={{ opacity: active ? 0.98 : 0.72, scale: active ? 1 : 0.992 }}
+      transition={{ duration: reduceMotion ? 0 : 0.4 }}
     >
       <div
         className={cn(
-          "flex items-center gap-2.5 rounded-xl border bg-[#0E1116] px-3 py-3 shadow-[0_18px_40px_-28px_#000]",
-          active && "shadow-[0_20px_45px_-28px_rgba(255,143,64,0.45)]",
+          "overflow-hidden rounded-xl border bg-[#0E1116] shadow-[0_18px_42px_-28px_#000]",
+          active && "shadow-[0_22px_48px_-28px_rgba(255,143,64,0.48)]",
         )}
         style={{ borderColor: nodeBorder(node.kind) }}
       >
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-orange/10 text-orange">
-          <Icon size={15} weight="bold" />
-        </span>
-        <span className="min-w-0 leading-tight">
-          <span className="block truncate font-heading text-[0.75rem] font-semibold text-ink-text">
-            {node.title}
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={codeId}
+          onClick={handleToggle}
+          className="flex w-full items-center gap-2 px-2.5 py-2.5 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-orange xl:gap-2.5 xl:px-3"
+        >
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-orange/12 text-orange">
+            <Icon size={15} weight="bold" />
           </span>
-          <span className="mt-0.5 block truncate text-[0.6rem] text-muted-line">
-            {node.subtitle}
+          <span className="min-w-0 flex-1 leading-tight">
+            <span className="block font-heading text-[0.7rem] font-semibold text-ink-text xl:text-[0.75rem]">
+              {node.title}
+            </span>
+            <span className="mt-0.5 block text-[0.56rem] leading-3 text-muted-line xl:text-[0.6rem]">
+              {node.subtitle}
+            </span>
           </span>
-        </span>
+          <CaretDown
+            size={12}
+            weight="bold"
+            className={cn(
+              "shrink-0 text-muted-line transition-transform",
+              expanded && "rotate-180 text-orange",
+            )}
+          />
+        </button>
+
+        <AnimatePresence initial={false}>
+          {bodyMounted && (
+            <motion.div
+              id={codeId}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.22, ease: "easeOut" }}
+              className="overflow-hidden border-t border-muted-line/16"
+            >
+              <div className="flex items-center justify-between px-2.5 pt-2 xl:px-3">
+                <span className="font-mono text-[0.5rem] uppercase tracking-[0.15em] text-muted-line/80">
+                  {node.language}
+                </span>
+                <span className="size-1 rounded-full bg-green shadow-[0_0_7px_#AAD94C]" />
+              </div>
+              <pre className="min-h-[4.7rem] overflow-x-auto px-2.5 pt-1.5 pb-2.5 font-mono text-[0.54rem] leading-[1.45] xl:px-3 xl:text-[0.58rem]">
+                <code>
+                  {lines.map((spans, index) => (
+                    <span key={index} className="block min-h-[0.8rem] whitespace-pre">
+                      {spans.length ? spans : " "}
+                      {typing && index === lines.length - 1 && (
+                        <span className="caret-blink ml-px text-orange">_</span>
+                      )}
+                    </span>
+                  ))}
+                </code>
+              </pre>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

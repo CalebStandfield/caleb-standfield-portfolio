@@ -25,7 +25,10 @@ export function ProfileHero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: "easeOut" }}
       >
-        <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-orange">
+        <p
+          className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-orange"
+          data-system-anchor="hero"
+        >
           // software engineer in progress
         </p>
         <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.045em] text-ink-text sm:text-5xl lg:text-[3.2rem] xl:text-6xl">

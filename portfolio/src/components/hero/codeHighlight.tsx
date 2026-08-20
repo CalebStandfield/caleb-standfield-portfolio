@@ -1,8 +1,8 @@
 // Tiny, dependency-free syntax highlighter. Tokenizes a snippet and returns
 // colored spans. Good enough for the fixed code shown in the hero cards; not a
-// full parser. Covers rust / ts / sql / nginx with a shared scanner.
+// full parser. Covers rust / ts / sql / nginx / yaml with a shared scanner.
 
-export type Lang = "rust" | "ts" | "sql" | "nginx";
+export type Lang = "rust" | "ts" | "sql" | "nginx" | "yaml";
 
 type TokenKind =
   | "comment"
@@ -56,13 +56,18 @@ const KEYWORDS: Record<Lang, Set<string>> = {
     "upstream", "server", "least_conn", "proxy_pass", "listen", "location",
     "http", "events", "worker_processes",
   ]),
+  yaml: new Set([
+    "name", "on", "jobs", "runs-on", "steps", "uses", "with", "env",
+    "services", "image", "ports", "command",
+  ]),
 };
 
 function tokenize(code: string, lang: Lang): Token[] {
   const out: Token[] = [];
   const len = code.length;
   const keywords = KEYWORDS[lang];
-  const commentPrefix = lang === "sql" ? "--" : lang === "nginx" ? "#" : "//";
+  const commentPrefix =
+    lang === "sql" ? "--" : lang === "nginx" || lang === "yaml" ? "#" : "//";
   let i = 0;
 
   const push = (kind: TokenKind, value: string) => {

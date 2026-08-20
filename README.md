@@ -72,9 +72,11 @@ preset is Vite (build output is `dist/`).
 ## Current status
 
 The portfolio uses a content-first, single-page layout with profile, projects,
-resume, and contact sections. On desktop and landscape tablet widths, a sticky
-system diagram follows the active section as a decorative visual. Narrower
-screens use the same content without the diagram.
+resume, and contact sections. At desktop widths, one continuous system diagram
+runs beside the page content and aligns its request, data, and operations bands
+with the relevant sections. Its expandable code nodes and animated traffic make
+the diagram interactive without changing the page hierarchy. Narrower screens
+use the same content without mounting the diagram.
 
 Project slots and system-rail content are configured in
 `portfolio/src/components/portfolio/portfolio.config.ts`. Static project images,

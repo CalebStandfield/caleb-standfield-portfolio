@@ -39,6 +39,7 @@ export function ContactSection() {
         eyebrow="contact"
         title="Let's build something useful."
         description="The fastest way to reach me is email. You can also find the code and the longer work history below."
+        systemAnchor="contact"
       />
 
       <div className="mt-10 grid gap-3">

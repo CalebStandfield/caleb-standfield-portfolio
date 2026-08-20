@@ -1,5 +1,6 @@
 import type { Icon } from "@phosphor-icons/react";
 
+import type { Lang } from "@/components/hero/codeHighlight";
 import type { Side } from "@/components/hero/connectors";
 
 export type PortfolioStage = "hero" | "projects" | "resume" | "contact";
@@ -27,8 +28,12 @@ export interface SystemNodeData {
   icon: Icon;
   kind: SystemNodeKind;
   band: SystemBand;
+  stage: PortfolioStage;
   x: number;
   y: number;
+  code: string;
+  language: Lang;
+  initiallyExpanded?: boolean;
 }
 
 export interface SystemEdgeData {

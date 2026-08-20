@@ -54,7 +54,7 @@ export default function App() {
       <Navigation activeStage={activeStage} />
 
       <div className="relative z-10 mx-auto grid max-w-[1600px] px-4 sm:px-8 lg:grid-cols-[minmax(0,3fr)_minmax(22rem,2fr)] lg:gap-8 xl:gap-12 2xl:gap-16">
-        <div className="min-w-0">
+        <div className="min-w-0" data-portfolio-content>
           <ProfileHero />
           <ProjectSlots />
           <ResumeSection />

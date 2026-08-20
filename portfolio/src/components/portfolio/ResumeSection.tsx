@@ -19,6 +19,7 @@ export function ResumeSection() {
         eyebrow="resume"
         title="Education and technical range"
         description="The useful parts of the resume, readable without opening another tab."
+        systemAnchor="resume"
       />
 
       <motion.div

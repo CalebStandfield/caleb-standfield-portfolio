@@ -1,16 +1,20 @@
+import type { PortfolioStage } from "./portfolio.types";
+
 interface SectionHeadingProps {
   eyebrow: string;
   title: string;
   description?: string;
+  systemAnchor: PortfolioStage;
 }
 
 export function SectionHeading({
   eyebrow,
   title,
   description,
+  systemAnchor,
 }: SectionHeadingProps) {
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl" data-system-anchor={systemAnchor}>
       <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-orange">
         // {eyebrow}
       </p>

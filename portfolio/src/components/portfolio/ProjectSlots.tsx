@@ -18,6 +18,7 @@ export function ProjectSlots() {
         eyebrow="selected work"
         title="Projects"
         description="A framework for the work worth discussing. Finished projects lead; active work follows."
+        systemAnchor="projects"
       />
 
       <div className="mt-10 space-y-6">
