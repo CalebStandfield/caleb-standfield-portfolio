@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { CaretDown } from "@phosphor-icons/react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 import { highlightLines } from "@/components/hero/codeHighlight";
 import { anchor, trace, type Point, type Rect } from "@/components/hero/connectors";
@@ -536,17 +536,13 @@ function SystemNode({
 }) {
   const Icon = node.icon;
   const codeId = `system-code-${node.id}`;
-  const { expanded, bodyMounted, visibleCode, typing, toggle } = useTypedCode(
+  // Fire the neighbor pulse when the open sequence finishes typing.
+  const { open, expanded, lineEls, caretEls, toggle } = useTypedCode(
     node.code,
     node.initiallyExpanded ?? true,
-    reduceMotion,
+    () => onToggle(true),
   );
-  const lines = highlightLines(visibleCode, node.language);
-
-  const handleToggle = () => {
-    const opening = toggle();
-    onToggle(opening);
-  };
+  const lines = highlightLines(node.code, node.language);
 
   return (
     <motion.div
@@ -566,9 +562,9 @@ function SystemNode({
       >
         <button
           type="button"
-          aria-expanded={expanded}
+          aria-expanded={open}
           aria-controls={codeId}
-          onClick={handleToggle}
+          onClick={toggle}
           className="flex w-full items-center gap-2 px-2.5 py-2.5 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-orange xl:gap-2.5 xl:px-3"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-orange/12 text-orange">
@@ -582,47 +578,63 @@ function SystemNode({
               {node.subtitle}
             </span>
           </span>
-          <CaretDown
-            size={12}
-            weight="bold"
-            className={cn(
-              "shrink-0 text-muted-line transition-transform",
-              expanded && "rotate-180 text-orange",
-            )}
-          />
+          <motion.span
+            animate={{ rotate: open ? 0 : -90 }}
+            transition={{ duration: reduceMotion ? 0 : 0.25, ease: "easeOut" }}
+            className="flex shrink-0"
+          >
+            <CaretDown
+              size={12}
+              weight="bold"
+              className={cn("text-muted-line", open && "text-orange")}
+            />
+          </motion.span>
         </button>
 
-        <AnimatePresence initial={false}>
-          {bodyMounted && (
-            <motion.div
-              id={codeId}
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: reduceMotion ? 0 : 0.22, ease: "easeOut" }}
-              className="overflow-hidden border-t border-muted-line/16"
-            >
-              <div className="flex items-center justify-between px-2.5 pt-2 xl:px-3">
-                <span className="font-mono text-[0.5rem] uppercase tracking-[0.15em] text-muted-line/80">
-                  {node.language}
-                </span>
-                <span className="size-1 rounded-full bg-green shadow-[0_0_7px_#AAD94C]" />
-              </div>
-              <pre className="min-h-[4.7rem] overflow-x-auto px-2.5 pt-1.5 pb-2.5 font-mono text-[0.54rem] leading-[1.45] xl:px-3 xl:text-[0.58rem]">
-                <code>
-                  {lines.map((spans, index) => (
-                    <span key={index} className="block min-h-[0.8rem] whitespace-pre">
+        {/* code: grid 0fr->1fr collapse so the box grows first, then lines wipe
+            in like fast typing; on close the text deletes, then it collapses */}
+        <div
+          id={codeId}
+          className="grid transition-[grid-template-rows] duration-300 ease-out"
+          style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
+        >
+          <div className="min-h-0 overflow-hidden border-t border-muted-line/16">
+            <div className="flex items-center justify-between px-2.5 pt-2 xl:px-3">
+              <span className="font-mono text-[0.5rem] uppercase tracking-[0.15em] text-muted-line/80">
+                {node.language}
+              </span>
+              <span className="size-1 rounded-full bg-green shadow-[0_0_7px_#AAD94C]" />
+            </div>
+            <pre className="overflow-x-auto px-2.5 pt-1.5 pb-2.5 font-mono text-[0.54rem] leading-[1.45] xl:px-3 xl:text-[0.58rem]">
+              <code>
+                {lines.map((spans, index) => (
+                  <span key={index} className="relative block w-fit min-h-[0.8rem] whitespace-pre">
+                    <span
+                      ref={(el) => {
+                        lineEls.current[index] = el;
+                      }}
+                      className="block"
+                    >
                       {spans.length ? spans : " "}
-                      {typing && index === lines.length - 1 && (
-                        <span className="caret-blink ml-px text-orange">_</span>
-                      )}
                     </span>
-                  ))}
-                </code>
-              </pre>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                    {/* the single blinking caret; the paint loop parks it on the
+                        line being typed and hides it everywhere else */}
+                    <span
+                      ref={(el) => {
+                        caretEls.current[index] = el;
+                      }}
+                      aria-hidden
+                      className="pointer-events-none absolute top-[0.12em] left-0"
+                      style={{ opacity: 0 }}
+                    >
+                      <span className="caret-blink block h-[0.95em] w-[2px] bg-orange" />
+                    </span>
+                  </span>
+                ))}
+              </code>
+            </pre>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
