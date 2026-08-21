@@ -103,8 +103,8 @@ export const resume = {
       ],
     },
   ],
-  certification:
-    "Certified Member, National Society of Leadership and Success (NSLS)",
+  work: 
+    "Adobe summer internship 2026",
 } as const;
 
 export const stageScene: Record<PortfolioStage, SystemScene> = {

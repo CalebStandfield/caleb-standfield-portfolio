@@ -18,7 +18,7 @@ export function ResumeSection() {
       <SectionHeading
         eyebrow="resume"
         title="Education and technical range"
-        description="The useful parts of the resume, readable without opening another tab."
+        description="Key points from my resume, full resume viewable or downloadable below."
         systemAnchor="resume"
       />
 
@@ -75,10 +75,10 @@ export function ResumeSection() {
           ))}
           <div className="grid gap-3 p-5 sm:grid-cols-[9rem_1fr] sm:p-6">
             <h3 className="font-mono text-xs uppercase tracking-[0.16em] text-orange">
-              Certification
+              Work Experience
             </h3>
             <p className="text-sm leading-6 text-muted-line">
-              {resume.certification}
+              {resume.work}
             </p>
           </div>
         </div>

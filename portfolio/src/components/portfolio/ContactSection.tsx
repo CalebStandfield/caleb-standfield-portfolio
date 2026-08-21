@@ -10,8 +10,8 @@ import { SectionHeading } from "./SectionHeading";
 const links = [
   {
     label: "Email",
-    value: "CalebJStandfield@gmail.com",
-    href: "mailto:CalebJStandfield@gmail.com",
+    value: "calebjstandfield@gmail.com",
+    href: "mailto:calebjstandfield@gmail.com",
     Icon: EnvelopeSimple,
   },
   {
@@ -38,7 +38,7 @@ export function ContactSection() {
       <SectionHeading
         eyebrow="contact"
         title="Let's build something useful."
-        description="The fastest way to reach me is email. You can also find the code and the longer work history below."
+        description="Feel free to reach out via email, connect with me on LinkedIn, or follow me on GitHub :)"
         systemAnchor="contact"
       />
 
