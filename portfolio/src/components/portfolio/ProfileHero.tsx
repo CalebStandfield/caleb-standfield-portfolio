@@ -1,17 +1,25 @@
-import { ArrowDown, FilePdf } from "@phosphor-icons/react";
+import { ArrowDown, CaretDown, FilePdf } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { highlightLines } from "@/components/hero/codeHighlight";
+import { cn } from "@/lib/utils";
+import { useTypedCode } from "./useTypedCode";
 
 const code = `struct Profile {
     name: "Caleb Standfield",
     degree: "B.S. Computer Science",
+    minor: "Japanese",
     school: "University of Utah",
     graduating: "Dec 2026",
+    recent_work: "Adobe 2026 internship",
 }`;
 
 export function ProfileHero() {
   const reduceMotion = useReducedMotion();
+  const { open, expanded, lineEls, caretEls, toggle } = useTypedCode(
+    code,
+    true,
+  );
   const lines = highlightLines(code, "rust");
 
   return (
@@ -29,16 +37,16 @@ export function ProfileHero() {
           className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-orange"
           data-system-anchor="hero"
         >
-          // software engineer in progress
+          // learning to create, and creating to learn
         </p>
-        <h1 className="mt-4 max-w-3xl font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.045em] text-ink-text sm:text-5xl lg:text-[3.2rem] xl:text-6xl">
-          Computer science student building practical software in Rust, C++,
-          and TypeScript.
+        <h1 className="mt-4 max-w-3xl font-heading text-3xl font-semibold leading-[1.08] tracking-[-0.04em] text-ink-text sm:text-4xl lg:text-[2.6rem] xl:text-5xl">
+          Computer science student focused on systems and developer tools.
         </h1>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-muted-line sm:text-lg">
-          I&apos;m Caleb Standfield, a University of Utah student graduating in
-          December 2026. I enjoy systems work, developer tools, and making
-          complicated software easier to use.
+        <p className="mt-5 max-w-2xl text-sm leading-6 text-muted-line sm:text-base sm:leading-7">
+          I'm Caleb Standfield, a University of Utah student graduating in
+          December 2026. I have worked across backend, full-stack, systems, and
+          data-focused projects, using languages and tools that fit the problem.
+          I recently completed an internship at Adobe.
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
@@ -74,9 +82,31 @@ export function ProfileHero() {
               Profile domain service
             </p>
           </div>
-          <span className="rounded-md border border-orange/40 px-2 py-1 font-mono text-[0.62rem] tracking-[0.16em] text-orange">
-            READ ONLY
-          </span>
+          <button
+            type="button"
+            onClick={toggle}
+            aria-expanded={open}
+            aria-controls="profile-struct"
+            aria-label={
+              open ? "Collapse profile struct" : "Expand profile struct"
+            }
+            className="flex size-7 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+          >
+            <motion.span
+              animate={{ rotate: open ? 0 : -90 }}
+              transition={{
+                duration: reduceMotion ? 0 : 0.25,
+                ease: "easeOut",
+              }}
+              className="flex"
+            >
+              <CaretDown
+                size={14}
+                weight="bold"
+                className={cn("text-muted-line", open && "text-orange")}
+              />
+            </motion.span>
+          </button>
         </header>
 
         <div className="p-4 sm:p-5">
@@ -87,26 +117,46 @@ export function ProfileHero() {
               className="h-full w-full object-cover object-[50%_43%]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-4 py-3">
-              <span className="font-mono text-xs tracking-wide text-ink-text">
-                Caleb Standfield
-              </span>
-              <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-orange">
-                CS @ Utah
-              </span>
-            </div>
           </div>
         </div>
 
-        <pre className="overflow-x-auto border-t border-muted-line/20 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:px-5 sm:text-xs">
-          <code>
-            {lines.map((spans, index) => (
-              <span key={index} className="block">
-                {spans.length ? spans : " "}
-              </span>
-            ))}
-          </code>
-        </pre>
+        <div
+          id="profile-struct"
+          className="grid transition-[grid-template-rows] duration-300 ease-out"
+          style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <pre className="overflow-x-auto border-t border-muted-line/20 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:px-5 sm:text-xs">
+              <code>
+                {lines.map((spans, index) => (
+                  <span
+                    key={index}
+                    className="relative block min-h-[1em] w-fit whitespace-pre"
+                  >
+                    <span
+                      ref={(element) => {
+                        lineEls.current[index] = element;
+                      }}
+                      className="block"
+                    >
+                      {spans.length ? spans : " "}
+                    </span>
+                    <span
+                      ref={(element) => {
+                        caretEls.current[index] = element;
+                      }}
+                      aria-hidden
+                      className="pointer-events-none absolute top-[0.12em] left-0"
+                      style={{ opacity: 0 }}
+                    >
+                      <span className="caret-blink block h-[0.95em] w-[2px] bg-orange" />
+                    </span>
+                  </span>
+                ))}
+              </code>
+            </pre>
+          </div>
+        </div>
       </motion.article>
     </section>
   );

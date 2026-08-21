@@ -71,6 +71,18 @@ const PULSE_HOLD_MS = 120;
 const PULSE_FADE_MS = 260;
 const LABEL_HEIGHT = 18;
 const CARD_CLEARANCE = 5;
+// How far apart to push the shared mid-lane of parallel edges so their straight
+// runs don't stack on the same pixels. Driven by each edge's port offset, which
+// is already distinct for sibling edges leaving the same node.
+const LANE_SPREAD = 60;
+// The two ingress edges that cross the center (Web SPA -> CDN and Mobile App ->
+// WAF) sit on mirror-image nodes, so the position-aware ports hand them the same
+// vertical lanes and their middle segments overlap into one unreadable line.
+// Nudge Mobile -> WAF onto its own lanes so the crossing reads as two lines.
+// Purely a drawing hint: it changes where a line attaches, not what connects.
+const PORT_OVERRIDES: Record<string, { from?: number; to?: number }> = {
+  "mobile-waf": { from: 0.5, to: 0.5 },
+};
 
 const nodeById = new Map(systemNodes.map((node) => [node.id, node]));
 const incidentEdges = new Map<string, SystemEdgeData[]>();
@@ -79,12 +91,34 @@ for (const edge of systemEdges) {
   incidentEdges.set(edge.to, [...(incidentEdges.get(edge.to) ?? []), edge]);
 }
 
-const portOffsets = new Map<string, number>();
-for (const [nodeId, edges] of incidentEdges) {
-  edges.forEach((edge, index) => {
-    const offset = edges.length === 1 ? 0.5 : 0.3 + (index / (edges.length - 1)) * 0.4;
-    portOffsets.set(`${edge.id}:${nodeId}`, offset);
-  });
+// Assign each node's ports by where the connected node actually sits, so an
+// edge heading left leaves from a left-ish port and one heading right leaves
+// from a right-ish port. Ordering by the other end's center-x this way stops
+// sibling edges from crossing right at the card, which is what tangled them.
+// Positions are only known once measured, so this runs per layout, not at load.
+function computePortOffsets(nodeRects: Record<string, Rect>): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const [nodeId, edges] of incidentEdges) {
+    const self = nodeRects[nodeId];
+    const ordered = edges
+      .map((edge) => {
+        const otherId = edge.from === nodeId ? edge.to : edge.from;
+        const other = nodeRects[otherId];
+        const anchorX = other
+          ? other.x + other.w / 2
+          : self
+            ? self.x + self.w / 2
+            : 0;
+        return { edge, anchorX };
+      })
+      .sort((a, b) => a.anchorX - b.anchorX);
+    ordered.forEach(({ edge }, index) => {
+      const offset =
+        ordered.length === 1 ? 0.5 : 0.3 + (index / (ordered.length - 1)) * 0.4;
+      map.set(`${edge.id}:${nodeId}`, offset);
+    });
+  }
+  return map;
 }
 
 function labelWidth(label: string): number {
@@ -193,7 +227,8 @@ function automaticRoute(
     const endSide: Side = below ? "top" : "bottom";
     const start = sideAnchor(from, startSide, fromOffset);
     const end = sideAnchor(to, endSide, toOffset);
-    const midY = (start.y + end.y) / 2;
+    const laneShift = (fromOffset - 0.5) * LANE_SPREAD;
+    const midY = (start.y + end.y) / 2 + laneShift;
     const points = [start, { x: start.x, y: midY }, { x: end.x, y: midY }, end];
     if (pathIsClear(points, obstacles)) {
       return { start, startSide, end, endSide, points };
@@ -235,7 +270,8 @@ function automaticRoute(
     const endSide: Side = toRight ? "left" : "right";
     const start = sideAnchor(from, startSide, fromOffset);
     const end = sideAnchor(to, endSide, toOffset);
-    const midX = (start.x + end.x) / 2;
+    const laneShift = (fromOffset - 0.5) * LANE_SPREAD;
+    const midX = (start.x + end.x) / 2 + laneShift;
     const points = [start, { x: midX, y: start.y }, { x: midX, y: end.y }, end];
     if (pathIsClear(points, obstacles)) {
       return { start, startSide, end, endSide, points };
@@ -287,14 +323,20 @@ function routedEdge(
   to: Rect,
   obstacles: Rect[],
   railWidth: number,
+  portOffsets: Map<string, number>,
 ) {
-  const fromOffset = portOffsets.get(`${edge.id}:${edge.from}`) ?? 0.5;
-  const toOffset = portOffsets.get(`${edge.id}:${edge.to}`) ?? 0.5;
+  const override = PORT_OVERRIDES[edge.id];
+  const fromOffset =
+    override?.from ?? portOffsets.get(`${edge.id}:${edge.from}`) ?? 0.5;
+  const toOffset =
+    override?.to ?? portOffsets.get(`${edge.id}:${edge.to}`) ?? 0.5;
 
   if (edge.trunk === "origin" || edge.trunk === "recovery") {
-    const left = edge.trunk === "origin";
-    const trunkX = left ? 14 : railWidth - 14;
-    const startSide: Side = left ? "left" : "right";
+    // Both the origin (CDN -> object store) and recovery trunks hug the right
+    // wall so the long vertical runs sit at the far edge of the screen instead
+    // of down the middle where the pulses are distracting.
+    const trunkX = railWidth - 14;
+    const startSide: Side = "right";
     const endSide: Side = startSide;
     const start = sideAnchor(from, startSide, fromOffset);
     const end = sideAnchor(to, endSide, toOffset);
@@ -414,6 +456,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
 
   const segments = useMemo<Segment[]>(() => {
     const reserved: Rect[] = [];
+    const portOffsets = computePortOffsets(nodeRects);
 
     return systemEdges.flatMap((edge) => {
       const from = nodeRects[edge.from];
@@ -423,7 +466,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
       const obstacles = Object.entries(nodeRects)
         .filter(([id]) => id !== edge.from && id !== edge.to)
         .map(([, rect]) => rect);
-      const route = routedEdge(edge, from, to, obstacles, size.width);
+      const route = routedEdge(edge, from, to, obstacles, size.width, portOffsets);
       const width = edge.label ? labelWidth(edge.label) : undefined;
       const result = trace(
         route.start,
@@ -599,7 +642,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
         circle.setAttribute("cy", String(point.y));
         circle.setAttribute(
           "opacity",
-          String(progress < 0.1 ? progress / 0.1 : Math.max(0, 1 - fade)),
+          String(0.88 * (progress < 0.1 ? progress / 0.1 : Math.max(0, 1 - fade))),
         );
       }
 
@@ -744,6 +787,22 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
           );
         })}
       </svg>
+
+      {systemClusters
+        .filter((cluster) => cluster.id === "ingress")
+        .map((cluster) => (
+          <div
+            key={`${cluster.id}-mock-label`}
+            className="absolute z-[4] text-center font-mono text-[0.62rem] uppercase tracking-[0.18em] text-muted-line/65"
+            style={{
+              ...alignedStyle(cluster.width, cluster.align),
+              top: stagePositions[cluster.stage] + cluster.offset - 48,
+            }}
+          >
+            <p>Conceptual system // real architecture patterns.</p>
+            <p className="mt-1">A little systems theater while you get to know me.</p>
+          </div>
+        ))}
 
       {systemClusters.map((cluster) => (
         <SystemCluster

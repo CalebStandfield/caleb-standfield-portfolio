@@ -138,8 +138,8 @@ export const systemClusters: SystemClusterData[] = [
     placements: [
       { nodeId: "web_spa", row: 1, column: 1, span: 3 },
       { nodeId: "mobile_app", row: 1, column: 4, span: 3 },
-      { nodeId: "cdn", row: 2, column: 1, span: 3 },
-      { nodeId: "waf", row: 2, column: 4, span: 3 },
+      { nodeId: "cdn", row: 2, column: 4, span: 3 },
+      { nodeId: "waf", row: 2, column: 1, span: 3 },
       { nodeId: "auth_service", row: 3, column: 2, span: 4 },
     ],
   },
@@ -174,7 +174,7 @@ export const systemClusters: SystemClusterData[] = [
     offset: 20,
     width: 86,
     align: "center",
-    rowGap: 72,
+    rowGap: 56,
     placements: [
       { nodeId: "git_repository", row: 1, column: 1, span: 3 },
       { nodeId: "ci_builder", row: 1, column: 4, span: 3 },
@@ -189,9 +189,9 @@ export const systemClusters: SystemClusterData[] = [
 
 export const systemStandalones: SystemStandaloneData[] = [
   { nodeId: "api_gateway", scene: "ingress", stage: "hero", offset: 890, width: 54, align: "center", eyebrow: "policy boundary" },
-  { nodeId: "object_store", scene: "application", stage: "projects", offset: 1024, width: 52, align: "end", eyebrow: "durable media" },
-  { nodeId: "email_gateway", scene: "operations", stage: "contact", offset: 30, width: 50, align: "start", eyebrow: "external delivery" },
-  { nodeId: "backup_vault", scene: "operations", stage: "contact", offset: 310, width: 54, align: "end", eyebrow: "recovery boundary" },
+  { nodeId: "object_store", scene: "application", stage: "projects", offset: 1175, width: 52, align: "end", eyebrow: "durable media" },
+  { nodeId: "email_gateway", scene: "operations", stage: "contact", offset: 200, width: 50, align: "start", eyebrow: "external delivery" },
+  { nodeId: "backup_vault", scene: "operations", stage: "contact", offset: 370, width: 54, align: "end", eyebrow: "recovery boundary" },
 ];
 
 function node(data: Omit<SystemNodeData, "initiallyExpanded">): SystemNodeData {
@@ -199,29 +199,29 @@ function node(data: Omit<SystemNodeData, "initiallyExpanded">): SystemNodeData {
 }
 
 export const systemNodes: SystemNodeData[] = [
-  node({ id: "web_spa", title: "Web SPA", subtitle: "React / Vite", icon: Browser, kind: "client", language: "ts", code: `const profile = await\napi.profile.get();` }),
-  node({ id: "mobile_app", title: "Mobile App", subtitle: "Typed client", icon: DeviceMobile, kind: "client", language: "ts", code: `const media = await\napi.media.list();` }),
-  node({ id: "cdn", title: "CDN", subtitle: "Assets + media", icon: CloudArrowDown, kind: "edge", language: "nginx", code: `location /assets/ {\n  expires 1y;\n}` }),
-  node({ id: "waf", title: "WAF", subtitle: "Threat filtering", icon: ShieldCheck, kind: "security", language: "nginx", code: `limit_req zone=api\n  burst=40;` }),
-  node({ id: "api_gateway", title: "API Gateway", subtitle: "Routing + policy", icon: ArrowsLeftRight, kind: "edge", language: "rust", code: `Router::new()\n  .nest("/v1", api())` }),
-  node({ id: "auth_service", title: "Auth Service", subtitle: "OAuth + JWT", icon: Fingerprint, kind: "security", language: "rust", code: `let claims = jwt\n  .verify(token)?;` }),
-  node({ id: "profile_service", title: "Profile Service", subtitle: "Profile domain", icon: Database, kind: "service", language: "rust", code: `pub async fn profile(\n  id: UserId)` }),
-  node({ id: "project_service", title: "Project Catalog", subtitle: "Project domain", icon: TreeStructure, kind: "service", language: "rust", code: `catalog.list_visible()\n  .await?;` }),
-  node({ id: "media_service", title: "Media Service", subtitle: "Upload contracts", icon: CloudArrowUp, kind: "service", language: "rust", code: `store.presign_put(key)\n  .await?;` }),
-  node({ id: "redis", title: "Redis Cache", subtitle: "Read-through cache", icon: Lightning, kind: "data", language: "rust", code: `cache.get(key)\n  .await?;` }),
-  node({ id: "postgres", title: "PostgreSQL", subtitle: "Source of truth", icon: HardDrives, kind: "data", language: "sql", code: `SELECT payload\nFROM profiles;` }),
-  node({ id: "object_store", title: "Object Store", subtitle: "Assets + media", icon: Cloud, kind: "data", language: "rust", code: `store.put(key, bytes)\n  .await?;` }),
-  node({ id: "event_bus", title: "Event Bus", subtitle: "Durable topics", icon: Broadcast, kind: "async", language: "rust", code: `bus.publish(topic, event)\n  .await?;` }),
-  node({ id: "media_worker", title: "Media Worker", subtitle: "Image pipeline", icon: GearSix, kind: "async", language: "rust", code: `let output = resize(\n  source)?;` }),
-  node({ id: "email_gateway", title: "Email Gateway", subtitle: "External delivery", icon: EnvelopeSimple, kind: "service", language: "rust", code: `provider.deliver(mail)\n  .await?;` }),
-  node({ id: "git_repository", title: "Git Repository", subtitle: "Source + manifests", icon: GitBranch, kind: "delivery", language: "yaml", code: `branch: main\nprotected: true` }),
-  node({ id: "ci_builder", title: "CI Builder", subtitle: "Test + package", icon: GearSix, kind: "delivery", language: "yaml", code: `jobs:\n  build: cargo test` }),
-  node({ id: "oci_registry", title: "OCI Registry", subtitle: "Signed images", icon: Package, kind: "delivery", language: "yaml", code: `image: profile-api\ntag: sha-7f3c` }),
-  node({ id: "deploy_controller", title: "Deploy Controller", subtitle: "Desired state", icon: GitCommit, kind: "delivery", language: "yaml", code: `syncPolicy:\n  automated: true` }),
-  node({ id: "runtime_cluster", title: "Runtime Cluster", subtitle: "Services + workers", icon: Cube, kind: "delivery", language: "yaml", code: `replicas: 3\nstrategy: Rolling` }),
-  node({ id: "otel_collector", title: "OTel Collector", subtitle: "Telemetry intake", icon: Pulse, kind: "ops", language: "yaml", code: `receivers:\n  otlp: {}` }),
-  node({ id: "alert_manager", title: "Alert Manager", subtitle: "Incident routing", icon: Warning, kind: "ops", language: "yaml", code: `group_wait: 30s\nrepeat: 4h` }),
-  node({ id: "backup_vault", title: "Backup Vault", subtitle: "Cross-region copies", icon: Archive, kind: "ops", language: "yaml", code: `snapshots: daily\nretention: 35d` }),
+  node({ id: "web_spa", title: "Web SPA", subtitle: "React / Vite", icon: Browser, kind: "client", language: "ts", code: `const { data } = await\n  api.profile.get();\nsetProfile(data);\nrender(<Profile />);` }),
+  node({ id: "mobile_app", title: "Mobile App", subtitle: "Typed client", icon: DeviceMobile, kind: "client", language: "ts", code: `const res = await\n  api.media.list();\nsetItems(res.data);\nnavigate("/feed");` }),
+  node({ id: "cdn", title: "CDN", subtitle: "Assets + media", icon: CloudArrowDown, kind: "edge", language: "nginx", code: `location /assets/ {\n  expires 1y;\n  access_log off;\n  try_files $uri =404;\n}` }),
+  node({ id: "waf", title: "WAF", subtitle: "Threat filtering", icon: ShieldCheck, kind: "security", language: "nginx", code: `limit_req zone=api\n  burst=40 nodelay;\nif ($bad_bot) {\n  return 403;\n}` }),
+  node({ id: "api_gateway", title: "API Gateway", subtitle: "Routing + policy", icon: ArrowsLeftRight, kind: "edge", language: "rust", code: `Router::new()\n  .nest("/v1", api())\n  .layer(auth())\n  .layer(trace())` }),
+  node({ id: "auth_service", title: "Auth Service", subtitle: "OAuth + JWT", icon: Fingerprint, kind: "security", language: "rust", code: `let token = bearer(&req)?;\nlet claims = jwt\n  .decode(token, &key)?;\nrequire_scope(&claims,\n  Scope::Read)?;\nOk(claims)` }),
+  node({ id: "profile_service", title: "Profile Service", subtitle: "Profile domain", icon: Database, kind: "service", language: "rust", code: `pub async fn profile(\n  id: UserId,\n) -> Json<Profile> {\n  cache.get_or(id, ||\n    db.load(id)).await\n}` }),
+  node({ id: "project_service", title: "Project Catalog", subtitle: "Project domain", icon: TreeStructure, kind: "service", language: "rust", code: `db.insert(project)\n  .await?;\nbus.publish(\n  ProjectAdded)\n  .await?;` }),
+  node({ id: "media_service", title: "Media Service", subtitle: "Upload contracts", icon: CloudArrowUp, kind: "service", language: "rust", code: `pub async fn upload(key: Key)\n  -> Result<PresignedUrl> {\n  let url = store\n    .presign_put(key).await?;\n  Ok(url)\n}` }),
+  node({ id: "redis", title: "Redis Cache", subtitle: "Read-through cache", icon: Lightning, kind: "data", language: "rust", code: `cache\n  .get(key)\n  .await?\n  .or_load()` }),
+  node({ id: "postgres", title: "PostgreSQL", subtitle: "Source of truth", icon: HardDrives, kind: "data", language: "sql", code: `SELECT id, payload\nFROM profiles\nWHERE user_id = $1\n  AND deleted_at IS NULL\nLIMIT 1;` }),
+  node({ id: "object_store", title: "Object Store", subtitle: "Assets + media", icon: Cloud, kind: "data", language: "rust", code: `store.put(key, bytes)\n  .content_type(mime)\n  .send().await?;\nOk(Key::from(key))` }),
+  node({ id: "event_bus", title: "Event Bus", subtitle: "Durable topics", icon: Broadcast, kind: "async", language: "rust", code: `bus.publish(Topic::MediaUploaded, Event {\n  key: media.key.clone(),\n  at: Utc::now(),\n}).await?;` }),
+  node({ id: "media_worker", title: "Media Worker", subtitle: "Image pipeline", icon: GearSix, kind: "async", language: "rust", code: `let out = image\n  ::load(&src)?\n  .resize(1600)\n  .to_webp()?;\nstore.put(out)?;` }),
+  node({ id: "email_gateway", title: "Email Gateway", subtitle: "External delivery", icon: EnvelopeSimple, kind: "service", language: "rust", code: `provider.send(Alert {\n  to: oncall.email,\n  incident: id,\n}).await?;` }),
+  node({ id: "git_repository", title: "Git Repository", subtitle: "Source + manifests", icon: GitBranch, kind: "delivery", language: "yaml", code: `branch: main\nprotected: true\nrequire_reviews: 2\nchecks:\n  - build\n  - test` }),
+  node({ id: "ci_builder", title: "CI Builder", subtitle: "Test + package", icon: GearSix, kind: "delivery", language: "yaml", code: `jobs:\n  build:\n    run: cargo test\n    then: cargo build\n    cache: ~/.cargo` }),
+  node({ id: "oci_registry", title: "OCI Registry", subtitle: "Signed images", icon: Package, kind: "delivery", language: "yaml", code: `image: profile-api\ntag: sha-7f3c9a1\ndigest: sha256:8e2...\nsigned: true\nsigner: cosign` }),
+  node({ id: "deploy_controller", title: "Deploy Controller", subtitle: "Desired state", icon: GitCommit, kind: "delivery", language: "yaml", code: `syncPolicy:\n  automated:\n    prune: true\n    selfHeal: true\nsource:\n  repoURL: git@repo:profile-api.git` }),
+  node({ id: "runtime_cluster", title: "Runtime Cluster", subtitle: "Services + workers", icon: Cube, kind: "delivery", language: "yaml", code: `replicas: 3\nstrategy:\n  type: RollingUpdate\n  maxSurge: 1\nresources:\n  limits: { cpu: 500m, memory: 512Mi }` }),
+  node({ id: "otel_collector", title: "OTel Collector", subtitle: "Telemetry intake", icon: Pulse, kind: "ops", language: "yaml", code: `receivers:\n  otlp:\n    protocols:\n      grpc:\nexporters:\n  - prometheus` }),
+  node({ id: "alert_manager", title: "Alert Manager", subtitle: "Incident routing", icon: Warning, kind: "ops", language: "yaml", code: `route:\n  group_wait: 30s\n  repeat: 4h\n  receiver: oncall\nroutes:\n  - match: sev=crit` }),
+  node({ id: "backup_vault", title: "Backup Vault", subtitle: "Cross-region copies", icon: Archive, kind: "ops", language: "yaml", code: `snapshots: daily\nretention: 35d\nregions:\n  - us-west\n  - us-east\ncopies: 3` }),
 ];
 
 export const systemEdges: SystemEdgeData[] = [
@@ -251,8 +251,8 @@ export const systemEdges: SystemEdgeData[] = [
   { id: "runtime-otel", from: "runtime_cluster", to: "otel_collector", kind: "telemetry", scene: "operations", label: "OTLP" },
   { id: "otel-alert", from: "otel_collector", to: "alert_manager", kind: "control", scene: "operations" },
   { id: "alert-email", from: "alert_manager", to: "email_gateway", kind: "control", scene: "operations" },
-  { id: "postgres-backup", from: "postgres", to: "backup_vault", kind: "control", scene: "operations", trunk: "recovery", label: "snapshot" },
-  { id: "object-backup", from: "object_store", to: "backup_vault", kind: "control", scene: "operations", trunk: "recovery" },
+  { id: "postgres-backup", from: "postgres", to: "backup_vault", kind: "data", scene: "operations", trunk: "recovery", label: "snapshot" },
+  { id: "object-backup", from: "object_store", to: "backup_vault", kind: "data", scene: "operations", trunk: "recovery" },
 ];
 
 export const trafficScenarios: TrafficScenario[] = [
@@ -294,10 +294,33 @@ export function validateSystemDefinition(definition: SystemDefinition): void {
   const assignedNodes = new Set<string>();
   const occupiedSlots = new Set<string>();
 
+  // Each card is a fixed-width column, so the horizontal budget is set by the
+  // node's column span (or a standalone's rail width), not a flat number. More
+  // lines just grow the card vertically. Derive a per-node char budget so the
+  // guard self-adjusts instead of hardcoding one width for every card.
+  const budgetForSpan = (span: number): number => Math.round(span * 7 + 2);
+  const spanForWidth = (width: number): number => width / 17;
+  const maxChars = new Map<string, number>();
+  for (const cluster of definition.clusters) {
+    for (const placement of cluster.placements) {
+      maxChars.set(placement.nodeId, budgetForSpan(placement.span));
+    }
+  }
+  for (const standalone of definition.standalones) {
+    maxChars.set(standalone.nodeId, budgetForSpan(spanForWidth(standalone.width)));
+  }
+
   for (const entry of definition.nodes) {
     const lines = entry.code.split("\n");
-    if (lines.length > 3 || lines.some((line) => line.length > 28)) {
-      throw new Error(`Node ${entry.id} has code that exceeds its compact card`);
+    if (lines.length > 6) {
+      throw new Error(`Node ${entry.id} has ${lines.length} code lines (max 6)`);
+    }
+    const budget = maxChars.get(entry.id) ?? 22;
+    const overflow = lines.find((line) => line.length > budget);
+    if (overflow !== undefined) {
+      throw new Error(
+        `Node ${entry.id} code line exceeds ${budget} chars: "${overflow}"`,
+      );
     }
   }
 
