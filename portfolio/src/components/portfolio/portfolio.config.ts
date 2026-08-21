@@ -38,25 +38,36 @@ import type {
 
 export const projectSlots: ProjectData[] = [
   {
-    id: "featured-project",
+    id: "blackjack",
     status: "complete",
     placeholderTitle: "Featured project",
+    title: "blackjack",
     tags: [],
-    images: [],
+    images: ["/blackjack/blackjack_main.png"],
   },
   {
-    id: "currently-working-on",
+    id: "pixelify",
     status: "in_progress",
     placeholderTitle: "Currently working on",
+    title: "Pixelify",
     tags: [],
     images: [],
   },
   {
-    id: "additional-project",
+    id: "learn-vim",
     status: "complete",
     placeholderTitle: "Additional project",
+    title: "learn-vim",
     tags: [],
     images: [],
+  },
+  {
+    id: "sprite-editor",
+    status: "complete",
+    placeholderTitle: "Additional project",
+    title: "Sprite Editor and Animation Tool",
+    tags: [],
+    images: ["/sprite/sprite_draw.png"],
   },
 ];
 

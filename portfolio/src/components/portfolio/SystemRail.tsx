@@ -683,7 +683,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
               orient="auto-start-reverse"
               markerUnits="userSpaceOnUse"
             >
-              <path d="M 0 1 L 6 3.5 L 0 6 Z" fill={color} fillOpacity="0.72" />
+              <path d="M 0 1 L 6 3.5 L 0 6 Z" fill={color} />
             </marker>
           ))}
         </defs>
@@ -723,7 +723,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
                   : undefined
               }
               markerEnd={`url(#rail-arrow-${segment.edge.kind})`}
-              animate={{ opacity: active ? 0.58 : 0.16 }}
+              animate={{ strokeOpacity: active ? 0.58 : 0.16 }}
               transition={{ duration: animate ? 0.45 : 0 }}
             />
           );

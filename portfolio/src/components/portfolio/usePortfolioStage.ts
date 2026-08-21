@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 
+import { stageForPath } from "./portfolio.routes";
 import type { PortfolioStage } from "./portfolio.types";
 
 const stages: PortfolioStage[] = ["hero", "projects", "resume", "contact"];
 
 export function usePortfolioStage(): PortfolioStage {
-  const [activeStage, setActiveStage] = useState<PortfolioStage>("hero");
+  // Seed from the URL so a deep link starts on the right stage before the
+  // observer's first reading arrives.
+  const [activeStage, setActiveStage] = useState<PortfolioStage>(() =>
+    stageForPath(window.location.pathname),
+  );
 
   useEffect(() => {
     const sections = stages
@@ -14,23 +19,36 @@ export function usePortfolioStage(): PortfolioStage {
 
     if (!sections.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              Math.abs(a.boundingClientRect.top - window.innerHeight * 0.3) -
-              Math.abs(b.boundingClientRect.top - window.innerHeight * 0.3),
-          );
+    // Pick the section whose top sits closest to the 30% line, measuring all
+    // sections live. We recompute from current positions (not from the
+    // callback's changed entries) because a section can already be intersecting
+    // when a neighbor leaves; reading only the changed entries would skip it.
+    const pickActive = () => {
+      const vh = window.innerHeight;
+      const bandTop = vh * 0.2;
+      const bandBottom = vh * 0.42;
+      const center = vh * 0.3;
 
-        const next = visible[0]?.target.getAttribute(
-          "data-stage",
-        ) as PortfolioStage | null;
-        if (next) setActiveStage(next);
-      },
-      { rootMargin: "-20% 0px -58% 0px", threshold: 0 },
-    );
+      let best: HTMLElement | null = null;
+      let bestDist = Infinity;
+      for (const section of sections) {
+        const rect = section.getBoundingClientRect();
+        if (rect.bottom <= bandTop || rect.top >= bandBottom) continue;
+        const dist = Math.abs(rect.top - center);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = section;
+        }
+      }
+
+      const next = best?.getAttribute("data-stage") as PortfolioStage | null;
+      if (next) setActiveStage(next);
+    };
+
+    const observer = new IntersectionObserver(pickActive, {
+      rootMargin: "-20% 0px -58% 0px",
+      threshold: 0,
+    });
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();

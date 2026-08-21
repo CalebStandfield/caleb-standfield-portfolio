@@ -2,6 +2,7 @@ import { GithubLogo, LinkedinLogo } from "@phosphor-icons/react";
 
 import { ContactSection } from "@/components/portfolio/ContactSection";
 import { ProfileHero } from "@/components/portfolio/ProfileHero";
+import { ProfileProjectConnector } from "@/components/portfolio/ProfileProjectConnector";
 import { ProjectSlots } from "@/components/portfolio/ProjectSlots";
 import { ResumeSection } from "@/components/portfolio/ResumeSection";
 import { SystemRail } from "@/components/portfolio/SystemRail";
@@ -9,13 +10,18 @@ import {
   useMediaQuery,
   usePortfolioStage,
 } from "@/components/portfolio/usePortfolioStage";
+import { useStageUrl } from "@/components/portfolio/useStageUrl";
+import {
+  smoothScrollToElement,
+  smoothScrollToY,
+} from "@/components/portfolio/scrollUtils";
 import type { PortfolioStage } from "@/components/portfolio/portfolio.types";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { href: "#projects", label: "Work", stage: "projects" },
-  { href: "#resume", label: "Resume", stage: "resume" },
-  { href: "#contact", label: "Contact", stage: "contact" },
+  { path: "/projects", sectionId: "projects", label: "Projects", stage: "projects" },
+  { path: "/resume", sectionId: "resume", label: "Resume", stage: "resume" },
+  { path: "/contact", sectionId: "contact", label: "Contact", stage: "contact" },
 ] as const;
 
 const socials = [
@@ -34,6 +40,7 @@ const socials = [
 export default function App() {
   const activeStage = usePortfolioStage();
   const showSystemRail = useMediaQuery("(min-width: 1024px)");
+  useStageUrl(activeStage);
 
   return (
     <main className="relative min-h-screen overflow-clip bg-ink text-ink-text">
@@ -54,7 +61,8 @@ export default function App() {
       <Navigation activeStage={activeStage} />
 
       <div className="relative z-10 mx-auto grid max-w-[1600px] px-4 sm:px-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(26rem,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(22rem,2fr)] xl:gap-12 2xl:gap-16">
-        <div className="min-w-0" data-portfolio-content>
+        <div className="relative min-w-0" data-portfolio-content>
+          <ProfileProjectConnector />
           <ProfileHero />
           <ProjectSlots />
           <ResumeSection />
@@ -71,7 +79,15 @@ function Navigation({ activeStage }: { activeStage: PortfolioStage }) {
   return (
     <nav className="fixed inset-x-0 top-0 z-50 border-b border-muted-line/15 bg-ink/78 backdrop-blur-xl">
       <div className="mx-auto flex h-[4.35rem] max-w-[1600px] items-center justify-between gap-5 px-4 sm:px-8">
-        <a href="#home" className="min-w-0 font-mono text-sm tracking-wide sm:text-base">
+        <a
+          href="/"
+          onClick={(event) => {
+            event.preventDefault();
+            smoothScrollToY(0);
+            window.history.replaceState(null, "", "/");
+          }}
+          className="min-w-0 font-mono text-sm tracking-wide sm:text-base"
+        >
           <span className="text-orange">caleb</span>
           <span className="text-muted-line">::</span>
           <span className="text-ink-text">standfield</span>
@@ -82,8 +98,13 @@ function Navigation({ activeStage }: { activeStage: PortfolioStage }) {
           <div className="hidden items-center gap-5 sm:flex lg:gap-7">
             {navigation.map((item) => (
               <a
-                key={item.href}
-                href={item.href}
+                key={item.path}
+                href={item.path}
+                onClick={(event) => {
+                  event.preventDefault();
+                  smoothScrollToElement(item.sectionId);
+                  window.history.replaceState(null, "", item.path);
+                }}
                 className={cn(
                   "font-mono text-xs transition-colors hover:text-orange",
                   activeStage === item.stage ? "text-orange" : "text-muted-line",

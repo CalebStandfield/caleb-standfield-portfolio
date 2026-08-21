@@ -81,6 +81,11 @@ and recovery move through the system. The delivery and operations scene keeps
 that story focused with seven core components. Narrower screens use the same
 content without mounting the diagram.
 
+A separate measured connector bundle links the profile card to each project at
+every viewport width. Its parallel left-gutter lanes compress on narrow screens
+without moving the content, and periodic traffic pulses reuse the visual
+language of the reference architecture.
+
 Project slots and system-rail content are configured in
 `portfolio/src/components/portfolio/portfolio.config.ts`. Static project images,
 the downloadable resume, and the social preview live in `portfolio/public/`.

@@ -13,7 +13,7 @@ export function ResumeSection() {
     <section
       id="resume"
       data-stage="resume"
-      className="scroll-mt-24 py-24 sm:py-28 lg:py-32"
+      className="scroll-mt-0 py-24 sm:py-28 lg:py-32"
     >
       <SectionHeading
         eyebrow="resume"

@@ -12,7 +12,7 @@ export function ProjectSlots() {
     <section
       id="projects"
       data-stage="projects"
-      className="scroll-mt-24 py-24 sm:py-28 lg:py-32"
+      className="scroll-mt-0 py-24 sm:py-28 lg:py-32"
     >
       <SectionHeading
         eyebrow="selected work"
@@ -23,12 +23,13 @@ export function ProjectSlots() {
 
       <div className="mt-10 space-y-6">
         {projectSlots.map((project, index) => (
-          <ProjectSlot
-            key={project.id}
-            project={project}
-            index={index}
-            animate={!reduceMotion}
-          />
+          <div key={project.id} data-profile-project-target={project.id}>
+            <ProjectSlot
+              project={project}
+              index={index}
+              animate={!reduceMotion}
+            />
+          </div>
         ))}
       </div>
     </section>

@@ -67,97 +67,103 @@ export function ProfileHero() {
         </div>
       </motion.div>
 
-      <motion.article
-        className="mt-10 max-w-[46rem] overflow-hidden rounded-2xl border border-orange/45 bg-[#0E1116] shadow-[0_30px_80px_-44px_#000]"
-        initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: reduceMotion ? 0 : 0.16 }}
+      <div
+        className="mt-10 max-w-[46rem]"
+        data-profile-project-source
+        data-profile-project-expanded={expanded}
       >
-        <header className="flex items-center justify-between gap-4 border-b border-muted-line/20 px-4 py-3.5 sm:px-5">
-          <div>
-            <p className="font-mono text-sm font-semibold text-ink-text">
-              profile.rs
-            </p>
-            <p className="mt-0.5 text-xs text-muted-line">
-              Profile domain service
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={toggle}
-            aria-expanded={open}
-            aria-controls="profile-struct"
-            aria-label={
-              open ? "Collapse profile struct" : "Expand profile struct"
-            }
-            className="flex size-7 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
-          >
-            <motion.span
-              animate={{ rotate: open ? 0 : -90 }}
-              transition={{
-                duration: reduceMotion ? 0 : 0.25,
-                ease: "easeOut",
-              }}
-              className="flex"
-            >
-              <CaretDown
-                size={14}
-                weight="bold"
-                className={cn("text-muted-line", open && "text-orange")}
-              />
-            </motion.span>
-          </button>
-        </header>
-
-        <div className="p-4 sm:p-5">
-          <div className="relative h-[250px] overflow-hidden rounded-xl border border-orange/35 sm:h-[300px] lg:h-[280px] xl:h-[330px]">
-            <img
-              src="/pfp.jpg"
-              alt="Caleb Standfield"
-              className="h-full w-full object-cover object-[50%_43%]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-transparent" />
-          </div>
-        </div>
-
-        <div
-          id="profile-struct"
-          className="grid transition-[grid-template-rows] duration-300 ease-out"
-          style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
+        <motion.article
+          className="overflow-hidden rounded-2xl border border-orange/45 bg-[#0E1116] shadow-[0_30px_80px_-44px_#000]"
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: reduceMotion ? 0 : 0.16 }}
         >
-          <div className="min-h-0 overflow-hidden">
-            <pre className="overflow-x-auto border-t border-muted-line/20 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:px-5 sm:text-xs">
-              <code>
-                {lines.map((spans, index) => (
-                  <span
-                    key={index}
-                    className="relative block min-h-[1em] w-fit whitespace-pre"
-                  >
-                    <span
-                      ref={(element) => {
-                        lineEls.current[index] = element;
-                      }}
-                      className="block"
-                    >
-                      {spans.length ? spans : " "}
-                    </span>
-                    <span
-                      ref={(element) => {
-                        caretEls.current[index] = element;
-                      }}
-                      aria-hidden
-                      className="pointer-events-none absolute top-[0.12em] left-0"
-                      style={{ opacity: 0 }}
-                    >
-                      <span className="caret-blink block h-[0.95em] w-[2px] bg-orange" />
-                    </span>
-                  </span>
-                ))}
-              </code>
-            </pre>
+          <header className="flex items-center justify-between gap-4 border-b border-muted-line/20 px-4 py-3.5 sm:px-5">
+            <div>
+              <p className="font-mono text-sm font-semibold text-ink-text">
+                profile.rs
+              </p>
+              <p className="mt-0.5 text-xs text-muted-line">
+                Profile domain service
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={toggle}
+              aria-expanded={open}
+              aria-controls="profile-struct"
+              aria-label={
+                open ? "Collapse profile struct" : "Expand profile struct"
+              }
+              className="flex size-7 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+            >
+              <motion.span
+                animate={{ rotate: open ? 0 : -90 }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.25,
+                  ease: "easeOut",
+                }}
+                className="flex"
+              >
+                <CaretDown
+                  size={14}
+                  weight="bold"
+                  className={cn("text-muted-line", open && "text-orange")}
+                />
+              </motion.span>
+            </button>
+          </header>
+
+          <div className="p-4 sm:p-5">
+            <div className="relative h-[250px] overflow-hidden rounded-xl border border-orange/35 sm:h-[300px] lg:h-[280px] xl:h-[330px]">
+              <img
+                src="/pfp.jpg"
+                alt="Caleb Standfield"
+                className="h-full w-full object-cover object-[50%_43%]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-transparent" />
+            </div>
           </div>
-        </div>
-      </motion.article>
+
+          <div
+            id="profile-struct"
+            className="grid transition-[grid-template-rows] duration-300 ease-out"
+            style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <pre className="overflow-x-auto border-t border-muted-line/20 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:px-5 sm:text-xs">
+                <code>
+                  {lines.map((spans, index) => (
+                    <span
+                      key={index}
+                      className="relative block min-h-[1em] w-fit whitespace-pre"
+                    >
+                      <span
+                        ref={(element) => {
+                          lineEls.current[index] = element;
+                        }}
+                        className="block"
+                      >
+                        {spans.length ? spans : " "}
+                      </span>
+                      <span
+                        ref={(element) => {
+                          caretEls.current[index] = element;
+                        }}
+                        aria-hidden
+                        className="pointer-events-none absolute top-[0.12em] left-0"
+                        style={{ opacity: 0 }}
+                      >
+                        <span className="caret-blink block h-[0.95em] w-[2px] bg-orange" />
+                      </span>
+                    </span>
+                  ))}
+                </code>
+              </pre>
+            </div>
+          </div>
+        </motion.article>
+      </div>
     </section>
   );
 }

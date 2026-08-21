@@ -30,7 +30,7 @@ Do not bring in new dependencies without explicit permission.
 - `index.html` is the entry; `src/main.tsx` mounts `src/App.tsx` into `#root`.
 - `src/components/portfolio/` holds the homepage sections, typed content
   configuration, active-section tracking, expandable code-node behavior, and
-  the continuous system rail.
+  the measured connector overlays.
 - `src/components/hero/` now contains only shared syntax-highlighting and
   connector-geometry utilities used by the portfolio presentation.
 - `src/components/ui/` holds shadcn components. `src/lib/utils.ts` has `cn()`.
@@ -48,6 +48,13 @@ pulses in both directions along shared paths. The delivery and operations scene
 is deliberately limited to seven core nodes so its release and reliability
 story stays readable. Project and graph content are configured in
 `src/components/portfolio/portfolio.config.ts`.
+
+A second document-level SVG overlay connects the profile card to every rendered
+project card at all viewport widths. Source and target wrappers provide stable
+measurements outside Motion transforms. The routes use separate left-gutter
+lanes that compress with the available space, solid arrowheads, and one random
+traffic pulse every four seconds. The overlay is decorative and never affects
+content layout.
 
 ### Scripts (run from `portfolio/`)
 
