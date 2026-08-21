@@ -25,6 +25,7 @@ html {
   --color-amber: #E6B450;
   --color-yellow: #F8D050;
   --color-green: #AAD94C;
+  --color-emerald: #86D96C;
   --color-cyan: #95E6CB;
   --color-blue: #59C2FF;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -152,7 +153,15 @@ html {
 
 @layer components {
   .project-link {
-    @apply inline-flex items-center gap-2 rounded-md border border-muted-line/25 px-3 py-2 font-mono text-xs text-ink-text transition-colors hover:border-orange/50 hover:text-orange;
+    @apply inline-flex items-center gap-2 rounded-lg border border-muted-line/25 bg-surface/40 px-4 py-2 font-mono text-xs text-ink-text transition-colors hover:border-orange/50 hover:text-orange;
+  }
+
+  .project-link--amber {
+    @apply border-amber/45 bg-amber/10 text-amber hover:border-amber/70 hover:text-amber;
+  }
+
+  .project-link--emerald {
+    @apply border-emerald/45 bg-emerald/10 text-emerald hover:border-emerald/70 hover:text-emerald;
   }
 
   .resume-chip {

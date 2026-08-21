@@ -16,15 +16,12 @@ interface ConnectorLayout {
   height: number;
   gutter: number;
   source: Rect;
-  sourceExpanded: boolean;
   targets: Array<Rect & { id: string }>;
 }
 
 interface ConnectorRoute {
   id: string;
   d: string;
-  branchD: string;
-  targetPort: Point;
 }
 
 interface Pulse {
@@ -39,9 +36,12 @@ const LINE_COLOR = edgeColors.request;
 const VIEWPORT_EDGE_CLEARANCE = 2;
 const DESIRED_NEAREST_LANE = 38;
 const DESIRED_LANE_GAP = 6;
-const SOURCE_PORT_GAP = 11;
-const SOURCE_OVERLAP = 4;
-const TARGET_OVERLAP = 12;
+// Source ports are spread across a fixed band measured from the top of the
+// profile card, not from its center. The band sits on the always-visible image
+// region so collapsing the struct code never leaves a line attached to nothing.
+const SOURCE_PORT_BAND_TOP = 104;
+const SOURCE_PORT_BAND_HEIGHT = 184;
+const TARGET_OVERLAP = 0;
 const ROUTE_RADIUS = 7;
 const FIRST_PULSE_DELAY_MS = 800;
 const PULSE_INTERVAL_MS = 4_000;
@@ -69,15 +69,17 @@ function buildRoutes(layout: ConnectorLayout): ConnectorRoute[] {
   const desiredOuterDepth =
     DESIRED_NEAREST_LANE + (targets.length - 1) * DESIRED_LANE_GAP;
   const laneScale = Math.min(1, availableDepth / desiredOuterDepth);
-  const sourceCenterY =
-    source.y + source.h * (layout.sourceExpanded ? 0.4 : 0.5);
-  const lowestSourceY =
-    sourceCenterY + ((targets.length - 1) * SOURCE_PORT_GAP) / 2;
+  const bandTop = source.y + SOURCE_PORT_BAND_TOP;
+  const bandStep =
+    targets.length > 1 ? SOURCE_PORT_BAND_HEIGHT / (targets.length - 1) : 0;
 
   return targets.map((target, index) => {
     const start: Point = {
-      x: source.x + SOURCE_OVERLAP,
-      y: lowestSourceY - (targets.length - index - 1) * SOURCE_PORT_GAP,
+      x: source.x,
+      y:
+        targets.length > 1
+          ? bandTop + index * bandStep
+          : bandTop + SOURCE_PORT_BAND_HEIGHT / 2,
     };
     const end: Point = {
       x: target.x + TARGET_OVERLAP,
@@ -99,8 +101,6 @@ function buildRoutes(layout: ConnectorLayout): ConnectorRoute[] {
         points,
         radius: ROUTE_RADIUS,
       }).d,
-      branchD: `M ${laneX} ${end.y} L ${end.x} ${end.y}`,
-      targetPort: { x: target.x, y: end.y },
     };
   });
 }
@@ -137,8 +137,6 @@ export function ProfileProjectConnector() {
       height: containerBox.height,
       gutter: containerBox.left,
       source: relativeRect(sourceElement, containerBox),
-      sourceExpanded:
-        sourceElement.dataset.profileProjectExpanded === "true",
       targets,
     });
   }, []);
@@ -279,19 +277,6 @@ export function ProfileProjectConnector() {
         </marker>
       </defs>
 
-      {routes.map((route) => (
-        <path
-          key={`branch-${route.id}`}
-          data-profile-project-branch={route.id}
-          d={route.branchD}
-          fill="none"
-          stroke={LINE_COLOR}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-        />
-      ))}
-
       {routes.map((route, index) => (
         <motion.path
           key={route.id}
@@ -306,22 +291,10 @@ export function ProfileProjectConnector() {
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeOpacity="0.74"
-          vectorEffect="non-scaling-stroke"
           markerEnd="url(#profile-project-arrow)"
           initial={reduceMotion ? false : { pathLength: 0, strokeOpacity: 0 }}
           animate={{ pathLength: 1, strokeOpacity: 0.74 }}
           transition={{ duration: reduceMotion ? 0 : 0.7, ease: "easeOut" }}
-        />
-      ))}
-
-      {routes.map((route) => (
-        <circle
-          key={`port-${route.id}`}
-          data-profile-project-port={route.id}
-          cx={route.targetPort.x}
-          cy={route.targetPort.y}
-          r="2.4"
-          fill={LINE_COLOR}
         />
       ))}
 

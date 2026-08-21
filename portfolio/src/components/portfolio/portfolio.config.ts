@@ -44,14 +44,22 @@ export const projectSlots: ProjectData[] = [
     title: "blackjack",
     tags: [],
     images: ["/blackjack/blackjack_main.png"],
+    // Placeholders. Drop either field to hide that button.
+    repositoryUrl: "https://github.com/CalebStandfield/blackjack",
+    demoUrl: "https://example.com/blackjack",
   },
   {
     id: "pixelify",
     status: "in_progress",
     placeholderTitle: "Currently working on",
     title: "Pixelify",
-    tags: [],
+    summary:
+      "A fast, modular image-processing engine built to turn complex pixel workflows into a clean and responsive experience. Designed around reliable backend systems, clear boundaries, and room to scale.",
+    tags: ["Rust", "System Design", "Backend", "Distributed Systems"],
     images: [],
+    // Placeholders. Drop either field to hide that button.
+    repositoryUrl: "https://github.com/CalebStandfield/pixelify",
+    demoUrl: "https://example.com/pixelify",
   },
   {
     id: "learn-vim",
@@ -60,14 +68,20 @@ export const projectSlots: ProjectData[] = [
     title: "learn-vim",
     tags: [],
     images: [],
+    // Placeholders. Drop either field to hide that button.
+    repositoryUrl: "https://github.com/CalebStandfield/learn-vim",
+    demoUrl: "https://example.com/learn-vim",
   },
   {
     id: "sprite-editor",
     status: "complete",
     placeholderTitle: "Additional project",
-    title: "Sprite Editor and Animation Tool",
+    title: "Sprite Editor",
     tags: [],
     images: ["/sprite/sprite_draw.png"],
+    // Placeholders. Drop either field to hide that button.
+    repositoryUrl: "https://github.com/CalebStandfield/sprite-editor",
+    demoUrl: "https://example.com/sprite-editor",
   },
 ];
 
