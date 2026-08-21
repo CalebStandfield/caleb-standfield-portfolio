@@ -37,11 +37,16 @@ Do not bring in new dependencies without explicit permission.
 - Static assets (resume PDF, images) live in `public/` and are served from `/`.
 
 The homepage uses a single-column content flow below 1024px. At 1024px and
-wider, the content occupies the left side and one document-level system graph
-runs down the right side. Graph bands align to measured section anchors rather
-than moving an internal canvas. Its code cards are expanded by default and use
-one reusable type/delete interaction; realistic traffic scenarios drive SVG
-pulses between connected nodes. Project and graph content are configured in
+wider, the content occupies the left side and one document-level reference
+architecture runs down the right side. Three measured scene clusters align to
+the hero, projects, and resume sections, while standalone bridge nodes continue
+the story through contact. Each cluster uses a six-column placement grid for
+varied horizontal, centered, and full-width node arrangements. Obstacle-aware
+orthogonal connectors use short local routes plus two shared long corridors for
+origin delivery and recovery. Topology-backed traffic scenarios drive SVG
+pulses in both directions along shared paths. The delivery and operations scene
+is deliberately limited to seven core nodes so its release and reliability
+story stays readable. Project and graph content are configured in
 `src/components/portfolio/portfolio.config.ts`.
 
 ### Scripts (run from `portfolio/`)

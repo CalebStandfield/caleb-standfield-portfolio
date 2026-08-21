@@ -1,13 +1,28 @@
 import type { Icon } from "@phosphor-icons/react";
 
 import type { Lang } from "@/components/hero/codeHighlight";
-import type { Side } from "@/components/hero/connectors";
 
 export type PortfolioStage = "hero" | "projects" | "resume" | "contact";
 export type ProjectStatus = "complete" | "in_progress";
-export type SystemBand = "request" | "data" | "ops";
-export type SystemNodeKind = "client" | "service" | "data" | "ops" | "core";
-export type SystemEdgeKind = "request" | "response" | "data" | "async" | "ops";
+export type SystemScene = "ingress" | "application" | "operations";
+export type SystemNodeKind =
+  | "client"
+  | "edge"
+  | "service"
+  | "data"
+  | "async"
+  | "delivery"
+  | "ops"
+  | "security";
+export type SystemEdgeKind =
+  | "request"
+  | "data"
+  | "async"
+  | "delivery"
+  | "telemetry"
+  | "control";
+export type SystemAlignment = "start" | "center" | "end";
+export type SystemTrunk = "gateway" | "origin" | "recovery";
 
 export interface ProjectData {
   id: string;
@@ -27,23 +42,50 @@ export interface SystemNodeData {
   subtitle: string;
   icon: Icon;
   kind: SystemNodeKind;
-  band: SystemBand;
-  stage: PortfolioStage;
-  x: number;
-  y: number;
   code: string;
   language: Lang;
   initiallyExpanded?: boolean;
 }
 
+export interface SystemNodePlacement {
+  nodeId: string;
+  row: number;
+  column: number;
+  span: number;
+}
+
+export interface SystemClusterData {
+  id: string;
+  scene: SystemScene;
+  stage: PortfolioStage;
+  order: string;
+  title: string;
+  subtitle: string;
+  offset: number;
+  width: number;
+  align: SystemAlignment;
+  rowGap: number;
+  placements: SystemNodePlacement[];
+}
+
+export interface SystemStandaloneData {
+  nodeId: string;
+  scene: SystemScene;
+  stage: PortfolioStage;
+  offset: number;
+  width: number;
+  align: SystemAlignment;
+  eyebrow: string;
+}
+
 export interface SystemEdgeData {
   id: string;
   from: string;
-  fromSide: Side;
   to: string;
-  toSide: Side;
   kind: SystemEdgeKind;
-  band: SystemBand;
+  scene: SystemScene;
+  trunk?: SystemTrunk;
+  bidirectional?: boolean;
   label?: string;
 }
 
@@ -55,7 +97,15 @@ export interface TrafficStep {
 
 export interface TrafficScenario {
   id: string;
-  band: SystemBand;
+  scene: SystemScene;
   weight: number;
   steps: TrafficStep[];
+}
+
+export interface SystemDefinition {
+  clusters: SystemClusterData[];
+  standalones: SystemStandaloneData[];
+  nodes: SystemNodeData[];
+  edges: SystemEdgeData[];
+  scenarios: TrafficScenario[];
 }

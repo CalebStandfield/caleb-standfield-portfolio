@@ -1,23 +1,38 @@
 import {
+  Archive,
   ArrowsLeftRight,
+  Broadcast,
+  Browser,
+  Cloud,
   CloudArrowDown,
+  CloudArrowUp,
+  Cube,
   Database,
+  DeviceMobile,
+  EnvelopeSimple,
+  Fingerprint,
   GearSix,
-  Globe,
+  GitBranch,
+  GitCommit,
   HardDrives,
   Lightning,
+  Package,
+  Pulse,
   ShieldCheck,
-  Stack,
   TreeStructure,
+  Warning,
 } from "@phosphor-icons/react";
 
 import type {
   PortfolioStage,
   ProjectData,
-  SystemBand,
+  SystemClusterData,
+  SystemDefinition,
   SystemEdgeData,
   SystemEdgeKind,
   SystemNodeData,
+  SystemScene,
+  SystemStandaloneData,
   TrafficScenario,
 } from "./portfolio.types";
 
@@ -92,602 +107,282 @@ export const resume = {
     "Certified Member, National Society of Leadership and Success (NSLS)",
 } as const;
 
-export const stageBand: Record<PortfolioStage, SystemBand> = {
-  hero: "request",
-  projects: "data",
-  resume: "ops",
-  contact: "ops",
+export const stageScene: Record<PortfolioStage, SystemScene> = {
+  hero: "ingress",
+  projects: "application",
+  resume: "operations",
+  contact: "operations",
 };
 
 export const edgeColors: Record<SystemEdgeKind, string> = {
   request: "#FF8F40",
-  response: "#95E6CB",
   data: "#59C2FF",
   async: "#E6B450",
-  ops: "#B79CFF",
+  delivery: "#B79CFF",
+  telemetry: "#95E6CB",
+  control: "#AAD94C",
 };
 
+export const systemClusters: SystemClusterData[] = [
+  {
+    id: "ingress",
+    scene: "ingress",
+    stage: "hero",
+    order: "01",
+    title: "Ingress",
+    subtitle: "clients / edge / identity",
+    offset: 20,
+    width: 88,
+    align: "center",
+    rowGap: 120,
+    placements: [
+      { nodeId: "web_spa", row: 1, column: 1, span: 3 },
+      { nodeId: "mobile_app", row: 1, column: 4, span: 3 },
+      { nodeId: "cdn", row: 2, column: 1, span: 3 },
+      { nodeId: "waf", row: 2, column: 4, span: 3 },
+      { nodeId: "auth_service", row: 3, column: 2, span: 4 },
+    ],
+  },
+  {
+    id: "application",
+    scene: "application",
+    stage: "projects",
+    order: "02",
+    title: "Application + data",
+    subtitle: "services / persistence / events",
+    offset: 20,
+    width: 92,
+    align: "center",
+    rowGap: 72,
+    placements: [
+      { nodeId: "profile_service", row: 1, column: 1, span: 3 },
+      { nodeId: "project_service", row: 1, column: 4, span: 3 },
+      { nodeId: "media_service", row: 2, column: 2, span: 4 },
+      { nodeId: "redis", row: 3, column: 1, span: 2 },
+      { nodeId: "postgres", row: 3, column: 3, span: 4 },
+      { nodeId: "event_bus", row: 4, column: 1, span: 6 },
+      { nodeId: "media_worker", row: 5, column: 3, span: 3 },
+    ],
+  },
+  {
+    id: "operations",
+    scene: "operations",
+    stage: "resume",
+    order: "03",
+    title: "Delivery + operations",
+    subtitle: "supply chain / runtime / reliability",
+    offset: 20,
+    width: 86,
+    align: "center",
+    rowGap: 72,
+    placements: [
+      { nodeId: "git_repository", row: 1, column: 1, span: 3 },
+      { nodeId: "ci_builder", row: 1, column: 4, span: 3 },
+      { nodeId: "oci_registry", row: 2, column: 2, span: 4 },
+      { nodeId: "deploy_controller", row: 3, column: 1, span: 6 },
+      { nodeId: "runtime_cluster", row: 4, column: 1, span: 6 },
+      { nodeId: "otel_collector", row: 5, column: 1, span: 3 },
+      { nodeId: "alert_manager", row: 5, column: 4, span: 3 },
+    ],
+  },
+];
+
+export const systemStandalones: SystemStandaloneData[] = [
+  { nodeId: "api_gateway", scene: "ingress", stage: "hero", offset: 890, width: 54, align: "center", eyebrow: "policy boundary" },
+  { nodeId: "object_store", scene: "application", stage: "projects", offset: 1024, width: 52, align: "end", eyebrow: "durable media" },
+  { nodeId: "email_gateway", scene: "operations", stage: "contact", offset: 30, width: 50, align: "start", eyebrow: "external delivery" },
+  { nodeId: "backup_vault", scene: "operations", stage: "contact", offset: 310, width: 54, align: "end", eyebrow: "recovery boundary" },
+];
+
+function node(data: Omit<SystemNodeData, "initiallyExpanded">): SystemNodeData {
+  return { ...data, initiallyExpanded: true };
+}
+
 export const systemNodes: SystemNodeData[] = [
-  {
-    id: "browser",
-    title: "Web Browser",
-    subtitle: "User request",
-    icon: Globe,
-    kind: "client",
-    band: "request",
-    stage: "hero",
-    x: 72,
-    y: 48,
-    language: "ts",
-    code: `const request = new Request(
-  "/api/profile",
-);`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "react_view",
-    title: "React View",
-    subtitle: "Render + events",
-    icon: Globe,
-    kind: "client",
-    band: "request",
-    stage: "hero",
-    x: 28,
-    y: 48,
-    language: "ts",
-    code: `const profile = useProfile();
-return <Hero {...profile} />;`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "api_client",
-    title: "API Client",
-    subtitle: "Typed JSON",
-    icon: ArrowsLeftRight,
-    kind: "client",
-    band: "request",
-    stage: "hero",
-    x: 28,
-    y: 224,
-    language: "ts",
-    code: `const data = await api.get<Profile>(
-  "/profile",
-);`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "edge_proxy",
-    title: "Edge Proxy",
-    subtitle: "TLS + policy",
-    icon: TreeStructure,
-    kind: "service",
-    band: "request",
-    stage: "hero",
-    x: 72,
-    y: 224,
-    language: "nginx",
-    code: `location /api/ {
-  proxy_pass http://portfolio;
-}`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "api_router",
-    title: "API Router",
-    subtitle: "Axum HTTP",
-    icon: TreeStructure,
-    kind: "service",
-    band: "request",
-    stage: "hero",
-    x: 72,
-    y: 400,
-    language: "rust",
-    code: `Router::new()
-  .route("/profile", get(profile))`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "auth_guard",
-    title: "Auth Guard",
-    subtitle: "JWT / RBAC",
-    icon: ShieldCheck,
-    kind: "service",
-    band: "request",
-    stage: "hero",
-    x: 28,
-    y: 400,
-    language: "rust",
-    code: `let claims = token.verify()?;
-claims.require(Role::Reader)?;`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "profile_ingress",
-    title: "profile.rs",
-    subtitle: "Service boundary",
-    icon: Database,
-    kind: "core",
-    band: "data",
-    stage: "projects",
-    x: 50,
-    y: 52,
-    language: "rust",
-    code: `pub async fn profile(
-  State(app): State<App>,
-) -> Json<Profile>`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "repository",
-    title: "Repository",
-    subtitle: "Persistence",
-    icon: Database,
-    kind: "service",
-    band: "data",
-    stage: "projects",
-    x: 50,
-    y: 252,
-    language: "rust",
-    code: `let profile = repo
-  .find_profile(user_id)
-  .await?;`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "redis",
-    title: "Redis Cache",
-    subtitle: "Read-through",
-    icon: Lightning,
-    kind: "data",
-    band: "data",
-    stage: "projects",
-    x: 28,
-    y: 456,
-    language: "rust",
-    code: `cache.get(key).await?
-  .map(Profile::decode)`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "postgres",
-    title: "PostgreSQL",
-    subtitle: "Source of truth",
-    icon: HardDrives,
-    kind: "data",
-    band: "data",
-    stage: "projects",
-    x: 72,
-    y: 456,
-    language: "sql",
-    code: `SELECT name, degree
-FROM profiles
-WHERE id = $1;`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "queue",
-    title: "Job Queue",
-    subtitle: "Durable broker",
-    icon: Stack,
-    kind: "data",
-    band: "data",
-    stage: "projects",
-    x: 28,
-    y: 680,
-    language: "rust",
-    code: `queue.publish(
-  Job::ProcessMedia(asset),
-).await?;`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "worker",
-    title: "Media Worker",
-    subtitle: "Async consumer",
-    icon: GearSix,
-    kind: "service",
-    band: "data",
-    stage: "projects",
-    x: 72,
-    y: 680,
-    language: "rust",
-    code: `while let Some(job) = rx.recv().await {
-  process(job).await?;
-}`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "object_store",
-    title: "Object Store",
-    subtitle: "Processed media",
-    icon: CloudArrowDown,
-    kind: "data",
-    band: "data",
-    stage: "projects",
-    x: 50,
-    y: 904,
-    language: "rust",
-    code: `store.put(
-  asset.key(), output,
-).await?;`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "ci_deploy",
-    title: "CI / Deploy",
-    subtitle: "Build + release",
-    icon: GearSix,
-    kind: "ops",
-    band: "ops",
-    stage: "resume",
-    x: 28,
-    y: 52,
-    language: "yaml",
-    code: `jobs:
-  deploy:
-    runs-on: ubuntu-latest`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "cdn",
-    title: "CDN",
-    subtitle: "Static assets",
-    icon: CloudArrowDown,
-    kind: "ops",
-    band: "ops",
-    stage: "resume",
-    x: 72,
-    y: 52,
-    language: "nginx",
-    code: `location /assets/ {
-  expires 1y;
-}`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "ops_router",
-    title: "API Router",
-    subtitle: "Runtime traces",
-    icon: TreeStructure,
-    kind: "ops",
-    band: "ops",
-    stage: "resume",
-    x: 28,
-    y: 276,
-    language: "rust",
-    code: `#[instrument(skip(state))]
-async fn route(state: AppState)`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "ops_view",
-    title: "React View",
-    subtitle: "Client events",
-    icon: Globe,
-    kind: "ops",
-    band: "ops",
-    stage: "resume",
-    x: 72,
-    y: 276,
-    language: "ts",
-    code: `telemetry.emit("profile_view", {
-  source: "portfolio",
-});`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "ops_worker",
-    title: "Media Worker",
-    subtitle: "Job metrics",
-    icon: GearSix,
-    kind: "ops",
-    band: "ops",
-    stage: "resume",
-    x: 28,
-    y: 500,
-    language: "rust",
-    code: `metrics::counter!("jobs.completed")
-  .increment(1);`,
-    initiallyExpanded: true,
-  },
-  {
-    id: "observability",
-    title: "Observability",
-    subtitle: "Logs + metrics + traces",
-    icon: Globe,
-    kind: "ops",
-    band: "ops",
-    stage: "resume",
-    x: 72,
-    y: 704,
-    language: "yaml",
-    code: `services:
-  collector:
-    image: otel/opentelemetry`,
-    initiallyExpanded: true,
-  },
+  node({ id: "web_spa", title: "Web SPA", subtitle: "React / Vite", icon: Browser, kind: "client", language: "ts", code: `const profile = await\napi.profile.get();` }),
+  node({ id: "mobile_app", title: "Mobile App", subtitle: "Typed client", icon: DeviceMobile, kind: "client", language: "ts", code: `const media = await\napi.media.list();` }),
+  node({ id: "cdn", title: "CDN", subtitle: "Assets + media", icon: CloudArrowDown, kind: "edge", language: "nginx", code: `location /assets/ {\n  expires 1y;\n}` }),
+  node({ id: "waf", title: "WAF", subtitle: "Threat filtering", icon: ShieldCheck, kind: "security", language: "nginx", code: `limit_req zone=api\n  burst=40;` }),
+  node({ id: "api_gateway", title: "API Gateway", subtitle: "Routing + policy", icon: ArrowsLeftRight, kind: "edge", language: "rust", code: `Router::new()\n  .nest("/v1", api())` }),
+  node({ id: "auth_service", title: "Auth Service", subtitle: "OAuth + JWT", icon: Fingerprint, kind: "security", language: "rust", code: `let claims = jwt\n  .verify(token)?;` }),
+  node({ id: "profile_service", title: "Profile Service", subtitle: "Profile domain", icon: Database, kind: "service", language: "rust", code: `pub async fn profile(\n  id: UserId)` }),
+  node({ id: "project_service", title: "Project Catalog", subtitle: "Project domain", icon: TreeStructure, kind: "service", language: "rust", code: `catalog.list_visible()\n  .await?;` }),
+  node({ id: "media_service", title: "Media Service", subtitle: "Upload contracts", icon: CloudArrowUp, kind: "service", language: "rust", code: `store.presign_put(key)\n  .await?;` }),
+  node({ id: "redis", title: "Redis Cache", subtitle: "Read-through cache", icon: Lightning, kind: "data", language: "rust", code: `cache.get(key)\n  .await?;` }),
+  node({ id: "postgres", title: "PostgreSQL", subtitle: "Source of truth", icon: HardDrives, kind: "data", language: "sql", code: `SELECT payload\nFROM profiles;` }),
+  node({ id: "object_store", title: "Object Store", subtitle: "Assets + media", icon: Cloud, kind: "data", language: "rust", code: `store.put(key, bytes)\n  .await?;` }),
+  node({ id: "event_bus", title: "Event Bus", subtitle: "Durable topics", icon: Broadcast, kind: "async", language: "rust", code: `bus.publish(topic, event)\n  .await?;` }),
+  node({ id: "media_worker", title: "Media Worker", subtitle: "Image pipeline", icon: GearSix, kind: "async", language: "rust", code: `let output = resize(\n  source)?;` }),
+  node({ id: "email_gateway", title: "Email Gateway", subtitle: "External delivery", icon: EnvelopeSimple, kind: "service", language: "rust", code: `provider.deliver(mail)\n  .await?;` }),
+  node({ id: "git_repository", title: "Git Repository", subtitle: "Source + manifests", icon: GitBranch, kind: "delivery", language: "yaml", code: `branch: main\nprotected: true` }),
+  node({ id: "ci_builder", title: "CI Builder", subtitle: "Test + package", icon: GearSix, kind: "delivery", language: "yaml", code: `jobs:\n  build: cargo test` }),
+  node({ id: "oci_registry", title: "OCI Registry", subtitle: "Signed images", icon: Package, kind: "delivery", language: "yaml", code: `image: profile-api\ntag: sha-7f3c` }),
+  node({ id: "deploy_controller", title: "Deploy Controller", subtitle: "Desired state", icon: GitCommit, kind: "delivery", language: "yaml", code: `syncPolicy:\n  automated: true` }),
+  node({ id: "runtime_cluster", title: "Runtime Cluster", subtitle: "Services + workers", icon: Cube, kind: "delivery", language: "yaml", code: `replicas: 3\nstrategy: Rolling` }),
+  node({ id: "otel_collector", title: "OTel Collector", subtitle: "Telemetry intake", icon: Pulse, kind: "ops", language: "yaml", code: `receivers:\n  otlp: {}` }),
+  node({ id: "alert_manager", title: "Alert Manager", subtitle: "Incident routing", icon: Warning, kind: "ops", language: "yaml", code: `group_wait: 30s\nrepeat: 4h` }),
+  node({ id: "backup_vault", title: "Backup Vault", subtitle: "Cross-region copies", icon: Archive, kind: "ops", language: "yaml", code: `snapshots: daily\nretention: 35d` }),
 ];
 
 export const systemEdges: SystemEdgeData[] = [
-  {
-    id: "browser-view",
-    from: "browser",
-    fromSide: "left",
-    to: "react_view",
-    toSide: "right",
-    kind: "request",
-    band: "request",
-  },
-  {
-    id: "view-client",
-    from: "react_view",
-    fromSide: "bottom",
-    to: "api_client",
-    toSide: "top",
-    kind: "request",
-    band: "request",
-    label: "fetch",
-  },
-  {
-    id: "client-edge",
-    from: "api_client",
-    fromSide: "right",
-    to: "edge_proxy",
-    toSide: "left",
-    kind: "request",
-    band: "request",
-    label: "HTTPS",
-  },
-  {
-    id: "edge-router",
-    from: "edge_proxy",
-    fromSide: "bottom",
-    to: "api_router",
-    toSide: "top",
-    kind: "request",
-    band: "request",
-  },
-  {
-    id: "router-auth",
-    from: "api_router",
-    fromSide: "left",
-    to: "auth_guard",
-    toSide: "right",
-    kind: "request",
-    band: "request",
-  },
-  {
-    id: "auth-profile",
-    from: "auth_guard",
-    fromSide: "bottom",
-    to: "profile_ingress",
-    toSide: "top",
-    kind: "request",
-    band: "request",
-    label: "authorized",
-  },
-  {
-    id: "profile-router-response",
-    from: "profile_ingress",
-    fromSide: "top",
-    to: "api_router",
-    toSide: "bottom",
-    kind: "response",
-    band: "request",
-    label: "200 JSON",
-  },
-  {
-    id: "router-edge-response",
-    from: "api_router",
-    fromSide: "top",
-    to: "edge_proxy",
-    toSide: "bottom",
-    kind: "response",
-    band: "request",
-  },
-  {
-    id: "edge-client-response",
-    from: "edge_proxy",
-    fromSide: "left",
-    to: "api_client",
-    toSide: "right",
-    kind: "response",
-    band: "request",
-  },
-  {
-    id: "client-view-response",
-    from: "api_client",
-    fromSide: "top",
-    to: "react_view",
-    toSide: "bottom",
-    kind: "response",
-    band: "request",
-  },
-  {
-    id: "view-browser-response",
-    from: "react_view",
-    fromSide: "right",
-    to: "browser",
-    toSide: "left",
-    kind: "response",
-    band: "request",
-  },
-  {
-    id: "profile-repository",
-    from: "profile_ingress",
-    fromSide: "bottom",
-    to: "repository",
-    toSide: "top",
-    kind: "data",
-    band: "data",
-    label: "CRUD",
-  },
-  {
-    id: "repository-redis",
-    from: "repository",
-    fromSide: "bottom",
-    to: "redis",
-    toSide: "top",
-    kind: "data",
-    band: "data",
-    label: "cache",
-  },
-  {
-    id: "repository-postgres",
-    from: "repository",
-    fromSide: "bottom",
-    to: "postgres",
-    toSide: "top",
-    kind: "data",
-    band: "data",
-    label: "SQL",
-  },
-  {
-    id: "profile-queue",
-    from: "profile_ingress",
-    fromSide: "right",
-    to: "queue",
-    toSide: "top",
-    kind: "async",
-    band: "data",
-    label: "enqueue",
-  },
-  {
-    id: "queue-worker",
-    from: "queue",
-    fromSide: "right",
-    to: "worker",
-    toSide: "left",
-    kind: "async",
-    band: "data",
-  },
-  {
-    id: "worker-store",
-    from: "worker",
-    fromSide: "bottom",
-    to: "object_store",
-    toSide: "top",
-    kind: "async",
-    band: "data",
-  },
-  {
-    id: "deploy-cdn",
-    from: "ci_deploy",
-    fromSide: "right",
-    to: "cdn",
-    toSide: "left",
-    kind: "ops",
-    band: "ops",
-    label: "assets",
-  },
-  {
-    id: "deploy-router",
-    from: "ci_deploy",
-    fromSide: "bottom",
-    to: "ops_router",
-    toSide: "top",
-    kind: "ops",
-    band: "ops",
-    label: "release",
-  },
-  {
-    id: "router-observe",
-    from: "ops_router",
-    fromSide: "right",
-    to: "observability",
-    toSide: "left",
-    kind: "ops",
-    band: "ops",
-    label: "traces",
-  },
-  {
-    id: "view-observe",
-    from: "ops_view",
-    fromSide: "bottom",
-    to: "observability",
-    toSide: "top",
-    kind: "ops",
-    band: "ops",
-    label: "events",
-  },
-  {
-    id: "worker-observe",
-    from: "ops_worker",
-    fromSide: "right",
-    to: "observability",
-    toSide: "left",
-    kind: "ops",
-    band: "ops",
-    label: "metrics",
-  },
+  { id: "web-cdn", from: "web_spa", to: "cdn", kind: "request", scene: "ingress", bidirectional: true, label: "assets" },
+  { id: "mobile-cdn", from: "mobile_app", to: "cdn", kind: "request", scene: "ingress", bidirectional: true },
+  { id: "web-waf", from: "web_spa", to: "waf", kind: "request", scene: "ingress", bidirectional: true },
+  { id: "mobile-waf", from: "mobile_app", to: "waf", kind: "request", scene: "ingress", bidirectional: true, label: "HTTPS" },
+  { id: "waf-gateway", from: "waf", to: "api_gateway", kind: "request", scene: "ingress", bidirectional: true },
+  { id: "gateway-auth", from: "api_gateway", to: "auth_service", kind: "control", scene: "ingress", bidirectional: true, label: "claims" },
+  { id: "cdn-object", from: "cdn", to: "object_store", kind: "data", scene: "ingress", trunk: "origin", bidirectional: true, label: "origin" },
+  { id: "gateway-profile", from: "api_gateway", to: "profile_service", kind: "request", scene: "application", trunk: "gateway", bidirectional: true, label: "/v1" },
+  { id: "gateway-project", from: "api_gateway", to: "project_service", kind: "request", scene: "application", trunk: "gateway", bidirectional: true },
+  { id: "gateway-media", from: "api_gateway", to: "media_service", kind: "request", scene: "application", trunk: "gateway", bidirectional: true },
+  { id: "profile-cache", from: "profile_service", to: "redis", kind: "data", scene: "application", bidirectional: true, label: "cache" },
+  { id: "profile-db", from: "profile_service", to: "postgres", kind: "data", scene: "application", bidirectional: true },
+  { id: "project-db", from: "project_service", to: "postgres", kind: "data", scene: "application", bidirectional: true, label: "SQL" },
+  { id: "media-object", from: "media_service", to: "object_store", kind: "data", scene: "application", bidirectional: true },
+  { id: "project-events", from: "project_service", to: "event_bus", kind: "async", scene: "application" },
+  { id: "media-events", from: "media_service", to: "event_bus", kind: "async", scene: "application", label: "events" },
+  { id: "events-media-worker", from: "event_bus", to: "media_worker", kind: "async", scene: "application" },
+  { id: "worker-object", from: "media_worker", to: "object_store", kind: "async", scene: "application" },
+  { id: "git-ci", from: "git_repository", to: "ci_builder", kind: "delivery", scene: "operations" },
+  { id: "ci-registry", from: "ci_builder", to: "oci_registry", kind: "delivery", scene: "operations", label: "image" },
+  { id: "git-deploy", from: "git_repository", to: "deploy_controller", kind: "delivery", scene: "operations" },
+  { id: "registry-runtime", from: "oci_registry", to: "runtime_cluster", kind: "delivery", scene: "operations" },
+  { id: "deploy-runtime", from: "deploy_controller", to: "runtime_cluster", kind: "delivery", scene: "operations", label: "sync" },
+  { id: "runtime-otel", from: "runtime_cluster", to: "otel_collector", kind: "telemetry", scene: "operations", label: "OTLP" },
+  { id: "otel-alert", from: "otel_collector", to: "alert_manager", kind: "control", scene: "operations" },
+  { id: "alert-email", from: "alert_manager", to: "email_gateway", kind: "control", scene: "operations" },
+  { id: "postgres-backup", from: "postgres", to: "backup_vault", kind: "control", scene: "operations", trunk: "recovery", label: "snapshot" },
+  { id: "object-backup", from: "object_store", to: "backup_vault", kind: "control", scene: "operations", trunk: "recovery" },
 ];
 
 export const trafficScenarios: TrafficScenario[] = [
-  {
-    id: "profile-request",
-    band: "request",
-    weight: 1,
-    steps: [
-      { edgeIds: ["browser-view"] },
-      { edgeIds: ["view-client"] },
-      { edgeIds: ["client-edge"] },
-      { edgeIds: ["edge-router"] },
-      { edgeIds: ["router-auth"] },
-      { edgeIds: ["auth-profile"] },
-      { edgeIds: ["profile-router-response"], pauseMs: 160 },
-      { edgeIds: ["router-edge-response"] },
-      { edgeIds: ["edge-client-response"] },
-      { edgeIds: ["client-view-response"] },
-      { edgeIds: ["view-browser-response"] },
-    ],
-  },
-  {
-    id: "cache-read",
-    band: "data",
-    weight: 3,
-    steps: [
-      { edgeIds: ["profile-repository"] },
-      { edgeIds: ["repository-redis"], pauseMs: 180 },
-      { edgeIds: [], reverseEdgeIds: ["repository-redis"] },
-      { edgeIds: [], reverseEdgeIds: ["profile-repository"] },
-    ],
-  },
-  {
-    id: "database-read",
-    band: "data",
-    weight: 2,
-    steps: [
-      { edgeIds: ["profile-repository"] },
-      { edgeIds: ["repository-postgres"], pauseMs: 220 },
-      { edgeIds: [], reverseEdgeIds: ["repository-postgres"] },
-      { edgeIds: [], reverseEdgeIds: ["profile-repository"] },
-    ],
-  },
-  {
-    id: "media-job",
-    band: "data",
-    weight: 1.5,
-    steps: [
-      { edgeIds: ["profile-queue"] },
-      { edgeIds: ["queue-worker"] },
-      { edgeIds: ["worker-store"] },
-    ],
-  },
-  {
-    id: "release",
-    band: "ops",
-    weight: 1.5,
-    steps: [
-      { edgeIds: ["deploy-cdn", "deploy-router"] },
-      { edgeIds: ["router-observe"] },
-    ],
-  },
-  {
-    id: "telemetry",
-    band: "ops",
-    weight: 2,
-    steps: [
-      { edgeIds: ["router-observe", "view-observe", "worker-observe"] },
-    ],
-  },
+  { id: "asset-delivery", scene: "ingress", weight: 2, steps: [{ edgeIds: ["web-cdn"] }, { edgeIds: ["cdn-object"] }, { edgeIds: [], reverseEdgeIds: ["cdn-object", "web-cdn"] }] },
+  { id: "profile-read", scene: "application", weight: 3, steps: [{ edgeIds: ["web-waf"] }, { edgeIds: ["waf-gateway"] }, { edgeIds: ["gateway-auth"] }, { edgeIds: [], reverseEdgeIds: ["gateway-auth"] }, { edgeIds: ["gateway-profile"] }, { edgeIds: ["profile-cache"] }, { edgeIds: [], reverseEdgeIds: ["profile-cache", "gateway-profile"] }] },
+  { id: "async-media", scene: "application", weight: 2, steps: [{ edgeIds: ["gateway-media"] }, { edgeIds: ["media-object"] }, { edgeIds: ["media-events"] }, { edgeIds: ["events-media-worker"] }, { edgeIds: ["worker-object"] }] },
+  { id: "build-deploy-observe", scene: "operations", weight: 3, steps: [{ edgeIds: ["git-ci", "git-deploy"] }, { edgeIds: ["ci-registry"] }, { edgeIds: ["registry-runtime", "deploy-runtime"] }, { edgeIds: ["runtime-otel"] }, { edgeIds: ["otel-alert"] }, { edgeIds: ["alert-email"] }] },
+  { id: "backup", scene: "operations", weight: 1.25, steps: [{ edgeIds: ["postgres-backup", "object-backup"] }] },
 ];
+
+export const systemDefinition: SystemDefinition = {
+  clusters: systemClusters,
+  standalones: systemStandalones,
+  nodes: systemNodes,
+  edges: systemEdges,
+  scenarios: trafficScenarios,
+};
+
+function assertUnique(ids: string[], label: string): void {
+  const seen = new Set<string>();
+  for (const id of ids) {
+    if (seen.has(id)) throw new Error(`Duplicate ${label} id: ${id}`);
+    seen.add(id);
+  }
+}
+
+export function validateSystemDefinition(definition: SystemDefinition): void {
+  assertUnique(definition.clusters.map((cluster) => cluster.id), "cluster");
+  assertUnique(definition.clusters.map((cluster) => cluster.scene), "cluster scene");
+  assertUnique(definition.standalones.map((entry) => entry.nodeId), "standalone node");
+  assertUnique(definition.nodes.map((entry) => entry.id), "node");
+  assertUnique(definition.edges.map((entry) => entry.id), "edge");
+  assertUnique(definition.scenarios.map((scenario) => scenario.id), "scenario");
+
+  const scenes = new Set(definition.clusters.map((cluster) => cluster.scene));
+  const nodeIds = new Set(definition.nodes.map((entry) => entry.id));
+  const edgeIds = new Set(definition.edges.map((entry) => entry.id));
+  const edgeById = new Map(definition.edges.map((entry) => [entry.id, entry]));
+  const assignedNodes = new Set<string>();
+  const occupiedSlots = new Set<string>();
+
+  for (const entry of definition.nodes) {
+    const lines = entry.code.split("\n");
+    if (lines.length > 3 || lines.some((line) => line.length > 28)) {
+      throw new Error(`Node ${entry.id} has code that exceeds its compact card`);
+    }
+  }
+
+  for (const cluster of definition.clusters) {
+    if (
+      cluster.width <= 0 ||
+      cluster.width > 100 ||
+      cluster.offset < 0 ||
+      cluster.rowGap < 0
+    ) {
+      throw new Error(`Cluster ${cluster.id} has invalid layout metadata`);
+    }
+    for (const placement of cluster.placements) {
+      if (!nodeIds.has(placement.nodeId)) {
+        throw new Error(`Cluster ${cluster.id} references missing node ${placement.nodeId}`);
+      }
+      if (placement.row < 1 || placement.column < 1 || placement.span < 1 || placement.column + placement.span > 7) {
+        throw new Error(`Cluster ${cluster.id} has an invalid placement for ${placement.nodeId}`);
+      }
+      if (assignedNodes.has(placement.nodeId)) {
+        throw new Error(`Node ${placement.nodeId} has more than one placement`);
+      }
+      for (let column = placement.column; column < placement.column + placement.span; column += 1) {
+        const slot = `${cluster.id}:${placement.row}:${column}`;
+        if (occupiedSlots.has(slot)) {
+          throw new Error(`More than one node occupies ${slot}`);
+        }
+        occupiedSlots.add(slot);
+      }
+      assignedNodes.add(placement.nodeId);
+    }
+  }
+
+  for (const standalone of definition.standalones) {
+    if (!nodeIds.has(standalone.nodeId) || !scenes.has(standalone.scene)) {
+      throw new Error(`Standalone ${standalone.nodeId} has an invalid reference`);
+    }
+    if (standalone.width <= 0 || standalone.width > 100 || standalone.offset < 0) {
+      throw new Error(`Standalone ${standalone.nodeId} has invalid layout metadata`);
+    }
+    if (assignedNodes.has(standalone.nodeId)) {
+      throw new Error(`Node ${standalone.nodeId} has more than one placement`);
+    }
+    assignedNodes.add(standalone.nodeId);
+  }
+
+  for (const nodeId of nodeIds) {
+    if (!assignedNodes.has(nodeId)) {
+      throw new Error(`Node ${nodeId} does not have a layout placement`);
+    }
+  }
+
+  for (const entry of definition.edges) {
+    if (!nodeIds.has(entry.from) || !nodeIds.has(entry.to)) {
+      throw new Error(`Edge ${entry.id} references a missing node`);
+    }
+    if (entry.from === entry.to) {
+      throw new Error(`Edge ${entry.id} cannot connect a node to itself`);
+    }
+    if (!scenes.has(entry.scene)) {
+      throw new Error(`Edge ${entry.id} references missing scene ${entry.scene}`);
+    }
+  }
+
+  for (const scenario of definition.scenarios) {
+    if (!scenes.has(scenario.scene) || scenario.weight <= 0 || !scenario.steps.length) {
+      throw new Error(`Scenario ${scenario.id} has invalid metadata`);
+    }
+    for (const step of scenario.steps) {
+      for (const edgeId of step.edgeIds) {
+        if (!edgeIds.has(edgeId)) {
+          throw new Error(`Scenario ${scenario.id} references missing edge ${edgeId}`);
+        }
+      }
+      for (const edgeId of step.reverseEdgeIds ?? []) {
+        const entry = edgeById.get(edgeId);
+        if (!entry) {
+          throw new Error(`Scenario ${scenario.id} references missing edge ${edgeId}`);
+        }
+        if (!entry.bidirectional) {
+          throw new Error(`Scenario ${scenario.id} reverses one-way edge ${edgeId}`);
+        }
+      }
+    }
+  }
+}
+
+validateSystemDefinition(systemDefinition);
