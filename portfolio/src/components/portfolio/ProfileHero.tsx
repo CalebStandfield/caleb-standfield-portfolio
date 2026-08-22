@@ -40,7 +40,7 @@ export function ProfileHero() {
           // learning to create, and creating to learn
         </p>
         <h1 className="mt-4 max-w-3xl font-heading text-3xl font-semibold leading-[1.08] tracking-[-0.04em] text-ink-text sm:text-4xl lg:text-[2.6rem] xl:text-5xl">
-          Computer science student focused on systems and developer tools.
+          Curiosity into creation.
         </h1>
         <p className="mt-5 max-w-2xl text-sm leading-6 text-muted-line sm:text-base sm:leading-7">
           I'm Caleb Standfield, a University of Utah student graduating in

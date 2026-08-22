@@ -56,3 +56,4 @@ output directory resolve correctly.
   Claude; `README.md` is public-facing documentation.
 - **No AI references in `README.md`** — keep all mention of Claude, AI, or agent
   tooling out of the README. It belongs only here.
+- Stop killing the dev server if your change doesn't require a hard restart.

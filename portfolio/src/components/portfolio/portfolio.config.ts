@@ -52,8 +52,7 @@ export const projectSlots: ProjectData[] = [
       "/blackjack/blackjack_lost.png",
     ],
     // Placeholders. Drop either field to hide that button.
-    repositoryUrl: "https://github.com/CalebStandfield/blackjack",
-    demoUrl: "https://example.com/blackjack",
+    repositoryUrl: "https://github.com/CalebStandfield/full-blackjack-game-engine-with-UI",
   },
   {
     id: "pixelify",
@@ -98,7 +97,6 @@ export const projectSlots: ProjectData[] = [
     ],
     // Placeholders. Drop either field to hide that button.
     repositoryUrl: "https://github.com/CalebStandfield/sprite-editor",
-    demoUrl: "https://example.com/sprite-editor",
   },
 ];
 

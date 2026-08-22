@@ -100,7 +100,7 @@ function ProjectSlot({
         <div className="flex min-h-[20rem] min-w-0 flex-col">
           <TagCarousel tags={tags} />
 
-          <div className="flex flex-1 flex-col px-6 py-6 sm:px-7">
+          <div className="@container flex flex-1 flex-col px-6 py-6 sm:px-7">
             <p className="font-mono text-sm leading-7 text-muted-line">
               {project.summary ||
                 "Add a concise problem, contribution, and result."}
@@ -113,13 +113,20 @@ function ProjectSlot({
                     href={project.repositoryUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="project-link flex-1 justify-between"
+                    aria-label="Github repository"
+                    className="project-link flex-1 justify-between @max-[300px]:justify-center"
                   >
                     <span className="flex items-center gap-2.5">
                       <GithubLogo size={18} weight="fill" />
-                      <span className="uppercase tracking-[0.16em]">Github</span>
+                      <span className="uppercase tracking-[0.16em] @max-[300px]:hidden">
+                        Github
+                      </span>
                     </span>
-                    <ArrowUpRight size={16} weight="bold" />
+                    <ArrowUpRight
+                      size={16}
+                      weight="bold"
+                      className="@max-[300px]:hidden"
+                    />
                   </a>
                 )}
                 {project.demoUrl && (
@@ -127,16 +134,23 @@ function ProjectSlot({
                     href={project.demoUrl}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label="Visit demo"
                     className={cn(
-                      "project-link flex-1 justify-between",
+                      "project-link flex-1 justify-between @max-[300px]:justify-center",
                       inProgress ? "project-link--amber" : "project-link--emerald",
                     )}
                   >
                     <span className="flex items-center gap-2.5">
                       <Globe size={18} weight="bold" />
-                      <span className="uppercase tracking-[0.16em]">Visit</span>
+                      <span className="uppercase tracking-[0.16em] @max-[300px]:hidden">
+                        Visit
+                      </span>
                     </span>
-                    <ArrowUpRight size={16} weight="bold" />
+                    <ArrowUpRight
+                      size={16}
+                      weight="bold"
+                      className="@max-[300px]:hidden"
+                    />
                   </a>
                 )}
               </div>
