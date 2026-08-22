@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowUpRight, GithubLogo, Globe, ImageSquare } from "@phosphor-icons/react";
+import {
+  ArrowUpRight,
+  CaretLeft,
+  CaretRight,
+  GithubLogo,
+  Globe,
+  ImageSquare,
+} from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@/lib/utils";
@@ -78,12 +85,8 @@ function ProjectSlot({
 
       <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="flex min-h-[20rem] items-center justify-center border-b border-muted-line/20 p-5 lg:border-r lg:border-b-0">
-          {project.images[0] ? (
-            <img
-              src={project.images[0]}
-              alt={`${title} preview`}
-              className="aspect-video w-full rounded-lg border border-muted-line/20 object-cover"
-            />
+          {project.images.length > 0 ? (
+            <ImageCarousel images={project.images} title={title} />
           ) : (
             <div className="flex size-full min-h-[16rem] flex-col items-center justify-center rounded-xl border border-dashed border-muted-line/30 text-muted-line/65">
               <ImageSquare size={32} weight="thin" />
@@ -148,6 +151,80 @@ function ProjectSlot({
 // Shown in the carousel when a project has no real tags yet, so every card
 // keeps the same layout. Replace by filling `tags` in portfolio.config.
 const PLACEHOLDER_TAGS = ["Tag one", "Tag two", "Tag three"];
+
+const AUTO_MS = 4000; // image auto-advance interval
+
+// Cycles a project's images. Auto-advances every AUTO_MS, pauses while hovered.
+// Orange caret arrows on each side and clickable dots below. Single image shows
+// no arrows or dots.
+function ImageCarousel({ images, title }: { images: string[]; title: string }) {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = images.length;
+
+  useEffect(() => {
+    if (paused || count <= 1) return;
+    const id = window.setInterval(
+      () => setIndex((i) => (i + 1) % count),
+      AUTO_MS,
+    );
+    return () => window.clearInterval(id);
+  }, [paused, count]);
+
+  const go = (next: number) => setIndex(((next % count) + count) % count);
+
+  return (
+    <div
+      className="group relative w-full"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <img
+        src={images[index]}
+        alt={`${title} preview ${index + 1}`}
+        className="aspect-video w-full rounded-lg border border-muted-line/20 object-cover"
+      />
+
+      {count > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={() => go(index - 1)}
+            className="absolute inset-y-0 left-2 flex items-center text-muted-line transition-colors hover:text-orange focus-visible:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+          >
+            <CaretLeft size={28} weight="bold" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={() => go(index + 1)}
+            className="absolute inset-y-0 right-2 flex items-center text-muted-line transition-colors hover:text-orange focus-visible:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+          >
+            <CaretRight size={28} weight="bold" />
+          </button>
+
+          <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
+            {images.map((image, i) => (
+              <button
+                key={image}
+                type="button"
+                aria-label={`Go to image ${i + 1}`}
+                onClick={() => setIndex(i)}
+                className={cn(
+                  "rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange",
+                  i === index
+                    ? "size-2.5 bg-orange"
+                    : "size-2 bg-muted-line/60 hover:bg-muted-line",
+                )}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 const SPIN_SPEED = 32; // px/sec, gentle continuous drift
 const HOLD_MS = 4000; // how long a focused pill stays centered

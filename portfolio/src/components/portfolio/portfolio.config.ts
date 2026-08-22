@@ -43,7 +43,14 @@ export const projectSlots: ProjectData[] = [
     placeholderTitle: "Featured project",
     title: "blackjack",
     tags: [],
-    images: ["/blackjack/blackjack_main.png"],
+    images: [
+      "/blackjack/blackjack_main.png",
+      "/blackjack/blackjack_bet.png",
+      "/blackjack/blackjack_playing.png",
+      "/blackjack/blackjack_blackjack.png",
+      "/blackjack/blackjack_won.png",
+      "/blackjack/blackjack_lost.png",
+    ],
     // Placeholders. Drop either field to hide that button.
     repositoryUrl: "https://github.com/CalebStandfield/blackjack",
     demoUrl: "https://example.com/blackjack",
@@ -67,10 +74,15 @@ export const projectSlots: ProjectData[] = [
     placeholderTitle: "Additional project",
     title: "learn-vim",
     tags: [],
-    images: [],
+    images: [
+      "/learn-vim/learn-vim-home.png",
+      "/learn-vim/learn-vim-level-select.png",
+      "/learn-vim/learn-vim-arena.png",
+      "/learn-vim/learn-vim-solved.png",
+    ],
     // Placeholders. Drop either field to hide that button.
     repositoryUrl: "https://github.com/CalebStandfield/learn-vim",
-    demoUrl: "https://example.com/learn-vim",
+    demoUrl: "https://learn-vim-ruddy.vercel.app/",
   },
   {
     id: "sprite-editor",
@@ -78,7 +90,12 @@ export const projectSlots: ProjectData[] = [
     placeholderTitle: "Additional project",
     title: "Sprite Editor",
     tags: [],
-    images: ["/sprite/sprite_draw.png"],
+    images: [
+      "/sprite/sprite_draw.png",
+      "/sprite/sprite_cs.png",
+      "/sprite/sprite_save.png",
+      "/sprite/sprite_stoplight.png",
+    ],
     // Placeholders. Drop either field to hide that button.
     repositoryUrl: "https://github.com/CalebStandfield/sprite-editor",
     demoUrl: "https://example.com/sprite-editor",
