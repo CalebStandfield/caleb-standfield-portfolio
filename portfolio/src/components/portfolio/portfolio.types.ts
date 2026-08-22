@@ -27,8 +27,7 @@ export type SystemTrunk = "gateway" | "origin" | "recovery";
 export interface ProjectData {
   id: string;
   status: ProjectStatus;
-  placeholderTitle: string;
-  title?: string;
+  title: string;
   summary?: string;
   tags: string[];
   images: string[];

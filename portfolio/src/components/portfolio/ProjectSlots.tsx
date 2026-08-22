@@ -57,7 +57,7 @@ function ProjectSlot({
   const inProgress = project.status === "in_progress";
   const statusLabel = inProgress ? "Currently working on" : "Complete";
   const statusClass = inProgress ? "text-amber" : "text-emerald";
-  const title = project.title || project.placeholderTitle;
+  const title = project.title || project.title;
   const tags = project.tags.length > 0 ? project.tags : PLACEHOLDER_TAGS;
 
   return (
@@ -84,11 +84,11 @@ function ProjectSlot({
       </header>
 
       <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="flex min-h-[20rem] items-center justify-center border-b border-muted-line/20 p-5 lg:border-r lg:border-b-0">
+        <div className="flex min-h-80 items-center justify-center border-b border-muted-line/20 p-5 lg:border-r lg:border-b-0">
           {project.images.length > 0 ? (
             <ImageCarousel images={project.images} title={title} />
           ) : (
-            <div className="flex size-full min-h-[16rem] flex-col items-center justify-center rounded-xl border border-dashed border-muted-line/30 text-muted-line/65">
+            <div className="flex size-full min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-muted-line/30 text-muted-line/65">
               <ImageSquare size={32} weight="thin" />
               <span className="mt-2 font-mono text-[0.68rem] uppercase tracking-[0.22em]">
                 Project image
@@ -97,7 +97,7 @@ function ProjectSlot({
           )}
         </div>
 
-        <div className="flex min-h-[20rem] min-w-0 flex-col">
+        <div className="flex min-h-80 min-w-0 flex-col">
           <TagCarousel tags={tags} />
 
           <div className="@container flex flex-1 flex-col px-6 py-6 sm:px-7">
@@ -376,7 +376,7 @@ function TagCarousel({ tags }: { tags: string[] }) {
     <div className="min-w-0 border-b border-muted-line/20 px-4 py-3.5 sm:px-5">
       <div
         ref={viewportRef}
-        className="relative min-w-0 overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_7%,#000_93%,transparent)]"
+        className="relative min-w-0 overflow-hidden mask-[linear-gradient(to_right,transparent,#000_7%,#000_93%,transparent)]"
       >
         <div ref={trackRef} className="flex w-max gap-2">
           {rendered.map(({ tag, renderedIndex }) => {

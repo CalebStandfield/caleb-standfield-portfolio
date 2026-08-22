@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { highlightLines } from "@/components/hero/codeHighlight";
 import { cn } from "@/lib/utils";
+import { Highlight } from "./Highlight";
 import { useTypedCode } from "./useTypedCode";
 
 const code = `struct Profile {
@@ -46,7 +47,8 @@ export function ProfileHero() {
           I'm Caleb Standfield, a University of Utah student graduating in
           December 2026. I have worked across backend, full-stack, systems, and
           data-focused projects, using languages and tools that fit the problem.
-          I recently completed an internship at Adobe.
+          I recently completed an internship at{" "}
+          <Highlight>Adobe</Highlight>.
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">

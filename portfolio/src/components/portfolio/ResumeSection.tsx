@@ -1,6 +1,7 @@
 import { ArrowUpRight, DownloadSimple, FilePdf } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 
+import { Highlight } from "./Highlight";
 import { resume } from "./portfolio.config";
 import { SectionHeading } from "./SectionHeading";
 
@@ -35,18 +36,18 @@ export function ResumeSection() {
               <p className="font-heading text-xl font-semibold text-ink-text">
                 {resume.education.school}
               </p>
-              <p className="mt-1 text-sm text-muted-line">
+              <p className="font-bold text-1xl text-orange">
                 {resume.education.degree}
               </p>
             </div>
-            <p className="font-mono text-xs text-muted-line">
+            <p className="font-mono text-xs text-ink-text">
               {resume.education.location}
             </p>
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
             {resume.education.details.map((detail) => (
-              <span key={detail} className="resume-chip">
+              <span key={detail} className="resume-chip text-ink-text">
                 {detail}
               </span>
             ))}
@@ -78,7 +79,7 @@ export function ResumeSection() {
               Work Experience
             </h3>
             <p className="text-sm leading-6 text-muted-line">
-              {resume.work}
+              <Highlight>{resume.work}</Highlight>
             </p>
           </div>
         </div>
