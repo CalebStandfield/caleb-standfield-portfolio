@@ -86,7 +86,11 @@ function ProjectSlot({
       <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="flex min-h-80 items-center justify-center border-b border-muted-line/20 p-5 lg:border-r lg:border-b-0">
           {project.images.length > 0 ? (
-            <ImageCarousel images={project.images} title={title} />
+            <ImageCarousel
+              images={project.images}
+              perSlide={project.imagesPerSlide ?? 1}
+              title={title}
+            />
           ) : (
             <div className="flex size-full min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-muted-line/30 text-muted-line/65">
               <ImageSquare size={32} weight="thin" />
@@ -168,13 +172,34 @@ const PLACEHOLDER_TAGS = ["Tag one", "Tag two", "Tag three"];
 
 const AUTO_MS = 4000; // image auto-advance interval
 
-// Cycles a project's images. Auto-advances every AUTO_MS, pauses while hovered.
+function chunk<T>(items: T[], size: number): T[][] {
+  const step = Math.max(1, Math.floor(size));
+  const groups: T[][] = [];
+  for (let i = 0; i < items.length; i += step) {
+    groups.push(items.slice(i, i + step));
+  }
+  return groups;
+}
+
+// Cycles a project's images in slides of `perSlide` images side by side.
+// Auto-advances every AUTO_MS, pauses while hovered. Images render at their
+// natural aspect ratio (capped height), so nothing gets cropped whether a shot
+// is wide, 4:3, or a portrait phone screen.
 // Orange caret arrows on each side and clickable dots below. Single image shows
 // no arrows or dots.
-function ImageCarousel({ images, title }: { images: string[]; title: string }) {
+function ImageCarousel({
+  images,
+  perSlide,
+  title,
+}: {
+  images: string[];
+  perSlide: number;
+  title: string;
+}) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const count = images.length;
+  const slides = chunk(images, perSlide);
+  const count = slides.length;
 
   useEffect(() => {
     if (paused || count <= 1) return;
@@ -193,17 +218,22 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <img
-        src={images[index]}
-        alt={`${title} preview ${index + 1}`}
-        className="aspect-video w-full rounded-lg border border-muted-line/20 object-cover"
-      />
+      <div className="mx-auto flex w-fit max-w-full justify-center gap-2">
+        {slides[index].map((src) => (
+          <img
+            key={src}
+            src={src}
+            alt={`${title} preview ${images.indexOf(src) + 1}`}
+            className="h-auto max-h-112 w-auto min-w-0 max-w-full rounded-lg border border-muted-line/20"
+          />
+        ))}
+      </div>
 
       {count > 1 && (
         <>
           <button
             type="button"
-            aria-label="Previous image"
+            aria-label="Previous slide"
             onClick={() => go(index - 1)}
             className="absolute inset-y-0 left-2 flex items-center text-muted-line transition-colors hover:text-orange focus-visible:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
           >
@@ -211,7 +241,7 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
           </button>
           <button
             type="button"
-            aria-label="Next image"
+            aria-label="Next slide"
             onClick={() => go(index + 1)}
             className="absolute inset-y-0 right-2 flex items-center text-muted-line transition-colors hover:text-orange focus-visible:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
           >
@@ -219,11 +249,11 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
           </button>
 
           <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
-            {images.map((image, i) => (
+            {slides.map((slide, i) => (
               <button
-                key={image}
+                key={slide[0]}
                 type="button"
-                aria-label={`Go to image ${i + 1}`}
+                aria-label={`Go to slide ${i + 1}`}
                 onClick={() => setIndex(i)}
                 className={cn(
                   "rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange",
@@ -240,9 +270,10 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
   );
 }
 
-const SPIN_SPEED = 32; // px/sec, gentle continuous drift
-const HOLD_MS = 4000; // how long a focused pill stays centered
+const SPIN_SPEED = 38; // px/sec, gentle continuous drift
 const FOCUS_EASE_MS = 650; // time to glide a pill to the middle
+const FOCUS_TOTAL_MS = 4000; // glide + hold, start of click to release
+const HOLD_MS = FOCUS_TOTAL_MS - FOCUS_EASE_MS; // how long it stays centered
 
 function easeInOut(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;

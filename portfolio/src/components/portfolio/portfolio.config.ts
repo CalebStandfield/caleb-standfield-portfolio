@@ -38,19 +38,68 @@ import type {
 
 export const projectSlots: ProjectData[] = [
   {
+    id: "cadenza",
+    status: "in_progress",
+    title: "Cadenza",
+    summary:
+      "Apple Music companion app for song tagging, query-based playlists, and listening analytics. Capstone project. I own the LLM song-tagging integration end to end, and built a persistent listening-event queue with deduplicated ingestion so retries never double count. SQL-backed analytics drive calendar heatmaps, tag filters, and ranked listening history.",
+    tags: [
+      "Rust",
+      "TypeScript",
+      "React Native",
+      "PostgreSQL",
+      "LLM Integration",
+      "System Architecture",
+      "Caching",
+    ],
+    images: [
+      "/cadenza/library_left.jpg",
+      "/cadenza/account_middle.jpg",
+      "/cadenza/search_right.jpg",
+      "/cadenza/media_left.jpg",
+      "/cadenza/media_middle.jpg",
+      "/cadenza/media_right.jpg",
+      "/cadenza/query_left.jpg",
+      "/cadenza/query_middle.jpg",
+      "/cadenza/query_right.jpg",
+      "/cadenza/analytics_left.jpg",
+      "/cadenza/analytics_middle.jpg",
+      "/cadenza/analytics_right.jpg",
+    ],
+    imagesPerSlide: 3,
+  },
+  {
+    id: "web-server",
+    status: "in_progress",
+    title: "Web Server",
+    summary:
+      "Multithreaded HTTP server built from scratch in Rust. Thread pooling and concurrency primitives handle requests, with async I/O and low-latency static file serving. Currently load testing on physical hardware to see how it holds up under concurrent load.",
+    tags: [
+      "Rust",
+      "Concurrency",
+      "Thread Pooling",
+      "Async I/O",
+      "HTTP",
+      "Performance",
+    ],
+    // Drop screenshots in public/web-server/ and list them here.
+    images: [],
+    repositoryUrl: "https://github.com/CalebStandfield/custom-http",
+  },
+  {
     id: "blackjack",
     status: "complete",
     title: "blackjack",
     summary:
-      "A complete blackjack game engine built from scratch in C++ with Qt. Fully AI-driven opponents give the table life and challenge. Built with a team of six on an Agile workflow with daily scrums, it leans on clear OOP design, event handling, and finite state management.",
+      "Complete blackjack game engine built from scratch in C++ and Qt, with AI-controlled opponents. Object-oriented design and a finite state machine manage game state transitions and event handling. Built on a six-person team following agile practices with daily scrum meetings.",
     tags: [
       "C++",
-      "Qt Creator",
-      "Full Stack",
-      "State Management",
-      "Agile",
+      "Qt",
+      "AI Opponents",
       "OOP Design",
-      "Sprint Planning",
+      "Finite State Machine",
+      "Event Handling",
+      "Agile",
     ],
     images: [
       "/blackjack/blackjack_main.png",
@@ -63,25 +112,6 @@ export const projectSlots: ProjectData[] = [
     // Placeholders. Drop either field to hide that button.
     repositoryUrl:
       "https://github.com/CalebStandfield/full-blackjack-game-engine-with-UI",
-  },
-  {
-    id: "pixelify",
-    status: "in_progress",
-    title: "Pixelify",
-    summary:
-      "Image-processing engine built to turn regular images into a pixel-art style, with advanced capabilities coming soon. Designed to be fast and robust. Always adding new features and improving performance.",
-    tags: ["Rust",
-      "System Design",
-      "Full Stack",
-      "UX Design",
-      "Complex Error Handling",
-      "Algorithms",
-      "Deployment",
-    ],
-    images: [],
-    // Placeholders. Drop either field to hide that button.
-    repositoryUrl: "https://github.com/CalebStandfield/pixelify",
-    demoUrl: "https://example.com/pixelify",
   },
   {
     id: "learn-vim",
@@ -107,29 +137,6 @@ export const projectSlots: ProjectData[] = [
     repositoryUrl: "https://github.com/CalebStandfield/learn-vim",
     demoUrl: "https://learn-vim-ruddy.vercel.app/",
   },
-  {
-    id: "sprite-editor",
-    status: "complete",
-    title: "Sprite Editor",
-    summary:
-      "A pixel-art sprite editor and animation tool built from scratch in C++ with Qt. Draw, edit, and animate in real time with smart tools (line, fill, circle, square), each powered by custom algorithms. Layers, palettes, and animation data save to JSON, with live previews and frame-by-frame playback.",
-    tags: [
-      "C++",
-      "Qt Creator",
-      "Algorithmic Tools",
-      "JSON Serialization",
-      "Animation Systems",
-      "System Design",
-    ],
-    images: [
-      "/sprite/sprite_draw.png",
-      "/sprite/sprite_cs.png",
-      "/sprite/sprite_save.png",
-      "/sprite/sprite_stoplight.png",
-    ],
-    // Placeholders. Drop either field to hide that button.
-    repositoryUrl: "https://github.com/CalebStandfield/sprite-editor",
-  },
 ];
 
 export const resume = {
@@ -137,11 +144,31 @@ export const resume = {
     school: "University of Utah",
     location: "Salt Lake City, UT",
     degree: "Bachelor of Science in Computer Science",
-    details: ["Minor in Japanese", "Undergraduate Certificate in Data Science"],
-    graduation: "Expected December 2026",
-    gpa: "3.746 GPA",
+    details: [
+      "Artificial Intelligence Track",
+      "Minor in Japanese",
+      "Data Science Certificate",
+    ],
+    graduation: "Expected Dec 2026",
+    gpa: "GPA: 3.788",
   },
   skills: [
+    {
+      label: "Relevant Coursework",
+      values: [
+        "Algorithms",
+        "Data Structures",
+        "Computer Systems",
+        "Computer Organization",
+        "Software Practice I & II",
+        "Artificial Intelligence",
+        "Machine Learning",
+        "NLP",
+        "Data Mining",
+        "Linear Algebra",
+        "Discrete Mathematics",
+      ],
+    },
     {
       label: "Languages",
       values: [
@@ -151,40 +178,51 @@ export const resume = {
         "Python",
         "Java",
         "TypeScript",
+        "SQL",
         "HTML",
         "CSS",
       ],
     },
     {
-      label: "Frameworks + tools",
+      label: "Frameworks",
       values: [
-        "React",
+        "Axum",
+        "Tokio",
+        "FastAPI",
+        "React Native",
         "Next.js",
         "Flutter",
-        "Tailwind CSS",
-        "PostgreSQL",
+        "TailwindCSS",
         "PyTorch",
-        "Docker",
-        "Git",
-        "Qt Creator",
-        "LaTeX",
+        "WebAssembly",
         "Blazor",
       ],
     },
     {
-      label: "Specialties",
+      label: "Tools",
       values: [
-        "Backend development",
-        "Full-stack engineering",
+        "PostgreSQL",
+        "MongoDB",
+        "Docker",
+        "Git",
+        "Linux Command Line",
+        "Tree-sitter",
+        "LaTeX",
+      ],
+    },
+    {
+      label: "Engineering",
+      values: [
+        "Backend Development",
+        "Full-Stack Development",
         "Concurrency",
-        "High-performance systems",
-        "API design",
-        "Data structures",
-        "Machine learning integration",
+        "API Design",
+        "System Design",
+        "ML Integration",
       ],
     },
   ],
-  work: "Adobe summer internship 2026",
+  work: "Adobe, Software Engineer Intern, May 2026 - Aug 2026",
 } as const;
 
 export const stageScene: Record<PortfolioStage, SystemScene> = {

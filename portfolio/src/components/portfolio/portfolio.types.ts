@@ -31,6 +31,8 @@ export interface ProjectData {
   summary?: string;
   tags: string[];
   images: string[];
+  /** Images shown together per carousel slide, e.g. 3 for phone shots. Default 1. */
+  imagesPerSlide?: number;
   repositoryUrl?: string;
   demoUrl?: string;
 }
