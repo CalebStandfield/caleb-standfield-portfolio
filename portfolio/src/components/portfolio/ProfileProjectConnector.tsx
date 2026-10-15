@@ -10,6 +10,7 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { trace, type Point, type Rect } from "@/components/hero/connectors";
 import { edgeColors } from "./portfolio.config";
+import { keepIfSame } from "./sameLayout";
 
 interface ConnectorLayout {
   width: number;
@@ -132,13 +133,17 @@ export function ProfileProjectConnector() {
       }))
       .sort((a, b) => a.y - b.y);
 
-    setLayout({
-      width: containerBox.width,
-      height: containerBox.height,
-      gutter: containerBox.left,
-      source: relativeRect(sourceElement, containerBox),
-      targets,
-    });
+    // the observer fires once per watched element, so most calls repeat the
+    // last reading; keep the old object then and skip the render
+    setLayout(
+      keepIfSame<ConnectorLayout | null>({
+        width: containerBox.width,
+        height: containerBox.height,
+        gutter: containerBox.left,
+        source: relativeRect(sourceElement, containerBox),
+        targets,
+      }),
+    );
   }, []);
 
   useLayoutEffect(() => {

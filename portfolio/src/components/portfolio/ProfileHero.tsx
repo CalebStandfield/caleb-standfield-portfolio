@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { highlightLines } from "@/components/hero/codeHighlight";
 import { cn } from "@/lib/utils";
 import { Highlight } from "./Highlight";
+import { ResponsiveImage } from "./ResponsiveImage";
 import { useTypedCode } from "./useTypedCode";
 
 const code = `struct Profile {
@@ -15,13 +16,15 @@ const code = `struct Profile {
     recent_work: "Adobe 2026 internship",
 }`;
 
+// the snippet is fixed, so tokenize once at load instead of every render
+const lines = highlightLines(code, "rust");
+
 export function ProfileHero() {
   const reduceMotion = useReducedMotion();
   const { open, expanded, lineEls, caretEls, toggle } = useTypedCode(
     code,
     true,
   );
-  const lines = highlightLines(code, "rust");
 
   return (
     <section
@@ -118,9 +121,11 @@ export function ProfileHero() {
 
           <div className="p-4 sm:p-5">
             <div className="relative h-[250px] overflow-hidden rounded-xl border border-orange/35 sm:h-[300px] lg:h-[280px] xl:h-[330px]">
-              <img
+              <ResponsiveImage
                 src="/pfp.jpg"
                 alt="Caleb Standfield"
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                fetchPriority="high"
                 className="h-full w-full object-cover object-[50%_43%]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-transparent" />

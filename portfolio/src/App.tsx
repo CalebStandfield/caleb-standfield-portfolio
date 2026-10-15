@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { GithubLogo, LinkedinLogo } from "@phosphor-icons/react";
 
 import { ContactSection } from "@/components/portfolio/ContactSection";
@@ -61,19 +62,27 @@ export default function App() {
       <Navigation activeStage={activeStage} />
 
       <div className="relative z-10 mx-auto grid max-w-[1600px] px-4 sm:px-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(26rem,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(22rem,2fr)] xl:gap-12 2xl:gap-16">
-        <div className="relative min-w-0" data-portfolio-content>
-          <ProfileProjectConnector />
-          <ProfileHero />
-          <ProjectSlots />
-          <ResumeSection />
-          <ContactSection />
-        </div>
+        <PortfolioContent />
 
         {showSystemRail && <SystemRail stage={activeStage} />}
       </div>
     </main>
   );
 }
+
+// the stage changes as you scroll past each section; memo keeps those updates
+// from re-rendering the whole content column, which takes no props
+const PortfolioContent = memo(function PortfolioContent() {
+  return (
+    <div className="relative min-w-0" data-portfolio-content>
+      <ProfileProjectConnector />
+      <ProfileHero />
+      <ProjectSlots />
+      <ResumeSection />
+      <ContactSection />
+    </div>
+  );
+});
 
 function Navigation({ activeStage }: { activeStage: PortfolioStage }) {
   return (

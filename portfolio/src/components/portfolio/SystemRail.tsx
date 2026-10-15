@@ -1,10 +1,14 @@
 import {
+  memo,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type Ref,
+  type RefObject,
 } from "react";
 import { CaretDown } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
@@ -36,6 +40,7 @@ import type {
   SystemScene,
   TrafficScenario,
 } from "./portfolio.types";
+import { keepIfSame } from "./sameLayout";
 import { useTypedCode } from "./useTypedCode";
 
 interface RailSize {
@@ -425,9 +430,11 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
       };
     });
 
-    setStagePositions(nextPositions);
-    setNodeRects(nextNodeRects);
-    setSize({ width: railBox.width, height: railBox.height });
+    // most observer calls repeat the last reading; keep the old objects then
+    // so the routing memo and the node tree stay put
+    setStagePositions(keepIfSame(nextPositions));
+    setNodeRects(keepIfSame(nextNodeRects));
+    setSize(keepIfSame({ width: railBox.width, height: railBox.height }));
   }, []);
 
   useLayoutEffect(() => {
@@ -445,6 +452,13 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
       window.removeEventListener("resize", measure);
     };
   }, [measure]);
+
+  // moving a cluster (new stage position) shifts its nodes without resizing
+  // them, so the observer never sees it. re-measure once they land so edges
+  // follow. converges: the second pass reads the same positions and bails.
+  useLayoutEffect(() => {
+    measure();
+  }, [measure, stagePositions]);
 
   const registerNode = useCallback(
     (id: string) => (element: HTMLDivElement | null) => {
@@ -510,23 +524,12 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
   }, [segments]);
 
   const pathEls = useRef<(SVGPathElement | null)[]>([]);
-  const pulseEls = useRef<Map<number, SVGCircleElement>>(new Map());
-  const nextPulseId = useRef(0);
-  const [pulses, setPulses] = useState<Pulse[]>([]);
+  const pulseLayer = useRef<PulseLayerHandle>(null);
 
+  // pulse state lives in RailPulses so each spawn/finish re-renders only the
+  // circles, not every cluster and node in the rail
   const spawn = useCallback((segmentIndex: number, direction: 1 | -1 = 1) => {
-    setPulses((current) => {
-      const trimmed = current.length >= MAX_PULSES ? current.slice(1) : current;
-      return [
-        ...trimmed,
-        {
-          id: nextPulseId.current++,
-          segmentIndex,
-          born: performance.now(),
-          direction,
-        },
-      ];
-    });
+    pulseLayer.current?.spawn(segmentIndex, direction);
   }, []);
 
   const emitNodeTraffic = useCallback(
@@ -606,57 +609,6 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
       timers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [activeScene, segments.length, size.width, spawn]);
-
-  useEffect(() => {
-    if (!pulses.length) return;
-    let frame = 0;
-
-    const tick = (now: number) => {
-      const finished: number[] = [];
-      for (const pulse of pulses) {
-        const circle = pulseEls.current.get(pulse.id);
-        const path = pathEls.current[pulse.segmentIndex];
-        if (!circle || !path) {
-          finished.push(pulse.id);
-          continue;
-        }
-
-        const length = path.getTotalLength();
-        const travelMs = Math.max(100, (length / PULSE_SPEED) * 1000);
-        const elapsed = now - pulse.born;
-        const progress = Math.min(elapsed / travelMs, 1);
-        const targetElapsed = elapsed - travelMs;
-        const fade =
-          targetElapsed <= PULSE_HOLD_MS
-            ? 0
-            : (targetElapsed - PULSE_HOLD_MS) / PULSE_FADE_MS;
-
-        if (fade >= 1) {
-          finished.push(pulse.id);
-          continue;
-        }
-
-        const directedProgress = pulse.direction === 1 ? progress : 1 - progress;
-        const point = path.getPointAtLength(directedProgress * length);
-        circle.setAttribute("cx", String(point.x));
-        circle.setAttribute("cy", String(point.y));
-        circle.setAttribute(
-          "opacity",
-          String(0.88 * (progress < 0.1 ? progress / 0.1 : Math.max(0, 1 - fade))),
-        );
-      }
-
-      if (finished.length) {
-        setPulses((current) =>
-          current.filter((pulse) => !finished.includes(pulse.id)),
-        );
-      }
-      frame = requestAnimationFrame(tick);
-    };
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [pulses]);
 
   return (
     <aside
@@ -766,26 +718,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
           );
         })}
 
-        {pulses.map((pulse) => {
-          const segment = segments[pulse.segmentIndex];
-          const color = segment?.color ?? edgeColors.request;
-          return (
-            <circle
-              key={pulse.id}
-              ref={(element) => {
-                if (element) pulseEls.current.set(pulse.id, element);
-                else pulseEls.current.delete(pulse.id);
-              }}
-              r={3.4}
-              fill={color}
-              stroke={color}
-              strokeOpacity={0.2}
-              strokeWidth={6}
-              opacity={0}
-              style={{ filter: `drop-shadow(0 0 7px ${color})` }}
-            />
-          );
-        })}
+        <RailPulses ref={pulseLayer} segments={segments} pathEls={pathEls} />
       </svg>
 
       {systemClusters
@@ -843,8 +776,8 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
               node={node}
               active={active}
               reduceMotion={Boolean(reduceMotion)}
-              registerRef={registerNode(node.id)}
-              onToggle={(opening) => emitNodeTraffic(node.id, opening)}
+              registerNode={registerNode}
+              onToggle={emitNodeTraffic}
             />
           </motion.div>
         );
@@ -853,7 +786,128 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
   );
 }
 
-function SystemCluster({
+interface PulseLayerHandle {
+  spawn: (segmentIndex: number, direction: 1 | -1) => void;
+}
+
+// Owns the traffic pulses. Spawns come in through the imperative handle and the
+// rAF loop writes circle positions straight to the DOM, so the only renders
+// here are pulses being added or removed.
+const RailPulses = memo(function RailPulses({
+  ref,
+  segments,
+  pathEls,
+}: {
+  ref: Ref<PulseLayerHandle>;
+  segments: Segment[];
+  pathEls: RefObject<(SVGPathElement | null)[]>;
+}) {
+  const pulseEls = useRef<Map<number, SVGCircleElement>>(new Map());
+  const nextPulseId = useRef(0);
+  const [pulses, setPulses] = useState<Pulse[]>([]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      spawn: (segmentIndex, direction) => {
+        setPulses((current) => {
+          const trimmed =
+            current.length >= MAX_PULSES ? current.slice(1) : current;
+          return [
+            ...trimmed,
+            {
+              id: nextPulseId.current++,
+              segmentIndex,
+              born: performance.now(),
+              direction,
+            },
+          ];
+        });
+      },
+    }),
+    [],
+  );
+
+  useEffect(() => {
+    if (!pulses.length) return;
+    let frame = 0;
+
+    const tick = (now: number) => {
+      const finished: number[] = [];
+      for (const pulse of pulses) {
+        const circle = pulseEls.current.get(pulse.id);
+        const path = pathEls.current[pulse.segmentIndex];
+        if (!circle || !path) {
+          finished.push(pulse.id);
+          continue;
+        }
+
+        const length = path.getTotalLength();
+        const travelMs = Math.max(100, (length / PULSE_SPEED) * 1000);
+        const elapsed = now - pulse.born;
+        const progress = Math.min(elapsed / travelMs, 1);
+        const targetElapsed = elapsed - travelMs;
+        const fade =
+          targetElapsed <= PULSE_HOLD_MS
+            ? 0
+            : (targetElapsed - PULSE_HOLD_MS) / PULSE_FADE_MS;
+
+        if (fade >= 1) {
+          finished.push(pulse.id);
+          continue;
+        }
+
+        const directedProgress = pulse.direction === 1 ? progress : 1 - progress;
+        const point = path.getPointAtLength(directedProgress * length);
+        circle.setAttribute("cx", String(point.x));
+        circle.setAttribute("cy", String(point.y));
+        circle.setAttribute(
+          "opacity",
+          String(0.88 * (progress < 0.1 ? progress / 0.1 : Math.max(0, 1 - fade))),
+        );
+      }
+
+      if (finished.length) {
+        setPulses((current) =>
+          current.filter((pulse) => !finished.includes(pulse.id)),
+        );
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [pathEls, pulses]);
+
+  return (
+    <>
+      {pulses.map((pulse) => {
+        const segment = segments[pulse.segmentIndex];
+        const color = segment?.color ?? edgeColors.request;
+        return (
+          <circle
+            key={pulse.id}
+            ref={(element) => {
+              if (element) pulseEls.current.set(pulse.id, element);
+              else pulseEls.current.delete(pulse.id);
+            }}
+            r={3.4}
+            fill={color}
+            stroke={color}
+            strokeOpacity={0.2}
+            strokeWidth={6}
+            opacity={0}
+            style={{ filter: `drop-shadow(0 0 7px ${color})` }}
+          />
+        );
+      })}
+    </>
+  );
+});
+
+// memo'd with stable props (config objects, primitives, stable callbacks) so a
+// rail re-render only touches clusters whose `top` or `active` changed
+const SystemCluster = memo(function SystemCluster({
   cluster,
   top,
   active,
@@ -920,8 +974,8 @@ function SystemCluster({
                 node={node}
                 active={active}
                 reduceMotion={reduceMotion}
-                registerRef={registerNode(node.id)}
-                onToggle={(opening) => onToggle(node.id, opening)}
+                registerNode={registerNode}
+                onToggle={onToggle}
               />
             </div>
           );
@@ -929,29 +983,37 @@ function SystemCluster({
       </div>
     </motion.section>
   );
-}
+});
 
-function SystemNode({
+// takes the shared callbacks and binds its own id, so props stay stable across
+// rail renders and the memo holds
+const SystemNode = memo(function SystemNode({
   node,
   active,
   reduceMotion,
-  registerRef,
+  registerNode,
   onToggle,
 }: {
   node: SystemNodeData;
   active: boolean;
   reduceMotion: boolean;
-  registerRef: (element: HTMLDivElement | null) => void;
-  onToggle: (opening: boolean) => void;
+  registerNode: (id: string) => (element: HTMLDivElement | null) => void;
+  onToggle: (nodeId: string, opening: boolean) => void;
 }) {
   const Icon = node.icon;
   const codeId = `system-code-${node.id}`;
+  const registerRef = useMemo(() => registerNode(node.id), [registerNode, node.id]);
   const { open, expanded, lineEls, caretEls, toggle } = useTypedCode(
     node.code,
     node.initiallyExpanded ?? true,
-    () => onToggle(true),
+    () => onToggle(node.id, true),
   );
-  const lines = highlightLines(node.code, node.language);
+  // tokenizing is the heaviest part of a node render; only redo it if the
+  // snippet changes
+  const lines = useMemo(
+    () => highlightLines(node.code, node.language),
+    [node.code, node.language],
+  );
 
   return (
     <div
@@ -1038,4 +1100,4 @@ function SystemNode({
       </div>
     </div>
   );
-}
+});

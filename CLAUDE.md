@@ -38,6 +38,17 @@ Do not bring in new dependencies without explicit permission.
   JSON-LD and an `llms.txt` link into `index.html`. Do not add static copies of
   these files to `public/`; they would shadow the generated ones.
 - Static assets (resume PDF, images) live in `public/` and are served from `/`.
+- Images: `scripts/optimize-images.mjs` (`npm run images`, needs `cwebp` +
+  macOS `sips`) turns every png/jpg in `public/` (except `og.png`) into WebP
+  variants in `public/img/` and writes `src/content/images.generated.ts`
+  (dims + variants, keyed by the original public path). Render images with
+  `ResponsiveImage` (`src/components/portfolio/ResponsiveImage.tsx`) using the
+  original path; helpers are in `src/lib/images.ts`. Outputs are committed, the
+  script never runs on Vercel. Rerun it after adding or changing an image.
+- Render perf: fast-changing state stays in leaves. `PortfolioContent` in
+  `App.tsx` is memo'd so stage changes skip the content column; rail pulses
+  live in `RailPulses`; measure callbacks use `keepIfSame` (`sameLayout.ts`) so
+  unchanged ResizeObserver readings do not re-render.
 
 ### Scripts (run from `portfolio/`)
 

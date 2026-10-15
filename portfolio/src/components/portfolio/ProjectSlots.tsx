@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ArrowUpRight,
   CaretLeft,
@@ -7,10 +14,12 @@ import {
   Globe,
   ImageSquare,
 } from "@phosphor-icons/react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 
 import { projectSlots } from "@/content/profile.content";
+import { aspectRatioOf, preloadImages } from "@/lib/images";
 import { cn } from "@/lib/utils";
+import { ResponsiveImage } from "./ResponsiveImage";
 import { SectionHeading } from "./SectionHeading";
 import type { ProjectData } from "./portfolio.types";
 
@@ -171,6 +180,33 @@ function ProjectSlot({
 const PLACEHOLDER_TAGS = ["Tag one", "Tag two", "Tag three"];
 
 const AUTO_MS = 4000; // image auto-advance interval
+const MAX_IMAGE_H = 448; // px, tallest a carousel image renders
+const IMAGE_GAP = 8; // px, matches gap-2 between side-by-side images
+// rough share of the viewport the image column takes per breakpoint, so the
+// browser picks a file for the real box and not the whole screen
+const COLUMN_VW: [string, number][] = [
+  ["(min-width: 1280px)", 28],
+  ["(min-width: 1024px)", 34],
+  ["", 100],
+];
+
+// Box for one carousel image, known before the file loads so a slide swap
+// never collapses the card (that shift used to ripple through the whole page).
+// Width is the smaller of "full height" and "fair share of the row".
+function imageBox(src: string, perSlide: number) {
+  const ratio = aspectRatioOf(src) ?? 16 / 9;
+  const fullHeightWidth = Math.round(MAX_IMAGE_H * ratio);
+  const gaps = (perSlide - 1) * IMAGE_GAP;
+  return {
+    style: {
+      aspectRatio: ratio,
+      width: `min(${fullHeightWidth}px, calc((100% - ${gaps}px) / ${perSlide}))`,
+    },
+    sizes: COLUMN_VW.map(([query, vw]) =>
+      `${query} min(${fullHeightWidth}px, ${Math.round(vw / perSlide)}vw)`.trim(),
+    ).join(", "),
+  };
+}
 
 function chunk<T>(items: T[], size: number): T[][] {
   const step = Math.max(1, Math.floor(size));
@@ -196,37 +232,54 @@ function ImageCarousel({
   perSlide: number;
   title: string;
 }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(rootRef, { margin: "200px" });
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const slides = chunk(images, perSlide);
+  const slides = useMemo(() => chunk(images, perSlide), [images, perSlide]);
   const count = slides.length;
+  const sizes = imageBox(images[0], perSlide).sizes;
+  const next = slides[(index + 1) % count];
+
+  // fetch the next slide while this one shows, so the swap is instant.
+  // only near the viewport, so offscreen carousels cost nothing on load.
+  useEffect(() => {
+    if (inView && count > 1) preloadImages(next, sizes);
+  }, [inView, count, next, sizes]);
 
   useEffect(() => {
-    if (paused || count <= 1) return;
+    if (paused || !inView || count <= 1) return;
     const id = window.setInterval(
       () => setIndex((i) => (i + 1) % count),
       AUTO_MS,
     );
     return () => window.clearInterval(id);
-  }, [paused, count]);
+  }, [paused, inView, count]);
 
   const go = (next: number) => setIndex(((next % count) + count) % count);
 
   return (
     <div
+      ref={rootRef}
       className="group relative w-full"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="mx-auto flex w-fit max-w-full justify-center gap-2">
-        {slides[index].map((src) => (
-          <img
-            key={src}
-            src={src}
-            alt={`${title} preview ${images.indexOf(src) + 1}`}
-            className="h-auto max-h-112 w-auto min-w-0 max-w-full rounded-lg border border-muted-line/20"
-          />
-        ))}
+      <div className="flex w-full justify-center gap-2">
+        {slides[index].map((src) => {
+          const box = imageBox(src, perSlide);
+          return (
+            <ResponsiveImage
+              key={src}
+              src={src}
+              alt={`${title} preview ${images.indexOf(src) + 1}`}
+              sizes={box.sizes}
+              style={box.style}
+              loading="lazy"
+              className="h-auto min-w-0 rounded-lg border border-muted-line/20"
+            />
+          );
+        })}
       </div>
 
       {count > 1 && (

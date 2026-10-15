@@ -54,6 +54,7 @@ Other scripts (also run from `portfolio/`):
 npm run build     # typecheck + production build (output to dist/)
 npm run preview   # serve the production build
 npm run lint      # eslint
+npm run images    # rebuild WebP image variants (needs cwebp, macOS)
 ```
 
 To add a shadcn component:
@@ -92,6 +93,13 @@ Profile, project, resume, and contact data live in
 `portfolio/src/content/profile.content.ts`. System-rail content is configured in
 `portfolio/src/components/portfolio/portfolio.config.ts`. Static project images,
 the downloadable resume, and the social preview live in `portfolio/public/`.
+
+After adding or changing an image in `public/`, run `npm run images`. It writes
+WebP copies at 480/960/1200/1600px wide to `public/img/` plus a manifest
+(`src/content/images.generated.ts`) with each image's size. Images render
+through `ResponsiveImage`, which uses the manifest for `srcset` and
+`width`/`height`, so the browser loads only what the screen needs and keeps the
+layout steady while images load. Commit the generated files.
 
 ## Crawler and agent files
 
