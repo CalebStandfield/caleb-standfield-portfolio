@@ -34,8 +34,7 @@ export const site = {
     "Software engineer graduating from the University of Utah in December 2026 (B.S. Computer Science, AI track). Software Engineer Intern at Adobe, summer 2026.",
   // Paragraphs, rendered in order.
   about: [
-    "My recent work is mostly backend and LLM-integrated systems. At Adobe I owned the translation stage of a code migration pipeline that pairs static analysis with LLM translation, and on my capstone (Cadenza) I own the LLM song-tagging integration end to end.",
-    "Projects took me further into backend and systems work: transactional ingestion and SQL analytics on PostgreSQL, concurrency and async I/O in a Rust HTTP server built from scratch, and object-oriented, state-machine design in C++ on a six-person agile team. I pick the language that fits the problem.",
+    "I'm a full-stack engineer with a backend and systems lean, and I've owned LLM features at Adobe and on my capstone. At Adobe I built a feature that migrates AppMeasurement analytics code to the Web SDK, and I owned its translation stage, which combines deterministic processing with LLM translation to generate the new code. On Cadenza, my capstone Apple Music companion app, I own LLM song tagging from the backend service to the mobile UI. On the systems side, I built Cadenza's transactional event ingestion with dedup so retries don't double count, and I'm writing a multithreaded HTTP server from scratch in Rust.",
   ],
   resumeUrl: "/Caleb_Standfield_Resume.pdf",
 } as const;
