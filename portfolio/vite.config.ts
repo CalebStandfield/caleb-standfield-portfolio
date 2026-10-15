@@ -7,6 +7,7 @@ import { agentFiles } from "./plugins/agent-files";
 import { stagePaths } from "./src/components/portfolio/portfolio.routes";
 import {
   contactLinks,
+  experience,
   projectSlots,
   resume,
   site,
@@ -19,6 +20,7 @@ export default defineConfig({
     agentFiles({
       site,
       projects: projectSlots,
+      experience,
       resume,
       contactLinks,
       pages: Object.values(stagePaths),

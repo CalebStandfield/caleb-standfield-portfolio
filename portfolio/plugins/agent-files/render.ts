@@ -3,6 +3,7 @@
 
 import type {
   ContactLink,
+  ExperienceData,
   ProjectData,
 } from "../../src/content/profile.content";
 
@@ -16,6 +17,7 @@ export interface SiteProfile {
     resumeUrl: string;
   };
   projects: readonly ProjectData[];
+  experience: readonly ExperienceData[];
   resume: {
     education: {
       school: string;
@@ -26,7 +28,6 @@ export interface SiteProfile {
       gpa: string;
     };
     skills: readonly { label: string; values: readonly string[] }[];
-    work: string;
   };
   contactLinks: readonly ContactLink[];
   /** Site-relative paths for every page, e.g. "/", "/projects". */
@@ -42,6 +43,14 @@ function absolute(base: string, path: string): string {
   return new URL(path, base).href;
 }
 
+function renderExperience(job: ExperienceData): string {
+  return [
+    `### ${job.company}, ${job.role} (${job.dates})`,
+    "",
+    ...job.highlights.map((highlight) => `- ${highlight}`),
+  ].join("\n");
+}
+
 function renderProject(project: ProjectData): string {
   const lines = [`### ${project.title} (${statusLabel[project.status]})`, ""];
   if (project.summary) lines.push(project.summary, "");
@@ -54,7 +63,7 @@ function renderProject(project: ProjectData): string {
 // Follows the llms.txt convention (https://llmstxt.org): H1 name, blockquote
 // summary, then H2 sections. The site is small, so everything is inline.
 export function renderLlmsTxt(profile: SiteProfile): string {
-  const { site, projects, resume, contactLinks } = profile;
+  const { site, projects, experience, resume, contactLinks } = profile;
   const { education } = resume;
 
   return [
@@ -66,7 +75,7 @@ export function renderLlmsTxt(profile: SiteProfile): string {
     "",
     "## Experience",
     "",
-    `- ${resume.work}`,
+    experience.map(renderExperience).join("\n\n"),
     "",
     "## Education",
     "",

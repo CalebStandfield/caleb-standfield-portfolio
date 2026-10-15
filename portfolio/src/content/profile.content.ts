@@ -34,10 +34,8 @@ export const site = {
     "Software engineer graduating from the University of Utah in December 2026 (B.S. Computer Science, AI track). Software Engineer Intern at Adobe, summer 2026.",
   // Paragraphs, rendered in order.
   about: [
-    "Caleb Standfield is a software engineer finishing a B.S. in Computer Science (AI track) at the University of Utah, graduating December 2026.",
-    "As a Software Engineer Intern at Adobe (May - Aug 2026), Caleb built a feature that migrates AppMeasurement analytics code to the Adobe Web SDK, extending support beyond Adobe Tags to standalone JavaScript implementations (Python and TypeScript). It uses Tree-sitter parsing, dependency graphs, and topological sorting to find analytics code and the context needed to convert it safely. Caleb owned the translation stage: a source-agnostic pipeline that combines deterministic processing with LLM translation to generate native Web SDK code. Caleb also built the frontend and backend review workflows that surface conversion results and point users to the exact code that needs manual fixes.",
-    "Projects cover the rest of the stack. On Cadenza, a capstone Apple Music companion app (Rust, TypeScript, React Native, PostgreSQL), Caleb owned the LLM song-tagging integration end to end, built transactional ingestion with deduplication so retried requests never double count, and built SQL-backed analytics with cached views for offline use. A multithreaded HTTP server written from scratch in Rust covers concurrency, thread pooling, async I/O, and load testing on physical hardware. A C++/Qt blackjack engine with AI opponents, built on a six-person agile team, covers object-oriented design and finite state machines.",
-    "Works in Rust, C++, Python, TypeScript, C#, and Java. 3.788 GPA, Data Science Certificate, minor in Japanese.",
+    "My recent work is mostly backend and LLM-integrated systems. At Adobe I owned the translation stage of a code migration pipeline that pairs static analysis with LLM translation, and on my capstone (Cadenza) I own the LLM song-tagging integration end to end.",
+    "Projects took me further into backend and systems work: transactional ingestion and SQL analytics on PostgreSQL, concurrency and async I/O in a Rust HTTP server built from scratch, and object-oriented, state-machine design in C++ on a six-person agile team. I pick the language that fits the problem.",
   ],
   resumeUrl: "/Caleb_Standfield_Resume.pdf",
 } as const;
@@ -121,11 +119,11 @@ export const projectSlots: ProjectData[] = [
     tags: [
       "C++",
       "Qt",
-      "AI Opponents",
-      "OOP Design",
-      "Finite State Machine",
-      "Event Handling",
-      "Agile",
+      "Object-Oriented Design",
+      "Finite State Machines",
+      "Event-Driven Programming",
+      "Game AI",
+      "Scrum",
     ],
     images: [
       "/blackjack/blackjack_main.png",
@@ -144,7 +142,7 @@ export const projectSlots: ProjectData[] = [
     status: "complete",
     title: "learn-vim",
     summary:
-      "An interactive Vim trainer built around real edits, not quizzes. Transform text and/or code in as few keystrokes as you can, with instant feedback and par scores to beat. Used as a refresher for an organization lunch and learn, and how to continue to use vim in the age of AI.",
+      "An interactive Vim trainer built around real edits, not quizzes. Transform text and/or code in as few keystrokes as you can, with instant feedback and par scores to beat. Used for an organization lunch and learn, as a Vim refresher and a talk on how to keep using Vim in the age of AI.",
     tags: [
       "JavaScript",
       "React",
@@ -163,6 +161,27 @@ export const projectSlots: ProjectData[] = [
     demoUrl: "https://learn-vim-ruddy.vercel.app/",
   },
 ];
+
+export interface ExperienceData {
+  company: string;
+  role: string;
+  dates: string;
+  highlights: string[];
+}
+
+const adobe: ExperienceData = {
+  company: "Adobe",
+  role: "Software Engineer Intern",
+  dates: "May 2026 - Aug 2026",
+  highlights: [
+    "Built an AppMeasurement to Web SDK migration feature in Python and TypeScript, extending support beyond Adobe Tags to standalone JavaScript implementations.",
+    "Used Tree-sitter, dependency graphs, and topological sorting to find analytics code and the context needed for safe conversion.",
+    "Owned code translation: a source-agnostic pipeline that combines deterministic processing with LLM translation to generate native Web SDK code from parsed source and variable mappings.",
+    "Built frontend and backend review workflows that surface conversion results and point users to the exact code needing manual fixes.",
+  ],
+};
+
+export const experience: ExperienceData[] = [adobe];
 
 export const resume = {
   education: {
@@ -247,5 +266,5 @@ export const resume = {
       ],
     },
   ],
-  work: "Adobe, Software Engineer Intern, May 2026 - Aug 2026",
+  work: `${adobe.company}, ${adobe.role}, ${adobe.dates}`,
 } as const;
