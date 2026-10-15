@@ -73,7 +73,7 @@ export const projectSlots: ProjectData[] = [
     status: "in_progress",
     title: "Web Server",
     summary:
-      "Multithreaded HTTP server built from scratch in Rust. Thread pooling and concurrency primitives handle requests, with async I/O and low-latency static file serving. Currently load testing on physical hardware to see how it holds up under concurrent load.",
+      "Multithreaded HTTP server built from scratch in Rust. Thread pooling and concurrency primitives handle requests, with async I/O and low-latency static file serving. Currently load testing on physical hardware to see how it holds up under concurrent load. Results coming soon.",
     tags: [
       "Rust",
       "Concurrency",
@@ -82,8 +82,7 @@ export const projectSlots: ProjectData[] = [
       "HTTP",
       "Performance",
     ],
-    // Drop screenshots in public/web-server/ and list them here.
-    images: [],
+    images: ["/web-server/load-test.png"],
     repositoryUrl: "https://github.com/CalebStandfield/custom-http",
   },
   {
@@ -118,7 +117,7 @@ export const projectSlots: ProjectData[] = [
     status: "complete",
     title: "learn-vim",
     summary:
-      "An interactive Vim trainer built around real edits, not quizzes. Transform text and/or code in as few keystrokes as you can, with instant feedback and par scores to beat. Used to teach coworkers at Adobe the basics of Vim, but also how to use Vim with AI and Obsidian.",
+      "An interactive Vim trainer built around real edits, not quizzes. Transform text and/or code in as few keystrokes as you can, with instant feedback and par scores to beat. Used as a refresher for an orginization lunch and learn, and how to continue to use vim in the age of AI.",
     tags: [
       "JavaScript",
       "React",
@@ -271,7 +270,7 @@ export const systemClusters: SystemClusterData[] = [
     offset: 20,
     width: 92,
     align: "center",
-    rowGap: 72,
+    rowGap: 150,
     placements: [
       { nodeId: "profile_service", row: 1, column: 1, span: 3 },
       { nodeId: "project_service", row: 1, column: 4, span: 3 },
@@ -319,7 +318,7 @@ export const systemStandalones: SystemStandaloneData[] = [
     nodeId: "object_store",
     scene: "application",
     stage: "projects",
-    offset: 1175,
+    offset: 1535,
     width: 52,
     align: "end",
     eyebrow: "durable media",
