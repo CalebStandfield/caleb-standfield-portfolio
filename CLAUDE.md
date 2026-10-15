@@ -29,6 +29,14 @@ Do not bring in new dependencies without explicit permission.
 
 - `index.html` is the entry; `src/main.tsx` mounts `src/App.tsx` into `#root`.
 - `src/components/ui/` holds shadcn components. `src/lib/utils.ts` has `cn()`.
+- `src/content/profile.content.ts` is the single source for site meta, projects,
+  resume, and contact links. It must stay import-free (no `@/` alias, no React)
+  because `vite.config.ts` imports it under `tsconfig.node.json`. Same rule for
+  `src/components/portfolio/portfolio.routes.ts`, which owns `PortfolioStage`.
+- `plugins/agent-files/` is a Vite plugin that generates `llms.txt`,
+  `robots.txt`, and `sitemap.xml` (dev middleware + emitted on build) and injects
+  JSON-LD and an `llms.txt` link into `index.html`. Do not add static copies of
+  these files to `public/`; they would shadow the generated ones.
 - Static assets (resume PDF, images) live in `public/` and are served from `/`.
 
 ### Scripts (run from `portfolio/`)

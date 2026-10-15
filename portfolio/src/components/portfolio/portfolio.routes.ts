@@ -1,4 +1,5 @@
-import type { PortfolioStage } from "./portfolio.types";
+// Kept free of imports so build tooling (vite.config.ts) can read it too.
+export type PortfolioStage = "hero" | "projects" | "resume" | "contact";
 
 // URL path shown for each stage. Hero is the bare root, no /home.
 export const stagePaths: Record<PortfolioStage, string> = {

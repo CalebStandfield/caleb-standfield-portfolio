@@ -1,11 +1,9 @@
 import { ArrowUpRight, DownloadSimple, FilePdf } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 
+import { resume, site } from "@/content/profile.content";
 import { Highlight } from "./Highlight";
-import { resume } from "./portfolio.config";
 import { SectionHeading } from "./SectionHeading";
-
-const RESUME_URL = "/Caleb_Standfield_Resume.pdf";
 
 export function ResumeSection() {
   const reduceMotion = useReducedMotion();
@@ -87,7 +85,7 @@ export function ResumeSection() {
 
       <div className="mt-6 flex flex-wrap gap-3">
         <a
-          href={RESUME_URL}
+          href={site.resumeUrl}
           target="_blank"
           rel="noreferrer"
           className="inline-flex h-11 items-center gap-2 rounded-lg bg-orange px-5 font-mono text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
@@ -97,7 +95,7 @@ export function ResumeSection() {
           <ArrowUpRight size={15} weight="bold" />
         </a>
         <a
-          href={RESUME_URL}
+          href={site.resumeUrl}
           download
           className="inline-flex h-11 items-center gap-2 rounded-lg border border-muted-line/35 bg-surface/70 px-5 font-mono text-sm font-semibold text-ink-text transition-colors hover:border-orange/60 hover:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
         >

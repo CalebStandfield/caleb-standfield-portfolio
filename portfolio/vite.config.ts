@@ -3,8 +3,27 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
+import { agentFiles } from "./plugins/agent-files";
+import { stagePaths } from "./src/components/portfolio/portfolio.routes";
+import {
+  contactLinks,
+  projectSlots,
+  resume,
+  site,
+} from "./src/content/profile.content";
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    agentFiles({
+      site,
+      projects: projectSlots,
+      resume,
+      contactLinks,
+      pages: Object.values(stagePaths),
+    }),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

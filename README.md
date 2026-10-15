@@ -15,9 +15,11 @@ caleb-standfield-portfolio/   <- git root (this folder)
     │   ├── main.tsx          <- app entry, mounts <App /> into #root
     │   ├── App.tsx           <- root component
     │   ├── index.css         <- Tailwind + theme tokens
+    │   ├── content/          <- profile, projects, resume, contact data
     │   ├── components/portfolio/ <- page sections + system rail
     │   ├── components/ui/     <- shadcn components
     │   └── lib/utils.ts       <- cn() helper
+    ├── plugins/agent-files/  <- builds llms.txt, robots.txt, sitemap.xml
     ├── public/               <- static assets (images, resume PDF)
     ├── vite.config.ts
     └── package.json
@@ -86,6 +88,15 @@ every viewport width. Its parallel left-gutter lanes compress on narrow screens
 without moving the content, and periodic traffic pulses reuse the visual
 language of the reference architecture.
 
-Project slots and system-rail content are configured in
+Profile, project, resume, and contact data live in
+`portfolio/src/content/profile.content.ts`. System-rail content is configured in
 `portfolio/src/components/portfolio/portfolio.config.ts`. Static project images,
 the downloadable resume, and the social preview live in `portfolio/public/`.
+
+## Crawler and agent files
+
+`portfolio/plugins/agent-files` is a Vite plugin that renders `llms.txt`,
+`robots.txt`, and `sitemap.xml` from the content module and page routes. They
+are served by the dev server and written to `dist/` on build. It also injects a
+schema.org `Person` JSON-LD block and a link to `llms.txt` into `index.html`.
+Edit the content module and these files update with it.

@@ -1,9 +1,10 @@
 import type { Icon } from "@phosphor-icons/react";
 
 import type { Lang } from "@/components/hero/codeHighlight";
+import type { PortfolioStage } from "./portfolio.routes";
 
-export type PortfolioStage = "hero" | "projects" | "resume" | "contact";
-export type ProjectStatus = "complete" | "in_progress";
+export type { ProjectData, ProjectStatus } from "@/content/profile.content";
+export type { PortfolioStage };
 export type SystemScene = "ingress" | "application" | "operations";
 export type SystemNodeKind =
   | "client"
@@ -23,19 +24,6 @@ export type SystemEdgeKind =
   | "control";
 export type SystemAlignment = "start" | "center" | "end";
 export type SystemTrunk = "gateway" | "origin" | "recovery";
-
-export interface ProjectData {
-  id: string;
-  status: ProjectStatus;
-  title: string;
-  summary?: string;
-  tags: string[];
-  images: string[];
-  /** Images shown together per carousel slide, e.g. 3 for phone shots. Default 1. */
-  imagesPerSlide?: number;
-  repositoryUrl?: string;
-  demoUrl?: string;
-}
 
 export interface SystemNodeData {
   id: string;

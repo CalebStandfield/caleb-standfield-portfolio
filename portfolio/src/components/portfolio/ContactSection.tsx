@@ -1,32 +1,21 @@
 import {
   ArrowUpRight,
+  type Icon,
   EnvelopeSimple,
   GithubLogo,
   LinkedinLogo,
 } from "@phosphor-icons/react";
 
+import { contactLinks, type ContactId } from "@/content/profile.content";
 import { SectionHeading } from "./SectionHeading";
 
-const links = [
-  {
-    label: "Email",
-    value: "calebjstandfield@gmail.com",
-    href: "mailto:calebjstandfield@gmail.com",
-    Icon: EnvelopeSimple,
-  },
-  {
-    label: "GitHub",
-    value: "github.com/CalebStandfield",
-    href: "https://github.com/CalebStandfield",
-    Icon: GithubLogo,
-  },
-  {
-    label: "LinkedIn",
-    value: "linkedin.com/in/caleb-standfield",
-    href: "https://www.linkedin.com/in/caleb-standfield/",
-    Icon: LinkedinLogo,
-  },
-];
+const icons: Record<ContactId, Icon> = {
+  email: EnvelopeSimple,
+  github: GithubLogo,
+  linkedin: LinkedinLogo,
+};
+
+const links = contactLinks.map((link) => ({ ...link, Icon: icons[link.id] }));
 
 export function ContactSection() {
   return (

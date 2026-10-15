@@ -9,8 +9,8 @@ import {
 } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 
+import { projectSlots } from "@/content/profile.content";
 import { cn } from "@/lib/utils";
-import { projectSlots } from "./portfolio.config";
 import { SectionHeading } from "./SectionHeading";
 import type { ProjectData } from "./portfolio.types";
 
