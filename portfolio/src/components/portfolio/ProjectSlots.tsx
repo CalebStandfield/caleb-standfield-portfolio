@@ -26,7 +26,7 @@ export function ProjectSlots() {
       <SectionHeading
         eyebrow="selected work"
         title="Projects"
-        description="A framework for the work worth discussing. Finished projects lead; active work follows."
+        description="What I am building now, then what I have shipped."
         systemAnchor="projects"
       />
 

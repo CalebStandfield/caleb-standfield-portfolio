@@ -133,7 +133,6 @@ export const projectSlots: ProjectData[] = [
       "/learn-vim/learn-vim-solved.png",
     ],
     // Placeholders. Drop either field to hide that button.
-    repositoryUrl: "https://github.com/CalebStandfield/learn-vim",
     demoUrl: "https://learn-vim-ruddy.vercel.app/",
   },
 ];
