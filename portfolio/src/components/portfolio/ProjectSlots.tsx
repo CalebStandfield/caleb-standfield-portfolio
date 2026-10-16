@@ -14,7 +14,13 @@ import {
   Globe,
   ImageSquare,
 } from "@phosphor-icons/react";
-import { motion, useInView, useReducedMotion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useReducedMotion,
+  type Variants,
+} from "motion/react";
 
 import { projectSlots } from "@/content/profile.content";
 import { aspectRatioOf, preloadImages } from "@/lib/images";
@@ -180,6 +186,22 @@ function ProjectSlot({
 const PLACEHOLDER_TAGS = ["Tag one", "Tag two", "Tag three"];
 
 const AUTO_MS = 4000; // image auto-advance interval
+const SLIDE_S = 0.5; // slide transition length
+
+// dir 1 = forward: new slide enters from the right, old one leaves left.
+// dir -1 mirrors it for the back arrow and earlier dots.
+const slideVariants: Variants = {
+  enter: (dir: number) => ({ x: `${dir * 100}%` }),
+  center: { x: "0%" },
+  exit: (dir: number) => ({ x: `${dir * -100}%` }),
+};
+
+// reduced motion: no sliding, but a crossfade so the swap still isn't a hard cut
+const fadeVariants: Variants = {
+  enter: { opacity: 0 },
+  center: { opacity: 1 },
+  exit: { opacity: 0 },
+};
 const MAX_IMAGE_H = 448; // px, tallest a carousel image renders
 const IMAGE_GAP = 8; // px, matches gap-2 between side-by-side images
 // rough share of the viewport the image column takes per breakpoint, so the
@@ -234,7 +256,8 @@ function ImageCarousel({
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const inView = useInView(rootRef, { margin: "200px" });
-  const [index, setIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const [{ index, dir }, setSlide] = useState({ index: 0, dir: 1 });
   const [paused, setPaused] = useState(false);
   const slides = useMemo(() => chunk(images, perSlide), [images, perSlide]);
   const count = slides.length;
@@ -250,13 +273,14 @@ function ImageCarousel({
   useEffect(() => {
     if (paused || !inView || count <= 1) return;
     const id = window.setInterval(
-      () => setIndex((i) => (i + 1) % count),
+      () => setSlide((s) => ({ index: (s.index + 1) % count, dir: 1 })),
       AUTO_MS,
     );
     return () => window.clearInterval(id);
   }, [paused, inView, count]);
 
-  const go = (next: number) => setIndex(((next % count) + count) % count);
+  const go = (next: number, dir: number) =>
+    setSlide({ index: ((next % count) + count) % count, dir });
 
   return (
     <div
@@ -265,21 +289,36 @@ function ImageCarousel({
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="flex w-full justify-center gap-2">
-        {slides[index].map((src) => {
-          const box = imageBox(src, perSlide);
-          return (
-            <ResponsiveImage
-              key={src}
-              src={src}
-              alt={`${title} preview ${images.indexOf(src) + 1}`}
-              sizes={box.sizes}
-              style={box.style}
-              loading="lazy"
-              className="h-auto min-w-0 rounded-lg border border-muted-line/20"
-            />
-          );
-        })}
+      {/* both slides share one grid cell during the swap, so the frame keeps
+          its height and overflow-hidden clips anything outside it */}
+      <div className="grid w-full overflow-hidden">
+        <AnimatePresence initial={false} custom={dir}>
+          <motion.div
+            key={index}
+            custom={dir}
+            variants={reduceMotion ? fadeVariants : slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: SLIDE_S, ease: [0.32, 0.72, 0, 1] }}
+            className="col-start-1 row-start-1 flex w-full justify-center gap-2"
+          >
+            {slides[index].map((src) => {
+              const box = imageBox(src, perSlide);
+              return (
+                <ResponsiveImage
+                  key={src}
+                  src={src}
+                  alt={`${title} preview ${images.indexOf(src) + 1}`}
+                  sizes={box.sizes}
+                  style={box.style}
+                  loading={inView ? "eager" : "lazy"}
+                  className="h-auto min-w-0 rounded-lg border border-muted-line/20"
+                />
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {count > 1 && (
@@ -287,7 +326,7 @@ function ImageCarousel({
           <button
             type="button"
             aria-label="Previous slide"
-            onClick={() => go(index - 1)}
+            onClick={() => go(index - 1, -1)}
             className="absolute inset-y-0 left-2 flex items-center text-muted-line transition-colors hover:text-orange focus-visible:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
           >
             <CaretLeft size={28} weight="bold" />
@@ -295,7 +334,7 @@ function ImageCarousel({
           <button
             type="button"
             aria-label="Next slide"
-            onClick={() => go(index + 1)}
+            onClick={() => go(index + 1, 1)}
             className="absolute inset-y-0 right-2 flex items-center text-muted-line transition-colors hover:text-orange focus-visible:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
           >
             <CaretRight size={28} weight="bold" />
@@ -307,7 +346,7 @@ function ImageCarousel({
                 key={slide[0]}
                 type="button"
                 aria-label={`Go to slide ${i + 1}`}
-                onClick={() => setIndex(i)}
+                onClick={() => go(i, i < index ? -1 : 1)}
                 className={cn(
                   "rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange",
                   i === index
