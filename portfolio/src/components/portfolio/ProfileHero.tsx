@@ -11,9 +11,10 @@ const code = `struct Profile {
     name: "Caleb Standfield",
     degree: "B.S. Computer Science",
     minor: "Japanese",
+    certificate: "Data Science",
     school: "University of Utah",
     graduating: "Dec 2026",
-    recent_work: "Adobe 2026 internship",
+    recent_work: "Adobe LLM pipeline",
 }`;
 
 // the snippet is fixed, so tokenize once at load instead of every render
@@ -165,11 +166,12 @@ export function ProfileHero() {
                       // about
                     </p>
                     <p className="mt-3 max-w-xl text-sm leading-7 text-ink-text/80 sm:text-[0.95rem]">
-                      I'm Caleb Standfield, a University of Utah student
-                      graduating in December 2026. I have worked across backend,
-                      full-stack, systems, and data-focused projects, using
-                      languages and tools that fit the problem. I recently
-                      completed an internship at <Highlight>Adobe</Highlight>.
+                      I'm Caleb Standfield, a new grad software engineer
+                      finishing CS at the University of Utah in December 2026,
+                      with a Japanese minor and a Data Science Certificate. I'm
+                      full stack first and can do ML too. At{" "}
+                      <Highlight>Adobe</Highlight> I built an LLM code migration
+                      pipeline.
                     </p>
                   </div>
 

@@ -31,10 +31,10 @@ export const site = {
   url: "https://calebstandfield.dev",
   title: "Software Engineer Portfolio",
   tagline:
-    "Software engineer graduating from the University of Utah in December 2026 (B.S. Computer Science, AI track). Software Engineer Intern at Adobe, summer 2026.",
+    "New grad software engineer (Dec 2026), full stack + ML. Software Engineer Intern at Adobe in summer 2026, built an LLM code migration pipeline. University of Utah: B.S. Computer Science (AI track), Japanese minor, Data Science Certificate.",
   // Paragraphs, rendered in order.
   about: [
-    "I'm a full-stack engineer with a backend and systems lean, and I've owned LLM features at Adobe and on my capstone. At Adobe I built a feature that migrates AppMeasurement analytics code to the Web SDK, and I owned its translation stage, which combines deterministic processing with LLM translation to generate the new code. On Cadenza, my capstone Apple Music companion app, I own LLM song tagging from the backend service to the mobile UI. On the systems side, I built Cadenza's transactional event ingestion with dedup so retries don't double count, and I'm writing a multithreaded HTTP server from scratch in Rust.",
+    "I'm a full-stack engineer with a backend and systems lean, and I've owned LLM features at Adobe and on my capstone. At Adobe I built an end-to-end LLM code migration pipeline that moves AppMeasurement analytics code to the Web SDK, from ingest through deterministic and LLM translation to writeback. On Cadenza, my capstone Apple Music companion app, I own LLM song tagging from the backend service to the mobile UI. On the systems side, I built Cadenza's transactional event ingestion with dedup so retries don't double count, and I'm writing a multithreaded HTTP server from scratch in Rust.",
   ],
   resumeUrl: "/Caleb_Standfield_Resume.pdf",
 } as const;
@@ -173,9 +173,9 @@ const adobe: ExperienceData = {
   role: "Software Engineer Intern",
   dates: "May 2026 - Aug 2026",
   highlights: [
-    "Built an AppMeasurement to Web SDK migration feature in Python and TypeScript, extending support beyond Adobe Tags to standalone JavaScript implementations.",
-    "Used Tree-sitter, dependency graphs, and topological sorting to find analytics code and the context needed for safe conversion.",
-    "Owned code translation: a source-agnostic pipeline that combines deterministic processing with LLM translation to generate native Web SDK code from parsed source and variable mappings.",
+    "Built an end-to-end LLM code migration pipeline in Python and TypeScript that converts AppMeasurement analytics code to the Web SDK, extending support beyond Adobe Tags to standalone JavaScript implementations.",
+    "Made the pipeline source-agnostic, so JavaScript files, code snippets, and Adobe Tags custom code share the same ingest, translation, and writeback stages, with output as snippets, files, or zip archives.",
+    "Used Tree-sitter, dependency graphs, and topological sorting to find analytics code and its context, then combined deterministic processing with LLM translation to generate native Web SDK code.",
     "Built frontend and backend review workflows that surface conversion results and point users to the exact code needing manual fixes.",
   ],
 };
