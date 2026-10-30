@@ -19,6 +19,32 @@ const code = `struct Profile {
 // the snippet is fixed, so tokenize once at load instead of every render
 const lines = highlightLines(code, "rust");
 
+// square source, cropped to a circle; swap the path when the new photo lands
+const PORTRAIT_SRC = "/pfp.jpg";
+
+// circular housing: a tick-mark dial, an orange ring, a dark gap, then the photo
+function ProfilePortrait() {
+  return (
+    <div className="relative size-56 shrink-0 sm:size-60 lg:size-64 xl:size-80">
+      <div
+        aria-hidden
+        className="absolute -inset-3 rounded-full bg-[repeating-conic-gradient(var(--color-orange)_0_1deg,transparent_1deg_6deg)] opacity-40 [mask:radial-gradient(closest-side,transparent_calc(100%-7px),#000_calc(100%-6px))]"
+      />
+      <div className="size-full rounded-full border border-orange/50 p-2 shadow-[0_0_60px_-14px_var(--color-orange)]">
+        <div className="size-full overflow-hidden rounded-full border border-muted-line/30 bg-surface">
+          <ResponsiveImage
+            src={PORTRAIT_SRC}
+            alt="Caleb Standfield"
+            sizes="(min-width: 1280px) 20rem, 16rem"
+            fetchPriority="high"
+            className="size-full object-cover object-[50%_30%]"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ProfileHero() {
   const reduceMotion = useReducedMotion();
   const { open, expanded, lineEls, caretEls, toggle } = useTypedCode(
@@ -46,15 +72,8 @@ export function ProfileHero() {
         <h1 className="mt-4 max-w-3xl font-heading text-3xl font-semibold leading-[1.08] tracking-[-0.04em] text-ink-text sm:text-4xl lg:text-[2.6rem] xl:text-5xl">
           Curiosity into creation.
         </h1>
-        <p className="mt-5 max-w-2xl text-sm leading-6 text-muted-line sm:text-base sm:leading-7">
-          I'm Caleb Standfield, a University of Utah student graduating in
-          December 2026. I have worked across backend, full-stack, systems, and
-          data-focused projects, using languages and tools that fit the problem.
-          I recently completed an internship at{" "}
-          <Highlight>Adobe</Highlight>.
-        </p>
 
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-wrap gap-3">
           <a
             href="#projects"
             className="inline-flex h-11 items-center gap-2 rounded-lg bg-orange px-5 font-mono text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
@@ -73,7 +92,7 @@ export function ProfileHero() {
       </motion.div>
 
       <div
-        className="mt-10 max-w-[46rem]"
+        className="mt-12"
         data-profile-project-source
         data-profile-project-expanded={expanded}
       >
@@ -97,9 +116,7 @@ export function ProfileHero() {
               onClick={toggle}
               aria-expanded={open}
               aria-controls="profile-struct"
-              aria-label={
-                open ? "Collapse profile struct" : "Expand profile struct"
-              }
+              aria-label={open ? "Collapse about panel" : "Expand about panel"}
               className="flex size-7 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
             >
               <motion.span
@@ -119,54 +136,74 @@ export function ProfileHero() {
             </button>
           </header>
 
-          <div className="p-4 sm:p-5">
-            <div className="relative h-[250px] overflow-hidden rounded-xl border border-orange/35 sm:h-[300px] lg:h-[280px] xl:h-[330px]">
-              <ResponsiveImage
-                src="/pfp.jpg"
-                alt="Caleb Standfield"
-                sizes="(min-width: 1024px) 40vw, 100vw"
-                fetchPriority="high"
-                className="h-full w-full object-cover object-[50%_43%]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-transparent" />
-            </div>
-          </div>
-
+          {/* the panel folds by rows everywhere; on sm+ its column also folds
+              to 0fr and the portrait column takes the space, so the photo
+              glides to center. min-w on the panel stops text rewrapping (and
+              growing taller) while it narrows. */}
           <div
-            id="profile-struct"
-            className="grid transition-[grid-template-rows] duration-300 ease-out"
-            style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
+            data-expanded={expanded}
+            className="flex flex-col sm:grid sm:grid-cols-[0fr_1fr] sm:transition-[grid-template-columns] sm:duration-500 sm:ease-[cubic-bezier(.2,.7,.2,1)] sm:data-[expanded=false]:grid-cols-[1fr_0fr]"
           >
-            <div className="min-h-0 overflow-hidden">
-              <pre className="overflow-x-auto border-t border-muted-line/20 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:px-5 sm:text-xs">
-                <code>
-                  {lines.map((spans, index) => (
-                    <span
-                      key={index}
-                      className="relative block min-h-[1em] w-fit whitespace-pre"
-                    >
-                      <span
-                        ref={(element) => {
-                          lineEls.current[index] = element;
-                        }}
-                        className="block"
-                      >
-                        {spans.length ? spans : " "}
-                      </span>
-                      <span
-                        ref={(element) => {
-                          caretEls.current[index] = element;
-                        }}
-                        aria-hidden
-                        className="pointer-events-none absolute top-[0.12em] left-0"
-                        style={{ opacity: 0 }}
-                      >
-                        <span className="caret-blink block h-[0.95em] w-[2px] bg-orange" />
-                      </span>
-                    </span>
-                  ))}
-                </code>
-              </pre>
+            <div className="flex items-center justify-center p-8 lg:p-10">
+              <ProfilePortrait />
+            </div>
+
+            <div
+              id="profile-struct"
+              data-expanded={expanded}
+              className="grid min-w-0 grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out data-[expanded=true]:grid-rows-[1fr] sm:duration-500 sm:ease-[cubic-bezier(.2,.7,.2,1)]"
+            >
+              <div
+                className={cn(
+                  "min-h-0 min-w-0 overflow-hidden transition-opacity duration-200",
+                  expanded ? "opacity-100 delay-300" : "opacity-0 duration-150",
+                )}
+              >
+                <div className="flex h-full flex-col justify-center gap-6 border-t border-muted-line/20 p-6 sm:min-w-[22rem] sm:border-t-0 sm:border-l sm:p-8 lg:p-10">
+                  <div>
+                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-orange">
+                      // about
+                    </p>
+                    <p className="mt-3 max-w-xl text-sm leading-7 text-ink-text/80 sm:text-[0.95rem]">
+                      I'm Caleb Standfield, a University of Utah student
+                      graduating in December 2026. I have worked across backend,
+                      full-stack, systems, and data-focused projects, using
+                      languages and tools that fit the problem. I recently
+                      completed an internship at <Highlight>Adobe</Highlight>.
+                    </p>
+                  </div>
+
+                  <pre className="overflow-x-auto rounded-xl border border-muted-line/20 bg-ink/60 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:text-xs">
+                    <code>
+                      {lines.map((spans, index) => (
+                        <span
+                          key={index}
+                          className="relative block min-h-[1em] w-fit whitespace-pre"
+                        >
+                          <span
+                            ref={(element) => {
+                              lineEls.current[index] = element;
+                            }}
+                            className="block"
+                          >
+                            {spans.length ? spans : " "}
+                          </span>
+                          <span
+                            ref={(element) => {
+                              caretEls.current[index] = element;
+                            }}
+                            aria-hidden
+                            className="pointer-events-none absolute top-[0.12em] left-0"
+                            style={{ opacity: 0 }}
+                          >
+                            <span className="caret-blink block h-[0.95em] w-[2px] bg-orange" />
+                          </span>
+                        </span>
+                      ))}
+                    </code>
+                  </pre>
+                </div>
+              </div>
             </div>
           </div>
         </motion.article>
