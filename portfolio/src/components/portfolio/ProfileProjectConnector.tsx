@@ -278,7 +278,7 @@ export function ProfileProjectConnector() {
           orient="auto"
           markerUnits="userSpaceOnUse"
         >
-          <path d="M 0.5 0.75 L 7.5 4 L 0.5 7.25 Z" fill={LINE_COLOR} />
+          <path d="M 0.5 0.75 L 7.5 4 L 0.5 7.25 Z" style={{ fill: LINE_COLOR }} />
         </marker>
       </defs>
 
@@ -291,7 +291,7 @@ export function ProfileProjectConnector() {
           data-profile-project-route={route.id}
           d={route.d}
           fill="none"
-          stroke={LINE_COLOR}
+          style={{ stroke: LINE_COLOR }}
           strokeWidth="1.35"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -312,12 +312,14 @@ export function ProfileProjectConnector() {
           }}
           data-profile-project-pulse={routes[pulse.routeIndex]?.id}
           r="3.2"
-          fill={LINE_COLOR}
-          stroke={LINE_COLOR}
           strokeOpacity="0.2"
           strokeWidth="6"
           opacity="0"
-          style={{ filter: `drop-shadow(0 0 7px ${LINE_COLOR})` }}
+          style={{
+            fill: LINE_COLOR,
+            stroke: LINE_COLOR,
+            filter: `drop-shadow(0 0 7px ${LINE_COLOR})`,
+          }}
         />
       ))}
     </svg>

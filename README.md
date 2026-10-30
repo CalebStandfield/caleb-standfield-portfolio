@@ -14,16 +14,21 @@ caleb-standfield-portfolio/   <- git root (this folder)
     ├── src/
     │   ├── main.tsx          <- app entry, mounts <App /> into #root
     │   ├── App.tsx           <- root component
-    │   ├── index.css         <- Tailwind + theme tokens
+    │   ├── index.css         <- Tailwind + day/night theme tokens
     │   ├── content/          <- profile, projects, resume, contact data
     │   ├── components/portfolio/ <- page sections + system rail
     │   ├── components/ui/     <- shadcn components
-    │   └── lib/utils.ts       <- cn() helper
+    │   └── lib/               <- cn(), image, color, and theme helpers
     ├── plugins/agent-files/  <- builds llms.txt, robots.txt, sitemap.xml
     ├── public/               <- static assets (images, resume PDF)
     ├── vite.config.ts
     └── package.json
 ```
+
+Colors come from theme tokens in `src/index.css`. Night is the default; the
+nav toggle switches `<html data-theme>` to `light` and saves the choice, and an
+inline script in `index.html` applies it before first paint. Orange and the
+Adobe red are shared by both themes; everything else has a light value.
 
 Because the app is nested one level down, **all `npm` commands must be run from
 inside `portfolio/`**, not from the repository root.

@@ -45,6 +45,16 @@ Do not bring in new dependencies without explicit permission.
   `ResponsiveImage` (`src/components/portfolio/ResponsiveImage.tsx`) using the
   original path; helpers are in `src/lib/images.ts`. Outputs are committed, the
   script never runs on Vercel. Rerun it after adding or changing an image.
+- Theme: day/night via `<html data-theme="dark|light">`, night default.
+  Palette values live in the `:root` / `:root[data-theme="light"]` blocks of
+  `src/index.css` and are exposed as Tailwind colors (`ink`, `surface`,
+  `panel`, `page`, `ink-text`, `muted-line`, `grain`, accents). Orange, red,
+  and `on-orange` are fixed. Never hardcode hex in components; use a token, or
+  `var(--color-x)` plus `withAlpha` (`src/lib/color.ts`) for inline styles and
+  SVG (set SVG fill/stroke through `style`, not attributes). `src/lib/theme.ts`
+  owns read/apply/persist and `useTheme`; `index.html` has a pre-paint script
+  that reads the same `theme` localStorage key. The shadcn `.dark` class is not
+  used.
 - Render perf: fast-changing state stays in leaves. `PortfolioContent` in
   `App.tsx` is memo'd so stage changes skip the content column; rail pulses
   live in `RailPulses`; measure callbacks use `keepIfSame` (`sameLayout.ts`) so

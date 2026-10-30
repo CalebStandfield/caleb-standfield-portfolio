@@ -8,7 +8,7 @@
 
 html {
   scroll-behavior: smooth;
-  background: #0A0A0C;
+  background: var(--page);
 }
 
 @theme inline {
@@ -16,19 +16,27 @@ html {
   --font-sans: 'Geist Variable', sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Ayu-dark hero palette (fixed dark surface, syntax-role accents) */
-  --color-ink: #0B0E14;
-  --color-surface: #11151C;
-  --color-ink-text: #BFBDB6;
-  --color-muted-line: #565B66;
+  /* Site palette. Values live in the [data-theme] blocks below; orange and
+     the Adobe red are the same in both themes. */
+  --color-page: var(--page);
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-ink-text: var(--ink-text);
+  --color-muted-line: var(--muted-line);
+  --color-grain: var(--grain);
   --color-orange: #FF8F40;
-  --color-amber: #E6B450;
-  --color-yellow: #F8D050;
-  --color-green: #AAD94C;
-  --color-emerald: #86D96C;
-  --color-cyan: #95E6CB;
-  --color-blue: #59C2FF;
+  --color-on-orange: #0B0E14;
+  --color-amber: var(--amber);
+  --color-yellow: var(--yellow);
+  --color-green: var(--green);
+  --color-emerald: var(--emerald);
+  --color-cyan: var(--cyan);
+  --color-blue: var(--blue);
+  --color-violet: var(--violet);
   --color-red: #FA0F00;
+  --color-syntax-func: var(--syntax-func);
+  --color-syntax-punct: var(--syntax-punct);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -136,6 +144,48 @@ html {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Night (default): Ayu-dark surfaces with syntax-role accents. */
+:root {
+  color-scheme: dark;
+  --page: #0A0A0C;
+  --ink: #0B0E14;
+  --surface: #11151C;
+  --panel: #0E1116;
+  --ink-text: #BFBDB6;
+  --muted-line: #565B66;
+  --grain: #967C60;
+  --amber: #E6B450;
+  --yellow: #F8D050;
+  --green: #AAD94C;
+  --emerald: #86D96C;
+  --cyan: #95E6CB;
+  --blue: #59C2FF;
+  --violet: #B79CFF;
+  --syntax-func: #D7D3CC;
+  --syntax-punct: #736F6A;
+}
+
+/* Day: warm paper, dark ink, accents darkened to read on a light page. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page: #F2ECE2;
+  --ink: #F7F2EA;
+  --surface: #FFFDF8;
+  --panel: #FFFDF8;
+  --ink-text: #2A2723;
+  --muted-line: #716A60;
+  --grain: #9C8A74;
+  --amber: #B7791F;
+  --yellow: #A67C00;
+  --green: #5E8C00;
+  --emerald: #3D8F2E;
+  --cyan: #23907A;
+  --blue: #2878C8;
+  --violet: #7B5CC4;
+  --syntax-func: #3B3732;
+  --syntax-punct: #8A8279;
 }
 
 @layer base {

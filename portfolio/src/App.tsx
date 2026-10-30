@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { GithubLogo, LinkedinLogo } from "@phosphor-icons/react";
+import { GithubLogo, LinkedinLogo, Moon, Sun } from "@phosphor-icons/react";
 
 import { ContactSection } from "@/components/portfolio/ContactSection";
 import { ProfileHero } from "@/components/portfolio/ProfileHero";
@@ -17,6 +17,8 @@ import {
   smoothScrollToY,
 } from "@/components/portfolio/scrollUtils";
 import type { PortfolioStage } from "@/components/portfolio/portfolio.types";
+import { withAlpha } from "@/lib/color";
+import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -49,8 +51,7 @@ export default function App() {
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 opacity-55"
         style={{
-          backgroundImage:
-            "radial-gradient(rgba(150,124,96,0.42) 1px, transparent 1px)",
+          backgroundImage: `radial-gradient(${withAlpha("var(--color-grain)", 42)} 1px, transparent 1px)`,
           backgroundSize: "24px 24px",
           maskImage:
             "radial-gradient(ellipse 90% 80% at 45% 32%, #000 55%, transparent 100%)",
@@ -138,9 +139,27 @@ function Navigation({ activeStage }: { activeStage: PortfolioStage }) {
                 <Icon size={22} weight="fill" />
               </a>
             ))}
+            <ThemeToggle />
           </div>
         </div>
       </div>
     </nav>
+  );
+}
+
+function ThemeToggle() {
+  const [theme, toggle] = useTheme();
+  const next = theme === "dark" ? "day" : "night";
+  const Icon = theme === "dark" ? Sun : Moon;
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={`Switch to ${next} mode`}
+      title={`Switch to ${next} mode`}
+      className="text-muted-line transition-colors hover:text-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+    >
+      <Icon size={22} weight="fill" />
+    </button>
   );
 }

@@ -21,6 +21,7 @@ import {
   type Rect,
   type Side,
 } from "@/components/hero/connectors";
+import { withAlpha } from "@/lib/color";
 import { cn } from "@/lib/utils";
 import {
   edgeColors,
@@ -144,17 +145,17 @@ function sceneColor(scene: SystemScene): string {
 function nodeBorder(kind: SystemNodeData["kind"]): string {
   switch (kind) {
     case "data":
-      return "rgba(89, 194, 255, 0.38)";
+      return withAlpha(edgeColors.data, 38);
     case "async":
-      return "rgba(230, 180, 80, 0.38)";
+      return withAlpha(edgeColors.async, 38);
     case "delivery":
-      return "rgba(183, 156, 255, 0.38)";
+      return withAlpha(edgeColors.delivery, 38);
     case "ops":
-      return "rgba(149, 230, 203, 0.36)";
+      return withAlpha(edgeColors.telemetry, 36);
     case "security":
-      return "rgba(170, 217, 76, 0.36)";
+      return withAlpha(edgeColors.control, 36);
     default:
-      return "rgba(255, 143, 64, 0.34)";
+      return withAlpha(edgeColors.request, 34);
   }
 }
 
@@ -616,7 +617,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
       aria-label="Interactive profile-platform reference architecture"
       className="relative min-w-0 self-stretch border-x border-muted-line/[0.06] bg-surface/[0.035]"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(255,143,64,0.045),transparent_18%),radial-gradient(circle_at_50%_46%,rgba(89,194,255,0.035),transparent_22%),radial-gradient(circle_at_50%_76%,rgba(183,156,255,0.04),transparent_22%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,color-mix(in_srgb,var(--color-orange)_4.5%,transparent),transparent_18%),radial-gradient(circle_at_50%_46%,color-mix(in_srgb,var(--color-blue)_3.5%,transparent),transparent_22%),radial-gradient(circle_at_50%_76%,color-mix(in_srgb,var(--color-violet)_4%,transparent),transparent_22%)]" />
 
       <svg
         className="pointer-events-none absolute inset-0 z-[3] size-full overflow-visible"
@@ -635,7 +636,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
               orient="auto-start-reverse"
               markerUnits="userSpaceOnUse"
             >
-              <path d="M 0 1 L 6 3.5 L 0 6 Z" fill={color} />
+              <path d="M 0 1 L 6 3.5 L 0 6 Z" style={{ fill: color }} />
             </marker>
           ))}
         </defs>
@@ -654,7 +655,7 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
               }}
               d={segment.d}
               fill="none"
-              stroke={segment.color}
+              style={{ stroke: segment.color }}
               strokeWidth={active ? 1.35 : 0.9}
               strokeDasharray={
                 segment.edge.kind === "async"
@@ -700,15 +701,14 @@ export function SystemRail({ stage }: { stage: PortfolioStage }) {
                 width={segment.labelWidth}
                 height={LABEL_HEIGHT}
                 rx={LABEL_HEIGHT / 2}
-                fill="#0A0A0C"
                 fillOpacity="0.96"
-                stroke={segment.color}
                 strokeOpacity="0.34"
+                style={{ fill: "var(--color-page)", stroke: segment.color }}
               />
               <text
                 x="0"
                 y="3"
-                fill={segment.color}
+                style={{ fill: segment.color }}
                 className="font-mono text-[8px] tracking-[0.05em]"
                 textAnchor="middle"
               >
@@ -892,12 +892,14 @@ const RailPulses = memo(function RailPulses({
               else pulseEls.current.delete(pulse.id);
             }}
             r={3.4}
-            fill={color}
-            stroke={color}
             strokeOpacity={0.2}
             strokeWidth={6}
             opacity={0}
-            style={{ filter: `drop-shadow(0 0 7px ${color})` }}
+            style={{
+              fill: color,
+              stroke: color,
+              filter: `drop-shadow(0 0 7px ${color})`,
+            }}
           />
         );
       })}
@@ -926,11 +928,11 @@ const SystemCluster = memo(function SystemCluster({
     <motion.section
       data-system-cluster={cluster.id}
       aria-label={cluster.title}
-      className="absolute z-[2] rounded-[1.2rem] border border-muted-line/14 bg-[#0B0E12]/60 p-3 shadow-[0_24px_70px_-52px_#000] backdrop-blur-[2px] xl:p-4"
+      className="absolute z-[2] rounded-[1.2rem] border border-muted-line/14 bg-ink/60 p-3 shadow-[0_24px_70px_-52px_#000] backdrop-blur-[2px] xl:p-4"
       style={{
         ...alignedStyle(cluster.width, cluster.align),
         top,
-        borderColor: active ? `${sceneColor(cluster.scene)}3D` : undefined,
+        borderColor: active ? withAlpha(sceneColor(cluster.scene), 24) : undefined,
       }}
       initial={false}
       animate={{ opacity: active ? 1 : 0.72 }}
@@ -1019,9 +1021,11 @@ const SystemNode = memo(function SystemNode({
     <div
       ref={registerRef}
       data-system-node={node.id}
-      className="relative min-w-0 overflow-hidden rounded-[0.7rem] border bg-[#0E1116] shadow-[0_14px_34px_-28px_#000]"
+      className="relative min-w-0 overflow-hidden rounded-[0.7rem] border bg-panel shadow-[0_14px_34px_-28px_#000]"
       style={{
-        borderColor: active ? nodeBorder(node.kind) : "rgba(150, 124, 96, 0.16)",
+        borderColor: active
+          ? nodeBorder(node.kind)
+          : withAlpha("var(--color-grain)", 16),
       }}
     >
       <button
@@ -1065,7 +1069,7 @@ const SystemNode = memo(function SystemNode({
             <span className="font-mono text-[0.47rem] uppercase tracking-[0.13em] text-muted-line/70">
               {node.language}
             </span>
-            <span className="size-1 rounded-full bg-green shadow-[0_0_6px_#AAD94C]" />
+            <span className="size-1 rounded-full bg-green shadow-[0_0_6px_var(--color-green)]" />
           </div>
           <pre className="overflow-hidden px-2 pt-1 pb-2 font-mono text-[clamp(0.5rem,0.56vw,0.6rem)] leading-[1.45] xl:px-2.5">
             <code>

@@ -23,14 +23,10 @@ const lines = highlightLines(code, "rust");
 // portrait source, cropped to a circle
 const PORTRAIT_SRC = "/pfp.jpg";
 
-// circular housing: a tick-mark dial, an orange ring, a dark gap, then the photo
+// circular housing: an orange ring, a gap, then the photo
 function ProfilePortrait() {
   return (
-    <div className="relative size-56 shrink-0 sm:size-60 lg:size-64 xl:size-80">
-      <div
-        aria-hidden
-        className="absolute -inset-3 rounded-full bg-[repeating-conic-gradient(var(--color-orange)_0_1deg,transparent_1deg_6deg)] opacity-40 [mask:radial-gradient(closest-side,transparent_calc(100%-7px),#000_calc(100%-6px))]"
-      />
+    <div className="size-56 shrink-0 sm:size-60 lg:size-64 xl:size-80">
       <div className="size-full rounded-full border border-orange/50 p-2 shadow-[0_0_60px_-14px_var(--color-orange)]">
         <div className="size-full overflow-hidden rounded-full border border-muted-line/30 bg-surface">
           <ResponsiveImage
@@ -77,7 +73,7 @@ export function ProfileHero() {
         <div className="mt-8 flex flex-wrap gap-3">
           <a
             href="#projects"
-            className="inline-flex h-11 items-center gap-2 rounded-lg bg-orange px-5 font-mono text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+            className="inline-flex h-11 items-center gap-2 rounded-lg bg-orange px-5 font-mono text-sm font-semibold text-on-orange transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
           >
             View projects
             <ArrowDown size={17} weight="bold" />
@@ -98,7 +94,7 @@ export function ProfileHero() {
         data-profile-project-expanded={expanded}
       >
         <motion.article
-          className="overflow-hidden rounded-2xl border border-orange/45 bg-[#0E1116] shadow-[0_30px_80px_-44px_#000]"
+          className="overflow-hidden rounded-2xl border border-orange/45 bg-panel shadow-[0_30px_80px_-44px_#000]"
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: reduceMotion ? 0 : 0.16 }}

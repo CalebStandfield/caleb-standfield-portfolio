@@ -21,16 +21,17 @@ interface Token {
 }
 
 // Warm, orange-forward palette. Keeps the whole thing 2-tone like the reference.
+// Theme variables, so the snippets follow day/night.
 const COLOR: Record<TokenKind, string> = {
-  comment: "#565B66",
-  keyword: "#FF8F40",
-  string: "#E6B450",
-  number: "#E6B450",
-  type: "#E6B450",
-  attr: "#FF8F40",
-  func: "#D7D3CC",
-  plain: "#BFBDB6",
-  punct: "#736F6A",
+  comment: "var(--color-muted-line)",
+  keyword: "var(--color-orange)",
+  string: "var(--color-amber)",
+  number: "var(--color-amber)",
+  type: "var(--color-amber)",
+  attr: "var(--color-orange)",
+  func: "var(--color-syntax-func)",
+  plain: "var(--color-ink-text)",
+  punct: "var(--color-syntax-punct)",
 };
 
 const KEYWORDS: Record<Lang, Set<string>> = {

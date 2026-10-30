@@ -88,7 +88,7 @@ export function ResumeSection() {
           href={site.resumeUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-11 items-center gap-2 rounded-lg bg-orange px-5 font-mono text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
+          className="inline-flex h-11 items-center gap-2 rounded-lg bg-orange px-5 font-mono text-sm font-semibold text-on-orange transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
         >
           <FilePdf size={17} weight="bold" />
           View PDF

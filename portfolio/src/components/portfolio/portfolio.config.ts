@@ -43,12 +43,12 @@ export const stageScene: Record<PortfolioStage, SystemScene> = {
 };
 
 export const edgeColors: Record<SystemEdgeKind, string> = {
-  request: "#FF8F40",
-  data: "#59C2FF",
-  async: "#E6B450",
-  delivery: "#B79CFF",
-  telemetry: "#95E6CB",
-  control: "#AAD94C",
+  request: "var(--color-orange)",
+  data: "var(--color-blue)",
+  async: "var(--color-amber)",
+  delivery: "var(--color-violet)",
+  telemetry: "var(--color-cyan)",
+  control: "var(--color-green)",
 };
 
 export const systemClusters: SystemClusterData[] = [
