@@ -481,8 +481,8 @@ export const imageManifest: Record<string, ImageEntry> = {
     ]
   },
   "/pfp.jpg": {
-    "width": 5914,
-    "height": 4194,
+    "width": 1097,
+    "height": 1434,
     "variants": [
       {
         "url": "/img/pfp-480.webp",
@@ -493,12 +493,8 @@ export const imageManifest: Record<string, ImageEntry> = {
         "width": 960
       },
       {
-        "url": "/img/pfp-1200.webp",
-        "width": 1200
-      },
-      {
-        "url": "/img/pfp-1600.webp",
-        "width": 1600
+        "url": "/img/pfp-1097.webp",
+        "width": 1097
       }
     ]
   },

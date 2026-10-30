@@ -20,7 +20,7 @@ const code = `struct Profile {
 // the snippet is fixed, so tokenize once at load instead of every render
 const lines = highlightLines(code, "rust");
 
-// square source, cropped to a circle; swap the path when the new photo lands
+// portrait source, cropped to a circle
 const PORTRAIT_SRC = "/pfp.jpg";
 
 // circular housing: a tick-mark dial, an orange ring, a dark gap, then the photo
@@ -117,7 +117,7 @@ export function ProfileHero() {
               onClick={toggle}
               aria-expanded={open}
               aria-controls="profile-struct"
-              aria-label={open ? "Collapse about panel" : "Expand about panel"}
+              aria-label={open ? "Collapse profile struct" : "Expand profile struct"}
               className="flex size-7 shrink-0 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange"
             >
               <motion.span
@@ -137,45 +137,39 @@ export function ProfileHero() {
             </button>
           </header>
 
-          {/* the panel folds by rows everywhere; on sm+ its column also folds
-              to 0fr and the portrait column takes the space, so the photo
-              glides to center. min-w on the panel stops text rewrapping (and
-              growing taller) while it narrows. */}
-          <div
-            data-expanded={expanded}
-            className="flex flex-col sm:grid sm:grid-cols-[0fr_1fr] sm:transition-[grid-template-columns] sm:duration-500 sm:ease-[cubic-bezier(.2,.7,.2,1)] sm:data-[expanded=false]:grid-cols-[1fr_0fr]"
-          >
+          {/* portrait and the about column sit side by side on sm+. only the
+              struct folds; as it closes the row shrinks toward the about text
+              and items-center keeps the photo level with it. */}
+          <div className="flex flex-col sm:grid sm:grid-cols-[auto_1fr] sm:items-center">
             <div className="flex items-center justify-center p-8 lg:p-10">
               <ProfilePortrait />
             </div>
 
-            <div
-              id="profile-struct"
-              data-expanded={expanded}
-              className="grid min-w-0 grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out data-[expanded=true]:grid-rows-[1fr] sm:duration-500 sm:ease-[cubic-bezier(.2,.7,.2,1)]"
-            >
-              <div
-                className={cn(
-                  "min-h-0 min-w-0 overflow-hidden transition-opacity duration-200",
-                  expanded ? "opacity-100 delay-300" : "opacity-0 duration-150",
-                )}
-              >
-                <div className="flex h-full flex-col justify-center gap-6 border-t border-muted-line/20 p-6 sm:min-w-[22rem] sm:border-t-0 sm:border-l sm:p-8 lg:p-10">
-                  <div>
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-orange">
-                      // about
-                    </p>
-                    <p className="mt-3 max-w-xl text-sm leading-7 text-ink-text/80 sm:text-[0.95rem]">
-                      I'm Caleb Standfield, a new grad software engineer
-                      finishing CS at the University of Utah in December 2026,
-                      with a Japanese minor and a Data Science Certificate. I
-                      work full stack, from the database to the UI. As an intern
-                      at <Highlight>Adobe</Highlight> I built an LLM code
-                      migration pipeline and the review UI around it.
-                    </p>
-                  </div>
+            <div className="flex min-w-0 flex-col justify-center border-t border-muted-line/20 p-6 sm:self-stretch sm:border-t-0 sm:border-l sm:p-8 lg:p-10">
+              <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-orange">
+                // about
+              </p>
+              <p className="mt-3 max-w-xl text-sm leading-7 text-ink-text/80 sm:text-[0.95rem]">
+                I'm Caleb Standfield, a new grad software engineer finishing CS
+                at the University of Utah in December 2026, with a Japanese
+                minor and a Data Science Certificate. I work full stack, from
+                the database to the UI. As an intern at{" "}
+                <Highlight>Adobe</Highlight> I built an LLM code migration
+                pipeline and the review UI around it.
+              </p>
 
-                  <pre className="overflow-x-auto rounded-xl border border-muted-line/20 bg-ink/60 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:text-xs">
+              <div
+                id="profile-struct"
+                data-expanded={expanded}
+                className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out data-[expanded=true]:grid-rows-[1fr] sm:duration-500 sm:ease-[cubic-bezier(.2,.7,.2,1)]"
+              >
+                <div
+                  className={cn(
+                    "min-h-0 min-w-0 overflow-hidden transition-opacity duration-200",
+                    expanded ? "opacity-100 delay-300" : "opacity-0 duration-150",
+                  )}
+                >
+                  <pre className="mt-6 overflow-x-auto rounded-xl border border-muted-line/20 bg-ink/60 px-4 py-4 font-mono text-[0.7rem] leading-relaxed sm:text-xs">
                     <code>
                       {lines.map((spans, index) => (
                         <span
