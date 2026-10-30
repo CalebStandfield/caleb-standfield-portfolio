@@ -146,9 +146,10 @@ export function ProfileHero() {
                 // about
               </p>
               <p className="mt-3 max-w-xl text-sm leading-7 text-ink-text/80 sm:text-[0.95rem]">
-                I'm Caleb Standfield, a new grad software engineer finishing CS
-                at the University of Utah in December 2026, with a Japanese
-                minor and a Data Science Certificate. I work full stack, from
+                I'm Caleb Standfield, a new grad software engineer finishing my
+                Computer Science degree at the University of Utah in December
+                2026, with a Japanese minor and a Data Science Certificate. I
+                work full stack, from
                 the database to the UI. As an intern at{" "}
                 <Highlight>Adobe</Highlight> I built an LLM code migration
                 pipeline and the review UI around it.
