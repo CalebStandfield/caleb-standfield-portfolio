@@ -76,3 +76,12 @@ output directory resolve correctly.
 - **No AI references in `README.md`** — keep all mention of Claude, AI, or agent
   tooling out of the README. It belongs only here.
 - Stop killing the dev server if your change doesn't require a hard restart.
+
+## Copy reviewers
+
+`.claude/agents/review-*.md` are Sonnet reviewer personas (engineer, hiring
+manager, recruiter, Japanese reader, founder) for wording on the site and
+LinkedIn. All share `.claude/reviewers/RUBRIC.md` for input and output format.
+Run them in parallel on a brief (surface, limits, goal, labeled candidates),
+aggregate rankings, rewrite, repeat. Add a persona by dropping in another
+`review-<name>.md` that points at the rubric.
