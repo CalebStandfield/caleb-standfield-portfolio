@@ -3,7 +3,6 @@ import { GithubLogo, LinkedinLogo, Moon, Sun } from "@phosphor-icons/react";
 
 import { ContactSection } from "@/components/portfolio/ContactSection";
 import { ProfileHero } from "@/components/portfolio/ProfileHero";
-import { ProfileProjectConnector } from "@/components/portfolio/ProfileProjectConnector";
 import { ProjectSlots } from "@/components/portfolio/ProjectSlots";
 import { ResumeSection } from "@/components/portfolio/ResumeSection";
 import { SystemRail } from "@/components/portfolio/SystemRail";
@@ -76,7 +75,6 @@ export default function App() {
 const PortfolioContent = memo(function PortfolioContent() {
   return (
     <div className="relative min-w-0" data-portfolio-content>
-      <ProfileProjectConnector />
       <ProfileHero />
       <ProjectSlots />
       <ResumeSection />
