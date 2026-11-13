@@ -81,7 +81,7 @@ export const systemClusters: SystemClusterData[] = [
     offset: 20,
     width: 92,
     align: "center",
-    rowGap: 150,
+    rowGap: 56,
     placements: [
       { nodeId: "profile_service", row: 1, column: 1, span: 3 },
       { nodeId: "project_service", row: 1, column: 4, span: 3 },
@@ -129,7 +129,7 @@ export const systemStandalones: SystemStandaloneData[] = [
     nodeId: "object_store",
     scene: "application",
     stage: "projects",
-    offset: 1535,
+    offset: 1104,
     width: 52,
     align: "end",
     eyebrow: "durable media",
