@@ -88,11 +88,7 @@ export function ProfileHero() {
         </div>
       </motion.div>
 
-      <div
-        className="mt-12"
-        data-profile-project-source
-        data-profile-project-expanded={expanded}
-      >
+      <div className="mt-12">
         <motion.article
           className="overflow-hidden rounded-2xl border border-orange/45 bg-panel shadow-[0_30px_80px_-44px_#000]"
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}

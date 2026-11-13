@@ -45,6 +45,19 @@ Do not bring in new dependencies without explicit permission.
   `ResponsiveImage` (`src/components/portfolio/ResponsiveImage.tsx`) using the
   original path; helpers are in `src/lib/images.ts`. Outputs are committed, the
   script never runs on Vercel. Rerun it after adding or changing an image.
+- Projects: `src/components/portfolio/projects/`. `ProjectWheel` is a generic
+  circular wheel (front card + peeking neighbors, spun by horizontal scroll,
+  touch swipe, arrows, keys, neighbor click); input and position live in
+  `useWheel`. Cards sit on a 3D circle: `STEP`, `RADIUS`, `SHADE` are at the
+  top of `ProjectWheel.tsx`; card width per breakpoint is `--card-w` on the
+  stage. All cards share one grid cell, so wheel height = tallest
+  card and spinning never moves the page. Each project's `media` is a list of
+  slides (`image`, `images` side by side, or `video` with optional `poster`).
+  Add a video by dropping the mp4 in `public/<project>/` and adding a `video`
+  slide; it plays only on the front card when on screen. Media frame height is
+  the `--media-h` var on `ProjectCard`. The rail's `application` cluster
+  `rowGap` and `object_store` offset in `portfolio.config.ts` are tuned to this
+  section's height; retune if the card gets much taller or shorter.
 - Theme: day/night via `<html data-theme="dark|light">`, night default.
   Palette values live in the `:root` / `:root[data-theme="light"]` blocks of
   `src/index.css` and are exposed as Tailwind colors (`ink`, `surface`,

@@ -89,15 +89,17 @@ and recovery move through the system. The delivery and operations scene keeps
 that story focused with seven core components. Narrower screens use the same
 content without mounting the diagram.
 
-A separate measured connector bundle links the profile card to each project at
-every viewport width. Its parallel left-gutter lanes compress on narrow screens
-without moving the content, and periodic traffic pulses reuse the visual
-language of the reference architecture.
+Projects show on a wheel: one project large in front, the next ones peeking at
+the sides. Horizontal scroll, swipe, the arrows, or the arrow keys spin it, and
+a counter shows the position. Each project's media is a list of slides, where a
+slide is one image, a few images side by side, or a video. Videos play only on
+the front card while it is on screen.
 
 Profile, project, resume, and contact data live in
 `portfolio/src/content/profile.content.ts`. System-rail content is configured in
-`portfolio/src/components/portfolio/portfolio.config.ts`. Static project images,
-the downloadable resume, and the social preview live in `portfolio/public/`.
+`portfolio/src/components/portfolio/portfolio.config.ts`. Static project images
+and videos, the downloadable resume, and the social preview live in
+`portfolio/public/`.
 
 After adding or changing an image in `public/`, run `npm run images`. It writes
 WebP copies at 480/960/1200/1600px wide to `public/img/` plus a manifest
