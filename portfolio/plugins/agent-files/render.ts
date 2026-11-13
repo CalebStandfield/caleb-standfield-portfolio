@@ -54,6 +54,7 @@ function renderExperience(job: ExperienceData): string {
 function renderProject(project: ProjectData): string {
   const lines = [`### ${project.title} (${statusLabel[project.status]})`, ""];
   if (project.summary) lines.push(project.summary, "");
+  for (const paragraph of project.details ?? []) lines.push(paragraph, "");
   lines.push(`Tech: ${project.tags.join(", ")}`);
   if (project.repositoryUrl) lines.push(`Source: ${project.repositoryUrl}`);
   if (project.demoUrl) lines.push(`Demo: ${project.demoUrl}`);

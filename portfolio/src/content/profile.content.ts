@@ -4,15 +4,25 @@
 
 export type ProjectStatus = "complete" | "in_progress";
 
+// One carousel slide. `images` shows its srcs side by side (phone shots).
+// Videos and posters live in public/ like images; run `npm run images` after
+// adding a poster so it gets WebP variants.
+export type ProjectMedia =
+  | { type: "image"; src: string }
+  | { type: "images"; srcs: string[] }
+  | { type: "video"; src: string; poster?: string };
+
 export interface ProjectData {
   id: string;
   status: ProjectStatus;
   title: string;
+  /** Short blurb. Leads the card and llms.txt. */
   summary?: string;
+  /** Longer paragraphs shown under the summary on the card. */
+  details?: string[];
   tags: string[];
-  images: string[];
-  /** Images shown together per carousel slide, e.g. 3 for phone shots. Default 1. */
-  imagesPerSlide?: number;
+  /** One entry per slide, in order. */
+  media: ProjectMedia[];
   repositoryUrl?: string;
   demoUrl?: string;
 }
@@ -76,21 +86,40 @@ export const projectSlots: ProjectData[] = [
       "System Architecture",
       "Caching",
     ],
-    images: [
-      "/cadenza/library_left.jpg",
-      "/cadenza/account_middle.jpg",
-      "/cadenza/search_right.jpg",
-      "/cadenza/media_left.jpg",
-      "/cadenza/media_middle.jpg",
-      "/cadenza/media_right.jpg",
-      "/cadenza/query_left.jpg",
-      "/cadenza/query_middle.jpg",
-      "/cadenza/query_right.jpg",
-      "/cadenza/analytics_left.jpg",
-      "/cadenza/analytics_middle.jpg",
-      "/cadenza/analytics_right.jpg",
+    media: [
+      {
+        type: "images",
+        srcs: [
+          "/cadenza/library_left.jpg",
+          "/cadenza/account_middle.jpg",
+          "/cadenza/search_right.jpg",
+        ],
+      },
+      {
+        type: "images",
+        srcs: [
+          "/cadenza/media_left.jpg",
+          "/cadenza/media_middle.jpg",
+          "/cadenza/media_right.jpg",
+        ],
+      },
+      {
+        type: "images",
+        srcs: [
+          "/cadenza/query_left.jpg",
+          "/cadenza/query_middle.jpg",
+          "/cadenza/query_right.jpg",
+        ],
+      },
+      {
+        type: "images",
+        srcs: [
+          "/cadenza/analytics_left.jpg",
+          "/cadenza/analytics_middle.jpg",
+          "/cadenza/analytics_right.jpg",
+        ],
+      },
     ],
-    imagesPerSlide: 3,
   },
   {
     id: "web-server",
@@ -106,7 +135,7 @@ export const projectSlots: ProjectData[] = [
       "HTTP",
       "Performance",
     ],
-    images: ["/web-server/load-test.png"],
+    media: [{ type: "image", src: "/web-server/load-test.png" }],
     repositoryUrl: "https://github.com/CalebStandfield/custom-http",
   },
   {
@@ -124,13 +153,13 @@ export const projectSlots: ProjectData[] = [
       "Game AI",
       "Scrum",
     ],
-    images: [
-      "/blackjack/blackjack_main.png",
-      "/blackjack/blackjack_bet.png",
-      "/blackjack/blackjack_playing.png",
-      "/blackjack/blackjack_blackjack.png",
-      "/blackjack/blackjack_won.png",
-      "/blackjack/blackjack_lost.png",
+    media: [
+      { type: "image", src: "/blackjack/blackjack_main.png" },
+      { type: "image", src: "/blackjack/blackjack_bet.png" },
+      { type: "image", src: "/blackjack/blackjack_playing.png" },
+      { type: "image", src: "/blackjack/blackjack_blackjack.png" },
+      { type: "image", src: "/blackjack/blackjack_won.png" },
+      { type: "image", src: "/blackjack/blackjack_lost.png" },
     ],
     // Placeholders. Drop either field to hide that button.
     repositoryUrl:
@@ -150,11 +179,11 @@ export const projectSlots: ProjectData[] = [
       "Gamification",
       "UX Design",
     ],
-    images: [
-      "/learn-vim/learn-vim-home.png",
-      "/learn-vim/learn-vim-level-select.png",
-      "/learn-vim/learn-vim-arena.png",
-      "/learn-vim/learn-vim-solved.png",
+    media: [
+      { type: "image", src: "/learn-vim/learn-vim-home.png" },
+      { type: "image", src: "/learn-vim/learn-vim-level-select.png" },
+      { type: "image", src: "/learn-vim/learn-vim-arena.png" },
+      { type: "image", src: "/learn-vim/learn-vim-solved.png" },
     ],
     // Placeholders. Drop either field to hide that button.
     demoUrl: "https://learn-vim-ruddy.vercel.app/",
